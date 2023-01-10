@@ -1,0 +1,187 @@
+.form {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.form__wrapper {
+  width: 900px;
+  max-width: 900px;
+  min-width: 900px;
+  padding-bottom: 0;
+  border-radius: 4px;
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto;
+}
+.form-icon {
+  right: 24px;
+  top: 20px;
+  position: absolute;
+  column-gap: 8px;
+}
+/* header */
+.form__title {
+  margin: 0;
+}
+.form__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 0;
+}
+.form__header,
+.form__content {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  justify-content: space-between;
+  column-gap: 24px;
+}
+
+.form__header--left {
+  width: 100%;
+  column-gap: 8px;
+}
+/* form content */
+.form__content {
+  padding: 24px;
+}
+.form__content-top {
+  column-gap: 32px;
+}
+.form__content-bottom {
+  padding-top: 32px;
+}
+
+/* .form-content--left,
+.form-content--right,
+.form__name,
+.form__date-range,
+.form__unit,
+.form__position,
+.form__issued-by,
+#txtDepartmentId {
+  width: 100%;
+} */
+/* form popup*/
+.form__content-bottom,
+.form__footer,
+form {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.form__popup-container {
+  border: 1px solid var(--border-color);
+}
+.form-popup-container-top,
+.form-popup-container-bottom {
+  column-gap: 8px;
+}
+
+/*  */
+.input__form-name,
+.input__form-birth,
+.input__form-email {
+  border: 1px solid var(--border-color);
+}
+label {
+  color: #1f1f1f;
+  font-weight: 600;
+}
+.form__footer {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background-color: #f5f5f5;
+  padding: 12px 24px;
+  justify-content: space-between;
+}
+.form__footer-right {
+  column-gap: 8px;
+}
+/* form add */
+.form__unit,
+.form__address {
+  width: 100%;
+}
+/* form icon */
+.form-icon--help {
+  background-position: -89px -144px;
+}
+.form-icon--close {
+  background-position: -144px -144px;
+  cursor: pointer;
+}
+/* form add employee */
+.form-input-client,
+.form-input-supplier {
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0 8px;
+}
+.input__form-id,
+.input__form-name,
+.input__form-birth {
+  font-family: "Roboto";
+  height: 36px;
+  width: 100%;
+  padding: 8px 8px 8px 12px;
+  outline: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+.form__id,
+.form__name,
+.form__unit,
+.form__email {
+  position: relative;
+}
+.form__email {
+  width: 100%;
+}
+.form-popup-container-top,
+.form-popup-container-bottom {
+  column-gap: 32px;
+}
+.input__form-birth {
+  min-width: 150px;
+}
+.input__form-sex-male,
+.input__form-sex-female {
+  width: 18px;
+  height: 18px;
+}
+.input__form-sex-female {
+  margin-left: 16px;
+}
+.input__form-unit,
+.input__form-position,
+.input__form-issued-by,
+.input__form-address {
+  width: 100%;
+  min-width: 100%;
+}
+.input__form-mbphone-number,
+.input__form-phone-number,
+.input__form-bank-number,
+.input__form-bank-name {
+  min-width: 100% !important;
+}
+
+.form__input-wrapper {
+  width: 50%;
+}
+.tooltip-save {
+  width: 170px;
+}
+.form-content--left,
+.form-content--right {
+  width: 100%;
+}

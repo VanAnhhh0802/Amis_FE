@@ -1,0 +1,183 @@
+.icon {
+  background: url(../../../assets/img/Sprites.64af8f61.svg) no-repeat;
+}
+.sidebar {
+  position: relative;
+  width: 200px;
+  height: 100vh;
+  box-sizing: border-box;
+  background-color: var(--background-menu-color);
+}
+.sidebar__header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: var(--height-header);
+  background-color: var(--background-menu-color);
+  width: 100%;
+  color: var(--sidebar-text-color);
+}
+.sidebar__option {
+  background: url(../../../assets/img/Sprites.64af8f61.svg) no-repeat -424px -89px;
+  width: 24px;
+  height: 24px;
+  margin: 0 16px;
+  cursor: pointer;
+}
+.sidebar__logo-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.sidebar__logo-wrapper > span {
+  margin-left: 8px;
+}
+.sidebar__logo-wrapper {
+  height: 32px;
+  padding: 2px;
+  background-position-y: center;
+  cursor: pointer;
+}
+.sidebar__header > span {
+  margin-left: 8px;
+}
+.sidebar__collapse {
+  position: sticky;
+  bottom: 0;
+  height: 44px;
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+  color: #fff;
+  column-gap: 8px;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-menu-color);
+}
+.sidebar__collapse--click {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+  margin-left: 24px;
+}
+
+/* sidebar */
+/* Menu */
+/* MENU */
+#sidebar-wrapper {
+  width: 100%;
+  height: 100%;
+}
+.menu {
+  width: 100%;
+  height: calc(100% - 56px);
+  overflow-y: auto;
+  background-color: var(--background-menu-color);
+}
+
+.menu-item__link {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  color: var(--sidebar-text-color);
+  text-decoration: none;
+  list-style: none;
+  box-sizing: border-box;
+  margin: 0 12px;
+  border-radius: 4px;
+}
+.menu__item + .menu__item {
+  padding-top: 4px;
+}
+.menu-item__link:hover {
+  background-color: var(--sidebar-hover-color);
+}
+.menu-item__link--active {
+  background-color: var(--sidebar-hover-color);
+}
+.menu-item__title {
+  color: #fff;
+}
+/* Menu */
+.sidebar__dashboard {
+  background-position: -30px -1632px;
+}
+.sidebar__cash {
+  background-position: -73px -1632px;
+}
+.sidebar__bank {
+  background-position: -117px -1632px;
+}
+.sidebar__purchase {
+  background-position: -161px -1632px;
+}
+.sidebar__sale {
+  background-position: -204px -1632px;
+}
+.sidebar__invoice {
+  background-position: -249px -1632px;
+}
+.sidebar__stock {
+  background-position: -291px -1632px;
+}
+.sidebar__tools {
+  background-position: -336px -1632px;
+}
+.sidebar__fixed-assets {
+  background-position: -378px -1632px;
+}
+.sidebar__tax {
+  background-position: -423px -1632px;
+}
+.sidebar__price {
+  background-position: -467px -1632px;
+}
+.sidebar__general {
+  background-position: -510px -1632px;
+}
+.sidebar__budget {
+  background-position: -378px -1659px;
+}
+.sidebar__report {
+  background-position: -547px -1632px;
+}
+.sidebar__finance {
+  background-position: -204px -1664px;
+}
+.sidebar-collapse__icon {
+  background-position: -29px -356px;
+}
+/* table */
+.table-icon--sort {
+  background-position: -1724px -519px;
+}
+.table-icon-filter {
+  background-position: -1600px -88px;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+/* Tool Tip */
+a[data-c-tooltip] {
+}
+a[data-c-tooltip]::after {
+}

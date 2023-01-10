@@ -1,0 +1,39 @@
+/* pagination */
+
+.record-in-page {
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.pagination-icon {
+  background-position: -1120px -357px;
+}
+.page__index {
+  margin: 0 16px;
+}
+.page__prev,
+.page__next {
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.page__next {
+  margin-left: 8px;
+}
+.page__prev {
+  margin-right: 8px;
+}
+.page__next--selected,
+.page__prev--selected {
+  color: #b3b3b3 !important;
+  cursor: pointer;
+}
+.pagination__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.pagination__number--selected {
+  border: 1px solid var(--border-color);
+}

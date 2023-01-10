@@ -1,0 +1,127 @@
+@import url(../assets/Icon/icofont/icofont.min.css);
+
+/*  */
+@import url(./bases/reset.css);
+@import url(./bases/variables.css);
+@import url(./bases/tooltip.css);
+/* Sử dụng chung*/
+
+/* Text */
+.heading {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 26px;
+}
+.title {
+  color: var(--title-color);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+}
+.title--small {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+}
+.caption {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 17px;
+}
+.subheader {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.text-menu {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.m-12 {
+  margin: 0 12px;
+}
+.m-16 {
+  margin: 0 16px;
+}
+.w-h-24 {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+}
+.flex {
+  display: flex;
+  align-items: center;
+}
+.focus {
+  border: var(--main-color);
+}
+.text-align-right {
+  text-align: right;
+}
+.text-align-left {
+  text-align: left;
+}
+.text-align-center {
+  text-align: center;
+}
+.width-table-checkbox {
+  min-width: 50px;
+  width: 50px;
+}
+.w-150 {
+  min-width: 150px !important;
+  width: 150px;
+}
+.w-100 {
+  min-width: 100px;
+  width: 100px;
+}
+.w-200 {
+  min-width: 200px;
+  width: 200px;
+}
+.border-focus {
+  border: 1px solid var(--main-color);
+}
+.bg-white {
+  background-color: #fff;
+}
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.col {
+  width: 50%;
+  column-gap: 8px;
+}
+.col + .col {
+  /* margin-left: 24px; */
+}
+.row ~ .row {
+  margin-top: 24px;
+}
+.gap-32 {
+  column-gap: 32px;
+}
+.col-gap {
+  column-gap: 8px;
+}
+.no-border {
+  border: none;
+}
+.w-full {
+  width: 100%;
+  height: 100%;
+}
+.fz-24 {
+  font-size: 24px;
+}
+.min-w {
+  min-width: 100% !important;
+}
+
+/*  */

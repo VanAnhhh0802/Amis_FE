@@ -1,0 +1,150 @@
+.icon {
+  background: url(../../assets/img/Sprites.64af8f61.svg) no-repeat;
+}
+
+/* Table */
+.btn-function-fix,
+.btn-function__dropdown {
+  position: relative;
+  height: 36px;
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+  cursor: pointer;
+  color: #0075c0;
+  font-weight: 600;
+}
+.btn-function__dropdown:hover {
+  background-color: #f5f5f5;
+}
+.table__function {
+  justify-content: center;
+}
+
+/* Form */
+
+/* Dialog */
+.dialog-content__header {
+  width: 100%;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: left;
+  justify-content: space-between;
+}
+.dialog-header__title {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 280px;
+  overflow: hidden;
+}
+.dialog-content__container {
+  max-width: 400px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0;
+}
+.dialog-content__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: 8px;
+}
+.dialog-mgs {
+  padding: 4px;
+  list-style: none;
+}
+
+.dialog-warring-footer {
+  justify-content: space-between;
+}
+
+/* Dialog Icon*/
+.dialog__header-icon {
+  background-position: -1171px -356px;
+  cursor: pointer;
+}
+.dialog__container-icon {
+  background-position: -538px -146px;
+  margin-right: 16px;
+}
+.dialog__wrarring-icon {
+  background-position: -593px -145px;
+  margin-right: 16px;
+}
+
+/* Toast */
+
+/* success */
+
+.toast-status--success {
+  color: var(--main-color);
+}
+/* error */
+
+.toast-status--error {
+  color: var(--error-color);
+}
+/* warring */
+
+.toast-status--warring {
+  color: var(--warring-color);
+}
+/* infor */
+
+.toast-status--infor {
+  color: var(--infor-color);
+}
+/* toast Icon*/
+.toast-right-icon {
+  background-position: -75px -307px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+.toast-icon--success {
+  background-position: -844px -308px;
+  margin-right: 8px;
+}
+.toast-icon--error {
+  background-position: -593px -145px;
+  margin-right: 8px;
+}
+.toast-icon--warring {
+  background-position: -538px -146px;
+  margin-right: 8px;
+}
+.toast-icon--infor {
+  background-position: -672px -462px;
+  margin-right: 8px;
+}
+/* Animation */
+/* Toast */
+@keyframes toast-show {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes toast-hide {
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* Input */
+
+/* company input */
+.company__input {
+  border-right: 1px solid var(--border-color);
+  position: relative;
+}
+.company__input:focus ~ .sub-list-company {
+  display: block;
+}
+
+/* Tool tip */
+.card-number-tooltip {
+  margin-bottom: 8px;
+}
