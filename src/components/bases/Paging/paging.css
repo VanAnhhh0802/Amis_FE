@@ -23,10 +23,9 @@
 .page__prev {
   margin-right: 8px;
 }
-.page__next--selected,
-.page__prev--selected {
+.page__button--disable {
   color: #b3b3b3 !important;
-  cursor: pointer;
+  cursor: default;
 }
 .pagination__number {
   display: flex;
@@ -36,4 +35,5 @@
 }
 .pagination__number--selected {
   border: 1px solid var(--border-color);
+  font-weight: 600;
 }

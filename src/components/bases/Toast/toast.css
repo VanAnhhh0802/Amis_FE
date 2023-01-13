@@ -28,6 +28,7 @@
 
 .toast__desc--status {
   font-weight: 700;
+  margin-right: 8px;
 }
 
 .toast__act {

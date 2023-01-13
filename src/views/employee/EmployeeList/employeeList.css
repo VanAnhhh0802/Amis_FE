@@ -89,7 +89,6 @@
   background-color: #fff;
 }
 
-
 /*  */
 .list__table {
   width: 100%;
@@ -109,8 +108,10 @@ thead {
 }
 
 tr:hover,
-tr:hover .tb-function {
+tr:hover .tb-function,
+tr:hover .width-table-checkbox {
   background-color: #f5f5f5;
+  cursor: default;
 }
 tr,
 th,

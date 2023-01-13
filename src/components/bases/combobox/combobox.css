@@ -1,5 +1,6 @@
 .a-combobox {
   position: relative;
+  width: 100%;
 }
 .combobox {
   height: 36px;
@@ -68,4 +69,7 @@
 }
 .border-focus {
   border-color: var(--main-color);
+}
+#cbxDepartment {
+  width: 100%;
 }

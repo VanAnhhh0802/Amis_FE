@@ -1,17 +1,20 @@
-<template lang="">
+<template>
   <div class="input-wrapper">
-    <label for=""
+    <label for="" v-if="label"
       >{{ label }}
       <span class="input--required" v-if="inputRequired">*</span></label
     >
-    <br />
     <input
       :type="inputType"
+      autocomplete="off"
       class="input"
-      :class="classInput"
-      :style="{ width: width }"
+      :style="{ width: width, border: border }"
       v-model="value"
       :tabindex="tabIndex"
+      :class="inputError"
+      @focus="inputOnFocus"
+      @blur="inputOutFocus"
+      :placeholder="placeholder"
     />
     <div class="error-text" v-if="isBorderError">Mã không được để trống</div>
   </div>
@@ -23,13 +26,15 @@ export default {
     label: String,
     width: String,
     inputType: String,
-    inputRequired: String,
+    inputRequired: Boolean,
     modelValue: String,
     isBorderError: String,
     tabIndex: Number,
+    border: String,
+    inputError: Boolean,
+    placeholder: String,
   },
 
-  updated() {},
   data() {
     return {
       isRequiredShow: false,
@@ -63,6 +68,27 @@ export default {
      * Hàm xử lý biding 2 chiều
      * Author: Văn Anh (9/1/2023)
      */
+    searchInput() {
+      try {
+        this.$parent.listEmployees();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    inputOnFocus() {
+      try {
+        this.$emit("inputFocus");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    inputOutFocus() {
+      try {
+        this.$emit("inputOutFocus");
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>

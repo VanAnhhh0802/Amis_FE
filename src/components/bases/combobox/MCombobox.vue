@@ -8,13 +8,14 @@
       <input
         :id="id"
         type="text"
+        autocomplete="off"
         class="input combobox__input"
         v-model="textSelected"
         @input="onSearchItem"
         @keydown="inputOnKeyDown"
         :tabindex="tabIndex"
         @focus="inputOnFocus = true"
-        @blur="inputOnFocus = false"
+        @blur="inputOutFocus"
       />
       <button
         class="combobox__button"
@@ -30,13 +31,13 @@
     <div class="combobox__data" v-show="isShowData">
       <a
         class="combobox-item"
-        v-for="(department, index) in departmentSearch"
+        v-for="(entity, index) in entitySearch"
         :key="index"
-        :value="department[propValue]"
-        @click="itemOnSelect(department, index)"
+        :value="entity[propValue]"
+        @click="itemOnSelect(entity, index)"
         :ref="`item_${index}`"
         :class="{ 'combobox-item--active': index == indexItemSelect }"
-        >{{ department[propName] }}</a
+        >{{ entity[propName] }}</a
       >
     </div>
   </div>
@@ -53,9 +54,9 @@ export default {
       itemSelected: null,
       isShowError: false,
       inputOnFocus: false,
-      departments: [],
+      entities: [],
       //Tạo 1 mảng rỗng
-      departmentSearch: [],
+      entitySearch: [],
     };
   },
   props: {
@@ -74,11 +75,11 @@ export default {
       axios
         .get(this.api)
         .then((data) => {
-          this.departments = data.data;
-          //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng departments
-          this.departmentSearch = data.data;
+          this.entities = data.data;
+          //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
+          this.entitySearch = data.data;
           this.setItemSelected();
-          console.log(this.departments);
+          console.log(this.entities);
         })
         .catch((response) => {
           console.log(response);
@@ -89,7 +90,7 @@ export default {
     findIdexSelected: function () {
       var me = this;
       //Tìm index của item đã được chọn
-      let findIdex = this.departmentSearch.findIndex(
+      let findIdex = this.entitySearch.findIndex(
         (item) => item[me.propValue] == me.itemSelected[me.propValue]
       );
       return findIdex;
@@ -114,11 +115,12 @@ export default {
     inputOnKeyDown(event) {
       try {
         const keyCode = event.keyCode;
+        console.log(keyCode);
         switch (keyCode) {
           case this.MISAEnum.KEY_CODE.ENTER:
             //Xác định item đang chọn dựa vào index
             //eslint-disable-next-line no-case-declarations
-            const item = this.departmentSearch[this.indexItemSelect];
+            const item = this.entitySearch[this.indexItemSelect];
             this.itemOnSelect(item);
             break;
           case this.MISAEnum.KEY_CODE.ROW_UP:
@@ -134,7 +136,7 @@ export default {
               this.isShowData = true;
             }
             //eslint-disable-next-line no-case-declarations
-            let maxLength = this.departmentSearch.length;
+            let maxLength = this.entitySearch.length;
             if (this.indexItemSelect < maxLength - 1) {
               this.indexItemSelect++;
             }
@@ -150,30 +152,31 @@ export default {
      * Sự kiện người dùng focus vào input
      * Author: Văn Anh (10/1/2023)
      */
-    // inputOnFocus() {
-    //   try {
-    //     log("eeee");
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+    inputOutFocus() {
+      try {
+        this.inputOnFocus = false;
+        this.isShowData = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Click vào item thì hiển thị lên combobox
      * Author: Văn Anh (20/1/2023)
      */
-    itemOnSelect(department) {
+    itemOnSelect(entity) {
       try {
         var me = this;
         //Sau khi chọn 1 trường thì thực hiện reset lại danh sách
-        this.departmentSearch = this.departments;
-        //Gán item đang đc chọn cho department
-        this.itemSelected = department;
+        this.entitySearch = this.entities;
+        //Gán item đang đc chọn cho entity
+        this.itemSelected = entity;
 
         //set index của item được chọn
         this.indexItemSelect = me.findIdexSelected;
-        this.textSelected = department[this.propName];
+        this.textSelected = entity[this.propName];
         this.isShowData = false;
-        this.$emit("update:modelValue", department[this.propValue]);
+        this.$emit("update:modelValue", entity[this.propValue]);
       } catch (error) {
         console.log(error);
       }
@@ -186,19 +189,19 @@ export default {
       try {
         var me = this;
         //Tìm item tương ứng với modelValue truyền ở ngoài vào
-        let departmentSelected = this.departments.find(
+        let entitySelected = this.entities.find(
           (item) => item[me.propValue] == me.modelValue
         );
         //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input
-        if (departmentSelected) {
-          this.textSelected = departmentSelected[this.propName];
+        if (entitySelected) {
+          this.textSelected = entitySelected[this.propName];
         }
       } catch (error) {
         console.log(error);
       }
     },
     /**
-     * Hàm tìm kiếm department
+     * Hàm tìm kiếm entity
      * Author: Văn Anh (20/1/2023)
      */
     onSearchItem() {
@@ -206,7 +209,7 @@ export default {
         console.log(this.textSelected);
         var me = this;
         //Tìm các trường tương ứng với nhập liệu ở input
-        this.departmentSearch = this.departments.filter((item) =>
+        this.entitySearch = this.entities.filter((item) =>
           item[me.propName]
             .toLowerCase()
             .includes(me.textSelected.toLowerCase())

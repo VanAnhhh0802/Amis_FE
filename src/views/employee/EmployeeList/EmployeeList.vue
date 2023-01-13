@@ -7,7 +7,7 @@
         <!-- <p>{{ $t("message") }}</p> -->
       </div>
       <MButton
-        @click="(updateFunction = false), (isShowForm = true)"
+        @click="(updateFunction = false), btnAddEmployee()"
         :class="{ 'btn--primary': true }"
         text="Thêm mới nhân viên"
       ></MButton>
@@ -15,14 +15,24 @@
     <div class="content__list">
       <div class="flex list__header">
         <div class="list-toolbar-wrapper">
-          <div id="" class="flex input__wrapper list__toolbar">
-            <input
-              type="text"
-              id="input-show"
-              class="input no-border no-border-focus input-list__search"
-              placeholder="Tìm theo mã, tên nhân viên"
-            />
-            <button class="btn icon btn--small btn__search"></button>
+          <div
+            :class="{ 'border-focus': this.inputSearchFocused }"
+            style="width: 260px"
+            class="flex input__wrapper list__toolbar"
+          >
+            <MInput
+              border="none"
+              v-model.trim="this.filter.employeeFilter"
+              @input="searchOnListEmployee"
+              @inputFocus="inputSearchFocus"
+              @inputOutFocus="this.inputSearchFocused = false"
+              placeholder="Tìm kiếm theo mã, tên nhân viên"
+            ></MInput>
+            <MButton
+              class="icon btn--small btn__search"
+              v-on:keyup.enter="listEmployees()"
+              @click="this.listEmployees()"
+            ></MButton>
           </div>
           <div class="tooltip">
             <div
@@ -39,13 +49,13 @@
           <thead>
             <tr>
               <th class="width-table-checkbox list-checkbox">
-                <input type="checkbox" name="" id="" />
+                <MCheckbox @btnCheck="this.checkAllEmployees()"></MCheckbox>
               </th>
               <th class="text-align-left">{{ this.textEmployeeCode }}</th>
               <th class="text-align-left w-200">{{ this.textEmployeeName }}</th>
-              <th class="text-align-left">{{ this.textGender }}</th>
+              <th class="text-align-left w-150">{{ this.textGender }}</th>
               <th class="text-align-center">{{ this.textDateOfBirth }}</th>
-              <th class="text-align-center">
+              <th class="text-align-left">
                 <div class="tooltip">
                   {{ this.textIdentity }}
                   <div class="tooltip-text tooltip-indentity">
@@ -75,28 +85,33 @@
               @dblclick="rowOnDbClick(item), (updateFunction = true)"
             >
               <td class="width-table-checkbox list-checkbox body-checkbox">
-                <input type="checkbox" name="" id="" />
+                <MCheckbox
+                  @btnCheck="this.selectEmployeeCheck(item)"
+                  @checkedEmployee="this.employeeSelected.includes(item)"
+                ></MCheckbox>
               </td>
               <td class="w-150 text-align-left employee-code">
                 {{ item.EmployeeCode }}
               </td>
               <td class="text-align-left">{{ item.EmployeeName }}</td>
-              <td class="text-align-center w-100">
+              <td class="text-align-left w-150">
                 {{ item.GenderName }}
               </td>
               <td class="text-align-center w-150">
                 {{ formatDate(item.DateOfBirth) }}
               </td>
               <td class="text-align-left w-150">
-                {{ item.Identity }}
+                {{ item.IdentityNumber }}
               </td>
               <td class="text-align-left w-150">
                 {{ item.DepartmentName }}
               </td>
               <td class="text-align-left w-150">{{ item.PositionName }}</td>
-              <td class="text-align-left w-150"></td>
-              <td class="text-align-left w-150"></td>
-              <td class="text-align-left w-200"></td>
+              <td class="text-align-left w-150">
+                {{ item.BankAccountNumber }}
+              </td>
+              <td class="text-align-left w-150">{{ item.BankName }}</td>
+              <td class="text-align-left w-200">{{ item.BankBranchName }}</td>
               <td class="text-align-center w-150 tb-function">
                 <div class="flex table__function">
                   <button
@@ -121,7 +136,11 @@
       </div>
     </div>
     <!-- Pagination -->
-    <MPaging></MPaging>
+    <MPaging
+      :total="this.totalRecord"
+      :totalInPage="totalPage"
+      v-model:pageNumber="currentPage"
+    ></MPaging>
   </div>
   <!-- Dialog nhân viên -->
   <EmployeeDetail
@@ -129,17 +148,17 @@
     @btnCloseForm="closeForm"
     :employeeId="employeeIdSelected"
     @showSuccessToast="showSuccessToast()"
+    @inputFocusDetail="isShowForm"
   ></EmployeeDetail>
   <!-- Loading -->
   <MLoading v-if="isShowLoading"></MLoading>
   <!-- DropMenu -->
-  <teleport to="body">
+  <teleport to="body" @click="isShowOnDropMenu = false">
     <div
       id="btn-dropdown-menu"
       class="dropdown-menu"
       v-if="isShowOnDropMenu"
       :style="dropdownPosition"
-      @blur="isShowOnDropMenu = false"
     >
       <ul class="dropdown-list">
         <li class="dropdown-item">Nhân bản</li>
@@ -193,7 +212,6 @@ import EmployeeDetail from "../EmployeeDetail/EmployeeDetail.vue";
 //Base
 import MLoading from "../../../components/bases/Loading/MLoading.vue";
 // import MDropMenu from "../DropMenu/MDropMenu.vue";
-import MButton from "../../../components/bases/Button/MButton.vue";
 import MPaging from "../../../components/bases/Paging/MPaging.vue";
 import MDialog from "@/components/bases/Dialog/MDialog.vue";
 import MToast from "../../../components/bases/Toast/MToast.vue";
@@ -203,12 +221,10 @@ export default {
     EmployeeDetail,
     MLoading,
     // MDropMenu,
-    MButton,
     MPaging,
     MDialog,
     MToast,
   },
-
   data() {
     return {
       //#region Xử lý data liên quan đến sự kiện
@@ -222,10 +238,16 @@ export default {
       isShowSuccessToast: false,
       updateFunction: false,
       isShowDialog: false,
+      inputSearchFocused: false,
+      //Khai báo thời gian delay search
+      debounce: null,
       //#endregion
       text: "Thêm nhân viên ",
       employeeIdSelected: null,
       employees: [],
+
+      employeeSelected: [],
+
       isPrimary: true,
 
       contentAdd: resource.TextVi.Content.Add,
@@ -257,9 +279,32 @@ export default {
           update: resource.TextVi.ToastMessage.Success.Update,
         },
       },
+      //Sử dụng ở tìm kiếm phân trang
+      totalRecord: 0,
+      totalPage: 0,
+      currentPage: 1,
+      filter: {
+        employeeFilter: "",
+        pageSize: 10,
+        pageNumber: 3,
+        keyword: "",
+      },
     };
   },
 
+  watch: {
+    filter: {
+      handler: function (newValue) {
+        console.log("value tìm kiếm", newValue);
+        this.listEmployees();
+      },
+      deep: true,
+    },
+    currentPage: function (newValue) {
+      this.pageNumber = newValue;
+      console.log("current Employee: ", newValue);
+    },
+  },
   created() {
     this.listEmployees();
   },
@@ -272,6 +317,7 @@ export default {
     btnAddEmployee() {
       try {
         this.isShowForm = true;
+        this.employeeIdSelected = null;
       } catch (error) {
         console.log(error);
       }
@@ -311,14 +357,11 @@ export default {
         console.log(e, deleteEmployeeId, deleteEmployeeCode);
         //Xét vị trí cho dropdown
         this.dropdownPositionX = e.clientX;
-        console.log(this.dropdownPositionX);
         this.dropdownPositionY = e.clientY;
         //Hiển thị drop menu
-        this.isShowOnDropMenu = true;
+        this.isShowOnDropMenu = !this.isShowOnDropMenu;
         this.warningDeleteMessage = `Bạn có thực sự muốn xóa ${deleteEmployeeCode} không?`;
-        console.log(this.warningDeleteMessage);
         this.deleteEmployeeId = deleteEmployeeId;
-        // this.employeeIdSelected = item.EmployeeId;
       } catch (error) {
         console.log(error);
       }
@@ -345,7 +388,7 @@ export default {
       try {
         console.log("click");
         this.isShowDialog = true;
-        this.isShowOnDropMenu = true;
+        this.isShowOnDropMenu = false;
       } catch (error) {
         console.log(error);
       }
@@ -366,15 +409,14 @@ export default {
      * Hàm xóa nhân viên
      * Author: Văn anh (10/1/2023)
      */
-    async btnOnDelete(deleteId) {
+    btnOnDelete(deleteId) {
       try {
         console.log(deleteId);
-        await axios
-          .get(`https://amis.manhnv.net/api/v1/Employees/${deleteId}`)
+        axios
+          .delete(`https://amis.manhnv.net/api/v1/Employees/${deleteId}`)
           .then((response) => {
             console.log("res", response);
             this.isShowDialog = false;
-            this.isShowOnDropMenu = false;
             this.listEmployees();
             this.deleteEmployeeId = "";
             console.log("sau khi xoa", this.deleteEmployeeId);
@@ -386,21 +428,77 @@ export default {
         console.log(error);
       }
     },
+    /**
+     *Hàm khi người dùng focus thì show border xanh
+     *Author: Văn Anh (11/1/2023)
+     */
+    inputSearchFocus() {
+      try {
+        this.inputSearchFocused = true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Check  nhân viên
+     * Author: Văn Anh (12/10/2023)
+     */
+    selectEmployeeCheck(selectedId) {
+      try {
+        if (this.employeeSelected.includes(selectedId)) {
+          this.employeeSelected = this.employeeSelected.filter(
+            (value) => value != selectedId
+          );
+        } else {
+          this.employeeSelected.push(selectedId);
+        }
+        console.log(this.employeeSelected);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Check all nhân viên
+     * Author: Văn Anh (12/10/2023)
+     */
+    checkAllEmployees() {
+      try {
+        if (this.employeeSelected.length == this.employees.length) {
+          this.employeeSelected = [];
+        } else {
+          for (const employee of this.employees) {
+            if (!this.employeeSelected.includes(employee.employeeId)) {
+              this.employeeSelected.push(employee.employeeId);
+            }
+          }
+        }
+        console.log("employeeSelected: ", this.employeeSelected);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     //#endregion Các hàm liên quan đến xử lý sự kiện
     //#region Hàm xử lý dữ liệu từ API
     /**
      * Hiển thị danh sách nhân viên
      * Author: Văn Anh (17/12/2022)
      */
-    listEmployees() {
+    async listEmployees() {
       try {
         this.isShowLoading = true;
-        axios
-          .get("https://amis.manhnv.net/api/v1/Employees")
+        await axios
+          .get(
+            `https://amis.manhnv.net/api/v1/Employees/filter?employeeFilter=${this.filter.employeeFilter}&pageSize=${this.filter.pageSize}&pageNumber=${this.currentPage}`
+            // "https://amis.manhnv.net/api/v1/Employees"
+          )
           .then((response) => {
-            this.employees = response.data;
-            console.log(this.employees);
+            // this.employees = response.data;
+            // this.employeesLength = this.employees.length;
+            this.employees = response.data.Data;
+            this.totalRecord = response.data.TotalRecord;
+            this.totalPage = response.data.TotalPage;
             this.isShowLoading = false;
+            console.log("currentPage: " + this.currentPage);
           })
           .catch((error) => {
             console.log(error);
@@ -409,7 +507,20 @@ export default {
         console.log(error);
       }
     },
-
+    /**
+     * Hàm xử lý tìm kiếm
+     * Author: Văn Anh (11/1/2023)
+     */
+    searchOnListEmployee() {
+      try {
+        clearTimeout(this.debounce);
+        this.debounce = setTimeout(() => {
+          this.listEmployees();
+        }, 600);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     //#endregion
     //#region Hàm định dạng các dữ liệu
     /**
