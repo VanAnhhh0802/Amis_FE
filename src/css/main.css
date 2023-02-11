@@ -51,6 +51,12 @@
   min-width: 24px;
   min-height: 24px;
 }
+.w-h-36{
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+}
 .flex {
   display: flex;
   align-items: center;

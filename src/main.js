@@ -3,7 +3,10 @@ import App from "./App.vue";
 import "./css/main.css";
 import axios from "axios";
 import VueAxios from "vue-axios";
-import { vue3Debounce } from "vue-debounce";
+//libary
+
+// import { vue3Debounce } from "vue-debounce";
+import vueDebounce, { PluginConfig, debounce } from 'vue-debounce'
 import MISAEnum from "./lib/enum";
 import resource from "./lib/resource";
 import MCombobox from "@/components/bases/combobox/MCombobox.vue";
@@ -13,11 +16,12 @@ import MCheckbox from "@/components/bases/input/MCheckbox.vue";
 
 const app = createApp(App);
 app.use(VueAxios, axios);
+app.use<PluginConfig>(vueDebounce, { lock: true, defaultTime: '5000ms', listenTo: 'keyup' });
 app.component("MCombobox", MCombobox);
 app.component("MInput", MInput);
 app.component("MButton", MButton);
 app.component("MCheckbox", MCheckbox);
-app.directive("debounce", vue3Debounce({ lock: true }));
+app.directive(debounce({ lock: true }));
 app.config.globalProperties.MISAEnum = MISAEnum;
 app.config.globalProperties.resource = resource;
 // app.provide("axios", app.config.globalProperties.axios);

@@ -34,15 +34,15 @@
 .toast__act {
   font-weight: 500;
 }
-.toast-status--success {
+.toast__desc--success {
   color: var(--main-color);
   font-weight: 600;
 }
-.toast--error {
+.toast__desc--error {
   color: #de3618;
   font-weight: 600;
 }
-.toast--warning {
+.toast__desc--warning {
   color: #f49342;
   font-weight: 600;
 }

@@ -9,17 +9,16 @@
             </slot>
           </div>
           <div
-            class="icon w-h-24 dialog__btn--acept dialog__header-icon"
+            
             @click="btnClose"
-          ></div>
+          >
+          <div class="icon w-h-24 dialog__btn--acept dialog__header-icon"></div>
+          </div>
         </div>
         <div class="dialog-content__container">
-          <li class="flex dialog-mgs">
-            <div
-              class="icon w-h-24 btn-dialog--close dialog__container-icon"
-            ></div>
-            <slot name="message">{{ message }}</slot>
-          </li>
+          <slot name="message" >
+            {{message}}
+          </slot>
         </div>
         <div class="dialog-content__footer">
           <slot name="footer"> </slot>

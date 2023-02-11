@@ -1,10 +1,17 @@
 <template lang="">
   <div class="a-combobox">
-    <label for=""
+    <label v-if="label"
       >{{ label }}
       <span class="input--required" v-if="isRequired">*</span>
     </label>
-    <div class="combobox" :class="{ 'border-focus': inputOnFocus }">
+
+    <div
+      class="combobox"
+      :class="{
+        'border-focus': inputOnFocus,
+        'field--error': inputErrorCombobox,
+      }"
+    >
       <input
         :id="id"
         type="text"
@@ -14,7 +21,7 @@
         @input="onSearchItem"
         @keydown="inputOnKeyDown"
         :tabindex="tabIndex"
-        @focus="inputOnFocus = true"
+        @focus="inputFocus"
         @blur="inputOutFocus"
       />
       <button
@@ -24,9 +31,9 @@
       >
         <i class="icofont-rounded-down"></i>
       </button>
-      <div class="error-text" v-if="isShowError">
-        Đơn vị viên không được để trống
-      </div>
+      <!-- <div class="error-text" v-if="inputErrorCombobox">
+        Đơn vị không được để trống
+      </div> -->
     </div>
     <div class="combobox__data" v-show="isShowData">
       <a
@@ -62,24 +69,26 @@ export default {
   props: {
     id: String,
     label: String,
+    //Trường bắt buộc nhập
     isRequired: Boolean,
     api: String,
     propName: String,
     propValue: String,
     modelValue: String,
     tabIndex: Number,
+    inputErrorCombobox: Boolean,
   },
-  emits: ["modelValue"],
+  emits: ["update:modelValue", "inputFocus"],
   created() {
     if (this.api) {
       axios
         .get(this.api)
         .then((data) => {
+          console.log(data.data);
           this.entities = data.data;
           //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
           this.entitySearch = data.data;
           this.setItemSelected();
-          console.log(this.entities);
         })
         .catch((response) => {
           console.log(response);
@@ -144,6 +153,14 @@ export default {
           default:
             break;
         }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    inputFocus() {
+      try {
+        this.inputOnFocus = true;
+        this.$emit("inputFocus");
       } catch (error) {
         console.log(error);
       }

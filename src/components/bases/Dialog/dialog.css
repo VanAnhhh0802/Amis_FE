@@ -63,7 +63,17 @@
   background-position: -538px -146px;
   margin-right: 16px;
 }
-.dialog__wrarring-icon {
+.dialog__warning-icon {
   background-position: -593px -145px;
-  margin-right: 16px;
+  margin-right: 8px;
+}
+.dialog__confirm-icon{
+  background-position: -832px -462px;
+  margin-right: 8px;
+  
+}
+
+.dialog__error-icon {
+  margin-right: 8px;
+  background-position: -762px -146px;
 }

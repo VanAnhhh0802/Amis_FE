@@ -5,7 +5,8 @@
         <div class="flex form__header">
           <div class="flex col-gap-16 form__header--left">
             <h1 id="form__title" class="heading form__title">
-              Thông tin nhân viên
+              <!-- Thông tin nhân viên -->
+              {{this.DetailTile}}
             </h1>
             <span class="flex col-gap">
               <MCheckbox></MCheckbox>
@@ -18,13 +19,13 @@
           </div>
           <div class="flex form-icon">
             <div class="icon w-h-24 tooltip form-icon--help">
-              <div class="tooltip-text">Giúp(F1)</div>
+              <div class="tooltip-text">{{this.textTooltipHelp}}</div>
             </div>
             <div
               class="icon w-h-24 tooltip form-icon--close btn--close"
               @click="btnClose"
             >
-              <div class="tooltip-text">Đóng(ESC)</div>
+              <div class="tooltip-text">{{this.textTooltipClose}}</div>
             </div>
           </div>
         </div>
@@ -33,63 +34,59 @@
             <div class="form-content--left">
               <div class="row col-gap">
                 <MInput
-                  label="Mã"
+                  :label="this.textLabelCode"
                   width="150px"
                   style="width: 150px"
-                  v-model:modelValue="newEmployee.EmployeeCode"
-                  inputRequired="true"
+                  v-model:modelValue="newEmployee.employeeCode"
+                  :inputRequired="true"
                   :tabIndex="1"
                   :name="this.nameInput"
-                  :errorValidate="[
-                    this.isEmployeeCodeError ? 'input--error' : '',
-                  ]"
-                  @inputFocus="inputFocusOnDetail"
+                  :inputError="this.isEmployeeCodeError"
+                  @inputFocus="this.isEmployeeCodeError = false"
                 ></MInput>
                 <MInput
-                  label="Tên"
-                  v-model:modelValue="newEmployee.EmployeeName"
-                  inputRequired="true"
+                  :label="this.textLabelName"
+                  v-model:modelValue="newEmployee.fullName"
+                  :inputRequired="true"
                   :tabIndex="2"
-                  :errorValidate="[
-                    this.isEmployeeNameError ? 'input--error' : '',
-                  ]"
+                  :inputError="this.isEmployeeNameError"
+                  @inputFocus="this.isEmployeeNameError = false"
                 ></MInput>
               </div>
               <div class="row">
                 <div class="form__unit">
                   <MCombobox
                     id="cbxDepartment"
-                    label="Đơn vị"
+                    :label="this.textLabelDepartment"
                     :isRequired="true"
-                    propName="DepartmentName"
-                    propValue="DepartmentId"
-                    api="https://amis.manhnv.net/api/v1/Departments"
-                    v-model="newEmployee.DepartmentId"
+                    propName="departmentName"
+                    propValue="departmentId"
+                    api="https://localhost:7232/api/Departments"
+                    v-model="newEmployee.departmentId"
                     :isShowError="false"
                     :tabIndex="3"
-                    :errorValidate="[
-                      this.isDepartmentError ? 'input--error' : '',
-                    ]"
+                    :inputErrorCombobox="this.isDepartmentError"
+                    @inputFocus="this.isDepartmentError = false"
                   ></MCombobox>
                 </div>
               </div>
               <div class="row">
                 <MInput
-                  label="Chức danh"
+                  :label="this.textLabelPositionName"
                   type="text"
                   :tabIndex="4"
-                  v-model:modelValue="newEmployee.PositionName"
+                  v-model:modelValue="newEmployee.positionName"
                 ></MInput>
               </div>
             </div>
             <div class="form-content--right">
               <div class="row col-gap">
                 <MInput
-                  label="Ngày sinh"
+                  :label="this.textLabelDateOfBirth"
                   style="width: 150px"
                   inputType="date"
                   :tabIndex="5"
-                  v-model:modelValue="newEmployee.DateOfBirth"
+                  v-model:modelValue="newEmployee.dateOfBirth"
                 ></MInput>
                 <div class="form__sex-wrapper input-wrapper">
                   <label for="" class="form__sex">Giới tính</label>
@@ -98,7 +95,6 @@
                       <input
                         type="radio"
                         checked
-                        property-name="employeeGender"
                         id="gender-male"
                         tabindex="6"
                         value="0"
@@ -137,21 +133,21 @@
               <div class="row col-gap">
                 <MInput label="CMND" class="" :tabIndex="9"></MInput>
                 <MInput
-                  label="Ngày cấp"
+                  :label="this.textLabelIdentityDate"
                   type="date"
                   width="150px"
                   style="width: 150px"
                   inputType="date"
                   :tabIndex="10"
-                  v-model:modelValue="newEmployee.IdentityDate"
+                  v-model:modelValue="newEmployee.identityDate"
                 ></MInput>
               </div>
               <div class="row">
                 <MInput
-                  label="Nơi cấp"
+                  :label="this.textLabelIdentityPlace"
                   class="w-full"
                   :tabIndex="11"
-                  v-model:modelValue="newEmployee.IdentityPlace"
+                  v-model:modelValue="newEmployee.identityPlace"
                 ></MInput>
               </div>
             </div>
@@ -159,31 +155,32 @@
           <div class="form__content-bottom">
             <div id="" class="row">
               <MInput
-                label="Địa chỉ"
+                :label="this.textLabelAddress"
                 :tabIndex="12"
-                v-model:modelValue="newEmployee.Address"
+                v-model:modelValue="newEmployee.address"
               ></MInput>
             </div>
             <div class="row form-popup-container-top">
               <div class="w-full flex col-gap">
                 <div class="w-full flex col-gap">
+                  
                   <MInput
-                    label="ĐT di động"
+                    :label="this.textLabelPhone"
                     :tabIndex="13"
-                    v-model:modelValue="newEmployee.PhoneNumber"
+                    v-model:modelValue="newEmployee.phoneNumber"
                   ></MInput>
                   <MInput
-                    label="ĐT cố định"
+                    :label="this.textLabelTelephone"
                     :tabIndex="14"
-                    v-model:modelValue="newEmployee.TelephoneNumber"
+                    v-model:modelValue="newEmployee.telephoneNumber"
                   ></MInput>
                 </div>
                 <div class="w-full">
                   <MInput
-                    label="Email"
+                    :label="this.textLabelEmail"
                     style="width: 260px"
                     :tabIndex="15"
-                    v-model:modelValue="newEmployee.Email"
+                    v-model:modelValue="newEmployee.email"
                   ></MInput>
                 </div>
               </div>
@@ -192,22 +189,22 @@
               <div class="w-full flex col-gap">
                 <div class="w-full flex col-gap">
                   <MInput
-                    label="TK ngân hàng"
+                    :label="this.textLabelBankAccountNumber"
                     :tabIndex="16"
-                    v-model:modelValue="newEmployee.BankAccountNumber"
+                    v-model:modelValue="newEmployee.bankAccountNumber"
                   ></MInput>
                   <MInput
-                    label="Tên ngân hàng"
+                    :label="this.textLabelBankName"
                     :tabIndex="17"
-                    v-model:modelValue="newEmployee.BankName"
+                    v-model:modelValue="newEmployee.bankName"
                   ></MInput>
                 </div>
                 <div class="w-full">
                   <MInput
-                    label="Chi nhánh"
+                    :label="this.textLabelBankBranch"
                     style="width: 260px"
                     :tabIndex="18"
-                    v-model:modelValue="newEmployee.BankBranchName"
+                    v-model:modelValue="newEmployee.bankBranchName"
                   ></MInput>
                 </div>
               </div>
@@ -220,7 +217,7 @@
             <MButton
               class="btn btn--secondary btn--close"
               @click="btnClose"
-              text="Hủy"
+              :text="this.textButtonCancel"
               :tabIndex="21"
               @keydown.tab="tabOrder"
             >
@@ -234,20 +231,20 @@
                 class="btn btn--secondary"
                 :tabIndex="20"
                 @click="btnSaveOnClick"
-                text="Cất"
+                :text="this.textButtonSave"
               >
               </MButton>
-              <div class="tooltip-text">Cất(Ctrl + S)</div>
+              <div class="tooltip-text">{{this.textTooltipSave}}</div>
             </div>
             <div class="tooltip">
               <MButton
                 class="btn btn--primary btn-save-add btnClass"
-                text="Cất và Thêm"
+                :text="this.textButtonSaveAndAdd"
                 :tabIndex="19"
               >
               </MButton>
               <div class="tooltip-text tooltip-save">
-                Cất và Thêm(Ctrl + Shift + S)
+                {{this.textTooltipSaveAndAdd}}
               </div>
             </div>
           </div>
@@ -257,7 +254,15 @@
   </div>
   <MDialog v-if="isShowDialog" @btnCloseDialog="closeDialog">
     <template v-slot:title>Dữ liệu không hợp lệ</template>
-    <template v-slot:message>{{ this.errorMessage[0] }}</template>
+    <template v-slot:message>
+      <li class="flex dialog-mgs">
+        <div
+          class="icon w-h-24 btn-dialog--close dialog__error-icon"
+        ></div>
+        {{ this.errorMessage[0] }}
+      </li>
+    
+    </template>
     <template v-slot:footer>
       <button class="btn btn--primary dialog__btn--acept" @click="closeDialog">
         Đóng
@@ -265,29 +270,36 @@
     </template>
   </MDialog>
   <MDialog v-if="isShowDialogWarning" @btnCloseDialog="closeDialog">
-    <template v-slot:title>Cảnh báo</template>
+    <template v-slot:title>{{this.textDialogTitle}}</template>
     <template v-slot:message
-      >Dữ liệu đã bị thay đổi. Bạn có muốn cất không?</template
+      >
+      <li class="flex dialog-mgs">
+        <div
+          class="icon w-h-36 btn-dialog--close dialog__confirm-icon"
+        ></div>
+        {{this.textDialogMessage}}
+      </li>
+      </template
     >
     <template v-slot:footer>
       <div class="flex w-full" style="justify-content: space-between">
         <MButton
           class="btn--secondary dialog__btn--acept"
           @click="this.isShowDialogWarning = false"
-          text="Hủy"
+          :text="this.textButtonCancel"
         >
         </MButton>
         <div class="flex col-gap">
           <MButton
             class="btn--secondary dialog__btn--acept"
             @click="hideDialogWarning"
-            text="Không"
+            :text="this.textDialogButtonNo"
           >
           </MButton>
           <MButton
             class="btn--primary dialog__btn--acept"
             @click="btnOnDelete(this.deleteEmployeeId)"
-            text="Có"
+            :text="this.textDialogButtonYes"
           >
           </MButton>
         </div>
@@ -295,13 +307,19 @@
     </template>
   </MDialog>
   <MLoading v-if="isShowLoading"></MLoading>
+  <MToast
+    v-if="(isShowOnToast = false)"
+    :toastMessage="this.errorToastMessage"
+  ></MToast>
 </template>
 <script>
 import axios from "axios";
+import resource from "@/lib/resource"
 import MDialog from "../../../components/bases/Dialog/MDialog.vue";
 import MInput from "@/components/bases/input/MInput.vue";
 import MCombobox from "@/components/bases/combobox/MCombobox.vue";
 import MLoading from "@/components/bases/Loading/MLoading";
+import MToast from "@/components/bases/Toast/MToast.vue";
 // import vn from '@/language/i18n'
 
 export default {
@@ -311,6 +329,7 @@ export default {
     MInput,
     MCombobox,
     MLoading,
+    MToast,
   },
   props: ["employee", "employeeId"],
   emits: [
@@ -345,37 +364,69 @@ export default {
       id: null,
       isShowDialog: false,
       isShowDialogWarning: false,
-      isShowSuccessToast: false,
       isShowLoading: false,
+      //Toast
+      isShowOnToast: false,
+
+      // khai báo message cho toast
+      errorToastMessage: null,
       //Các ô input required
       isEmployeeCodeError: false,
       isEmployeeNameError: false,
       isDepartmentError: false,
       nameInput: "",
-      // isDepartmentError: false,
-      // isEmployeeNameError: false,
-      // isEmployeeCodeError: false,
+      //resource 
+      DetailTile:resource.TextVi.Detail.DetailTitle,
+      textLabelCode:resource.TextVi.Detail.EmployeeCode,
+      textLabelName:resource.TextVi.Detail.EmployeeName,
+      textLabelDepartment:resource.TextVi.Detail.DepartmentName,
+      textLabelDateOfBirth:resource.TextVi.Detail.DateOfBirth,
+      textLabelGender:resource.TextVi.Detail.Gender,
+      textLabelIdentityNumber:resource.TextVi.Detail.IdentityNumber,
+      textLabelIdentityDate:resource.TextVi.Detail.IdentityDate,
+      textLabelPositionName:resource.TextVi.Detail.PositionName,
+      textLabelIdentityPlace:resource.TextVi.Detail.IdentityPlace,
+      textLabelAddress:resource.TextVi.Detail.Address,
+      textLabelPhone:resource.TextVi.Detail.Phone,
+      textLabelTelephone:resource.TextVi.Detail.Telephone,
+      textLabelEmail:resource.TextVi.Detail.Email,
+      textLabelBankAccountNumber:resource.TextVi.Detail.BankAccountNumber,
+      textLabelBankName:resource.TextVi.Detail.BankName,
+      textLabelBankBranch:resource.TextVi.Detail.BankBranch,
+      //text button 
+      textButtonSave:resource.TextVi.Detail.Save,
+      textButtonCancel:resource.TextVi.Detail.Cancel,
+      textButtonSaveAndAdd:resource.TextVi.Detail.SaveAndAdd,
+      //Dialog
+      textDialogTitle:resource.TextVi.Dialog.Title.Warning,
+      textDialogMessage:resource.TextVi.Dialog.Title.Change,
+      textDialogButtonYes:resource.TextVi.Dialog.Yes,
+      textDialogButtonNo:resource.TextVi.Dialog.No,
+      textDialogButtonCancel:resource.TextVi.Dialog.Cancel,
+      //ToolTip
+      textTooltipHelp:resource.TextVi.ToolTip.Help,
+      textTooltipClose:resource.TextVi.ToolTip.Close,
+      textTooltipIdentityNumber:resource.TextVi.ToolTip.IdentityNumber,
+      textTooltipPhone:resource.TextVi.ToolTip.Phone,
+      textTooltipTelePhone:resource.TextVi.ToolTip.TelePhone,
+      textTooltipSave:resource.TextVi.ToolTip.Save,
+      textTooltipSaveAndAdd:resource.TextVi.ToolTip.SaveAndAdd,
     };
   },
   watch: {
-    newEmployee: {
-      handler: function (newValue) {
-        console.log("newEmployee thay doi: ", newValue);
-        console.log("newEmployeeCode thay doi: ", newValue.EmployeeCode);
-        console.log("newEmployeeName thay doi: ", newValue.EmployeeName);
-        console.log("department thay doi: ", newValue.DepartmentId);
-      },
-      deep: true,
-    },
-    employeeId: function (newValue) {
-      console.log("aasdasd", newValue);
-    },
-    getNewEmployeeCode: function (newValue) {
-      console.log("mã mới: ", newValue);
-    },
+    // newEmployee: {
+    //   handler: function (newValue) {
+    //     console.log("newEmployee thay doi: ", newValue);
+    //     console.log("newEmployeeCode thay doi: ", newValue.EmployeeCode);
+    //     console.log("newEmployeeName thay doi: ", newValue.EmployeeName);
+    //     console.log("department thay doi: ", newValue.DepartmentId);
+    //   },
+    //   deep: true,
+    // },
+    
+    
   },
   async created() {
-    console.log("employee:::", this.employeeId);
     if (!this.valueIsEmpty(this.employeeId)) {
       this.getEmployeeId(this.employeeId);
     } else {
@@ -383,15 +434,22 @@ export default {
     }
   },
   methods: {
+    /**
+     * Hàm hiển thị nhân viên theo Id
+     * Author: Văn Anh (06/02/2023)
+     * @param {*} id 
+     */
     async getEmployeeId(id) {
       try {
         await axios
-          .get(`https://amis.manhnv.net/api/v1/Employees/${id}`)
+          .get(`https://localhost:7232/api/Employees/${id}`)
           .then((response) => {
             this.newEmployee = response.data;
-            console.log("newEmployee data----------------", this.newEmployee);
-            this.newEmployee.DateOfBirth = this.bidingDate(
-              response.DateOfBirth
+            this.newEmployee.dateOfBirth = this.bidingDate(
+              response.data.dateOfBirth
+            );
+            this.newEmployee.identityDate = this.bidingDate(
+              response.data.identityDate
             );
             //Focus vào ô nhập liệu khác ô mã nhân viên
             // this.$nextTick(function () {
@@ -405,45 +463,52 @@ export default {
         console.log(error);
       }
     },
-    async getNewEmployeeCode() {
-      try {
-        await axios
-          .get("https://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
-          .then((response) => {
-            console.log("Mã mới");
-            this.newEmployee.EmployeeCode = response.data;
+    /**
+     * Hàm lấy mã nhân viên mới nhất
+     * Author: Văn Anh (6/1/2023)
+     */
+    // async getNewEmployeeCode() {
+    //   try {
+    //     await axios
+    //       .get("https://localhost:7232/api/Employees/NewEmployeeCode")
+    //       .then((response) => {
+    //         this.newEmployee.EmployeeCode = response.data;
 
-            //Focus vào ô nhập đầu tiên
-            // this.$nextTick(function () {
-            //   this.$refs.txtEmployeeCode.focus();
-            // });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    //         //Focus vào ô nhập đầu tiên
+    //         // this.$nextTick(function () {
+    //         //   this.$refs.txtEmployeeCode.focus();
+    //         // });
+    //       })
+    //       .catch((error) => {
+    //         console.log(error);
+    //       });
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
+    /**
+     * Hàm gọi api thêm nhân viên
+     * Author: Văn Anh (6/1/2023)
+     */
     async addEmployee() {
       try {
         await axios
-          .post("https://amis.manhnv.net/api/v1/Employees", {
-            EmployeeCode: this.newEmployee.EmployeeCode,
-            EmployeeName: this.newEmployee.EmployeeName,
-            DepartmentId: this.newEmployee.DepartmentId,
-            Gender: this.newEmployee.Gender,
-            DateOfBirth: this.newEmployee.DateOfBirth,
-            PhoneNumber: this.newEmployee.PhoneNumber,
-            Email: this.newEmployee.Email,
-            IdentityNumber: this.newEmployee.IdentityNumber,
-            IdentityDate: this.newEmployee.IdentityDate,
-            IdentityPlace: this.newEmployee.IdentityPlace,
-            TelephoneNumber: this.newEmployee.TelephoneNumber,
-            BankAccountNumber: this.newEmployee.BankAccountNumber,
-            BankName: this.newEmployee.BankName,
-            BankBranchName: this.newEmployee.BankBranchName,
-            PositionName: this.newEmployee.PositionName,
+          .post("https://localhost:7232/api/Employees", {
+            EmployeeCode: this.newEmployee.employeeCode,
+            EmployeeName: this.newEmployee.employeeName,
+            DepartmentId: this.newEmployee.departmentId,
+            Gender: this.newEmployee.gender,
+            DateOfBirth: this.newEmployee.dateOfBirth,
+            PhoneNumber: this.newEmployee.phoneNumber,
+            Email: this.newEmployee.email,
+            IdentityNumber: this.newEmployee.identityNumber,
+            IdentityDate: this.newEmployee.identityDate,
+            IdentityPlace: this.newEmployee.identityPlace,
+            TelephoneNumber: this.newEmployee.telephoneNumber,
+            BankAccountNumber: this.newEmployee.bankAccountNumber,
+            BankName: this.newEmployee.bankName,
+            BankBranchName: this.newEmployee.bankBranchName,
+            PositionName: this.newEmployee.positionName,
           })
           .then((res) => {
             console.log(res);
@@ -454,6 +519,8 @@ export default {
             this.$emit("showSuccessToast");
             this.$parent.listEmployees();
             this.showSuccessToast();
+            this.errorToastMessage = "Thêm nhân viên thành công";
+
             console.log("newEmployeeSave: " + this.newEmployee);
           })
           .catch((err) => {
@@ -464,9 +531,11 @@ export default {
             switch (statusCode) {
               case 400:
                 this.isShowLoading = false;
+                //Hiển thị toast message thông báo mã bị trùng
+                this.isShowOnToast = true;
                 //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
                 var errMsg = err.response.data.userMsg;
-                alert(errMsg);
+                this.errorMessageToast = errMsg;
                 break;
               case 500:
                 console.log(err);
@@ -482,22 +551,22 @@ export default {
     async editEmployee(id) {
       try {
         await axios
-          .put(`https://amis.manhnv.net/api/v1/Employees/${id}`, {
-            EmployeeCode: this.newEmployee.EmployeeCode,
-            EmployeeName: this.newEmployee.EmployeeName,
-            DepartmentId: this.newEmployee.DepartmentId,
-            Gender: this.newEmployee.Gender,
-            DateOfBirth: this.newEmployee.DateOfBirth,
-            PhoneNumber: this.newEmployee.PhoneNumber,
-            Email: this.newEmployee.Email,
-            IdentityNumber: this.newEmployee.IdentityNumber,
-            IdentityDate: this.newEmployee.IdentityDate,
-            IdentityPlace: this.newEmployee.IdentityPlace,
-            TelephoneNumber: this.newEmployee.TelephoneNumber,
-            BankAccountNumber: this.newEmployee.BankAccountNumber,
-            BankName: this.newEmployee.BankName,
-            BankBranchName: this.newEmployee.BankBranchName,
-            PositionName: this.newEmployee.PositionName,
+          .put(`https://localhost:7232/api/Employees/${id}`, {
+            EmployeeCode: this.newEmployee.employeeCode,
+            EmployeeName: this.newEmployee.employeeName,
+            DepartmentId: this.newEmployee.departmentId,
+            Gender: this.newEmployee.gender,
+            DateOfBirth: this.newEmployee.dateOfBirth,
+            PhoneNumber: this.newEmployee.phoneNumber,
+            Email: this.newEmployee.email,
+            IdentityNumber: this.newEmployee.identityNumber,
+            IdentityDate: this.newEmployee.identityDate,
+            IdentityPlace: this.newEmployee.identityPlace,
+            TelephoneNumber: this.newEmployee.telephoneNumber,
+            BankAccountNumber: this.newEmployee.bankAccountNumber,
+            BankName: this.newEmployee.bankName,
+            BankBranchName: this.newEmployee.bankBranchName,
+            PositionName: this.newEmployee.positionName,
           })
           .then((res) => {
             //Ẩn load ding
@@ -505,6 +574,9 @@ export default {
             this.newEmployee.DateOfBirth = this.bidingDate(res.DateOfBirth);
             console.log("Sửa", res);
             this.$emit("showSuccessToast");
+            //Gán message cho toast
+            this.errorToastMessage = "Thông tin nhân viên đã được thay đổi";
+
             this.$emit("btnCloseForm");
             this.$parent.listEmployees();
             console.log("newEmployeeSave: " + this.newEmployee);
@@ -517,6 +589,10 @@ export default {
       }
     },
     //#region Sự kiện liên quan đến button
+    /**
+     * Hàm ẩn hiện dialog
+     * Author: Văn Anh (1/1/2023)
+     */
     hideDialogWarning() {
       try {
         this.$emit("btnCloseForm");
@@ -530,10 +606,7 @@ export default {
      */
     btnClose() {
       try {
-        console.log("show");
         this.isShowDialogWarning = true;
-
-        this.clearData();
       } catch (error) {
         console.log(error);
       }
@@ -548,7 +621,6 @@ export default {
         //Validate dữ liệu
         let isValid = this.validateData();
         if (!isValid) {
-          console.log("HIển thi dialog");
           this.isShowDialog = true;
         } else {
           this.isShowLoading = true;
@@ -568,37 +640,7 @@ export default {
         console.log(error);
       }
     },
-    /**
-     * Xử lý input lỗi khi blur và không rỗng thì ẩn
-     * Author: Văn Anh (30/12/2022)
-     */
-    // inputEmployeeCodeErrorBlur() {
-    //   try {
-    //     if (!this.valueIsEmpty(this.EmployeeCode)) {
-    //       this.isEmployeeError = false;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // inputEmployeeNameErrorBlur() {
-    //   try {
-    //     if (!this.valueIsEmpty(this.EmployeeName)) {
-    //       this.isEmployeeError = false;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // inputDepartmentErrorBlur() {
-    //   try {
-    //     if (!this.valueIsEmpty(this.DepartmentId)) {
-    //       this.isEmployeeError = false;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+
     /**
      * Hàm ẩn dialog
      * Author: Văn Anh (6/1/2023)
@@ -633,7 +675,6 @@ export default {
           //Khai báo biến month gán month vì month bắt đầu từ 0 nên ta + thêm 1
           let month = date.getMonth() + 1;
           //Dùng toán tử 3 ngôi để thêm 0 đằng trước ngày nhỏ hơn 10
-          // month < 10 ? `0${month}` : `${month}`;
           if (month < 10) {
             month = "0" + month;
           } else {
@@ -648,7 +689,7 @@ export default {
           } else {
             day = "" + day;
           }
-          return `${year}/${month}/${day}`;
+          return `${year}-${month}-${day}`;
         } else {
           ("");
         }
@@ -662,7 +703,10 @@ export default {
      */
     tabOrder(e) {
       try {
-        e.preventDefault();
+        console.log("taborder: ", e);
+        this.$nextTick(function () {
+          this.$refs.EmployeeCode.focus();
+        });
       } catch (error) {
         console.log(error);
       }
@@ -678,7 +722,6 @@ export default {
 
         if (this.valueIsEmpty(this.newEmployee.EmployeeCode)) {
           this.isEmployeeCodeError = true;
-          console.log("Mã nhân viên trống", this.isEmployeeCodeError);
           this.errorMessage.push("Mã nhân viên không được để trống");
           // this.$nextTick(function () {
           //   this.$refs.txtEmployeeCode.focus();
@@ -688,7 +731,6 @@ export default {
         //Tên nhân viên không được phép để trống
         if (this.valueIsEmpty(this.newEmployee.EmployeeName)) {
           this.isEmployeeNameError = true;
-          console.log("Tên nhân viên trống", this.isEmployeeNameError);
           this.errorMessage.push("Tên nhân viên không được để trống");
           // this.$nextTick(function () {
           //   this.$refs.txtEmployeeName.focus();
@@ -697,7 +739,6 @@ export default {
         //Tên đơn vị không được để trống
         if (this.valueIsEmpty(this.newEmployee.DepartmentId)) {
           this.isDepartmentError = true;
-          console.log("Đơn vị nhân viên trống", this.isDepartmentError);
           this.errorMessage.push("Tên đơn vị không được để trống");
           // this.$nextTick(function () {
           //   this.$refs.txtDepartmentId.focus();
@@ -730,21 +771,7 @@ export default {
       }
     },
     //#endregion
-    /**
-     * Hàm reset lại data của đối tượng
-     * Author: Văn Anh (20/12/2022)
-     */
-    clearData() {
-      try {
-        console.log("Xoas", this.newEmployee);
-        this.newEmployee.EmployeeCode = "";
-
-        console.log("sau", this.newEmployee);
-        // console.log("new employee : " + this.newEmployee);
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    
     //#region Các hàm liên quan đến hiển thị toast, dialog
 
     //#endregion

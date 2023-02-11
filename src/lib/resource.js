@@ -5,8 +5,8 @@
 export default {
   Url: {
     Employees: "https://amis.manhnv.net/api/v1/Employees",
-    Departments: "https://cukcuk.manhnv.net/api/v1/Departments",
-    Positions: "https://cukcuk.manhnv.net/api/v1/Positions",
+    Departments: "https://amis.manhnv.net/api/v1/Departments",
+    Positions: "https://amis.manhnv.net/api/v1/Positions",
   },
   //Các thông báo exception gửi từ backend hiển thị cho người dùng
   ExceptionMsg: {
@@ -47,7 +47,7 @@ export default {
   },
   TextVi: {
     Header: {
-      CompanyName: "Công ty TNHH Sản xuất - Thương mại - Dịch vụ Qui Phúc",
+      CompanyName: "Công ty TNHH SONG VIỆT - Misatest",
       EmployeeName: "Hồ Văn Anh",
     },
     Content: {
@@ -75,9 +75,8 @@ export default {
       Stop: "Ngừng sử dụng",
       RecordInPage: " bản ghi trên 1 trang",
     },
-    Modal: {
-      AddModal: "Thêm nhân viên",
-      UpdateModal: "Thông tin nhân viên",
+    Detail: {
+      DetailTitle: "Thông tin nhân viên",
       EmployeeCode: "Mã",
       EmployeeName: "Tên",
       DateOfBirth: "Ngày sinh",
@@ -112,12 +111,13 @@ export default {
       No: "Không",
       Yes: "Có",
       Close: "Đóng",
-      Cancel: "Huỷ bỏ",
+      Cancel: "Huỷ",
       Delete: "Xoá",
       Accept: "Đồng ý",
       Title: {
         Delete: "Xoá nhân viên",
-        Change: "Dữ liệu đã thay đổi",
+        Warning: "Cảnh báo",
+        Change: "Dữ liệu đã bị thay đổi. Bạn có muốn cất không? ",
         Error: "Có lỗi!",
       },
       Text: {
@@ -141,5 +141,14 @@ export default {
         Update: "Nhân viên đã được thay đổi.",
       },
     },
+    ToolTip: {
+      Help: "Giúp (F1)",
+      Close: "Đóng (ESC)",
+      IdentityNumber: "Số chứng minh nhân dân",
+      Phone: "Số điện thoại di động",
+      Telephone: "Số điện thoại cố định",
+      Save: "Cất (Ctrl+S)",
+      SaveAndAdd: "Cất và Thêm (Ctrl+Shift+S)",
+    }
   },
 };

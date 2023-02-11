@@ -9,13 +9,13 @@
     </div>
     <div class="content--right">
       <div class="flex pagination">
-        <select class="flex combobox record-in-page">
+        <!-- <select class="flex combobox record-in-page">
           <option>20 bản ghi trên trang</option>
           <option>30 bản ghi trên trang</option>
           <option>40 bản ghi trên trang</option>
           <div class="icon w-h-24 pagination-icon"></div>
-        </select>
-        <!-- <MCombobox></MCombobox> -->
+        </select> -->
+        <MCombobox></MCombobox>
         <div class="flex">
           <div
             class="page__next page__prev--selected"
@@ -154,7 +154,7 @@ export default {
       totalPage: null, //Tổng số trang
     };
   },
-  created() {
+  updated() {
     this.currentPage = this.pageNumber;
   },
   methods: {
@@ -196,6 +196,7 @@ export default {
           this.currentPage++;
           //GỌi lại api
           this.loadApi();
+          console.log("next page");
         }
       } catch (error) {
         console.log(error);
@@ -212,6 +213,7 @@ export default {
           console.log(this.currentPage);
           //Gọi lại api
           this.loadApi();
+          console.log("trang dau");
         }
       } catch (error) {
         console.log(error);

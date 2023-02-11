@@ -23,10 +23,10 @@
             <MInput
               border="none"
               v-model.trim="this.filter.employeeFilter"
-              @input="searchOnListEmployee"
               @inputFocus="inputSearchFocus"
               @inputOutFocus="this.inputSearchFocused = false"
               placeholder="Tìm kiếm theo mã, tên nhân viên"
+              
             ></MInput>
             <MButton
               class="icon btn--small btn__search"
@@ -91,6 +91,29 @@
                 ></MCheckbox>
               </td>
               <td class="w-150 text-align-left employee-code">
+                {{ item.employeeCode }}
+              </td>
+              <td class="text-align-left">{{ item.fullName }}</td>
+              <td class="text-align-left w-150">
+                {{ item.gender }}
+              </td>
+              <td class="text-align-center w-150">
+                {{ this.commonJs.formatDate(item.dateOfBirth) }}
+              </td>
+              <td class="text-align-left w-150">
+                {{ item.identityNumber }}
+              </td>
+              <td class="text-align-left w-150">
+                {{ item.departmnetName }}
+              </td>
+              <td class="text-align-left w-150">{{ item.positionName }}</td>
+              <td class="text-align-left w-150">
+                {{ item.bankAccountNumber }}
+              </td>
+              <td class="text-align-left w-150">{{ item.bankName }}</td>
+              <td class="text-align-left w-200">{{ item.bankBranchName }}</td>
+              <!--  -->
+              <!-- <td class="w-150 text-align-left employee-code">
                 {{ item.EmployeeCode }}
               </td>
               <td class="text-align-left">{{ item.EmployeeName }}</td>
@@ -98,7 +121,7 @@
                 {{ item.GenderName }}
               </td>
               <td class="text-align-center w-150">
-                {{ formatDate(item.DateOfBirth) }}
+                {{ this.commonJs.formatDate(item.DateOfBirth) }}
               </td>
               <td class="text-align-left w-150">
                 {{ item.IdentityNumber }}
@@ -111,7 +134,7 @@
                 {{ item.BankAccountNumber }}
               </td>
               <td class="text-align-left w-150">{{ item.BankName }}</td>
-              <td class="text-align-left w-200">{{ item.BankBranchName }}</td>
+              <td class="text-align-left w-200">{{ item.BankBranchName }}</td> -->
               <td class="text-align-center w-150 tb-function">
                 <div class="flex table__function">
                   <button
@@ -123,7 +146,7 @@
                   <button
                     class="btn-function__dropdown"
                     @click="
-                      showOnDropMenu($event, item.EmployeeId, item.EmployeeCode)
+                      showOnDropMenu($event, item.employeeId, item.employeeCode)
                     "
                   >
                     <div class="icon w-h-24 function-dropdown-icon"></div>
@@ -153,7 +176,7 @@
   <!-- Loading -->
   <MLoading v-if="isShowLoading"></MLoading>
   <!-- DropMenu -->
-  <teleport to="body" @click="isShowOnDropMenu = false">
+  <teleport to="body" @blur="hideOnDropMenu">
     <div
       id="btn-dropdown-menu"
       class="dropdown-menu"
@@ -171,7 +194,14 @@
   </teleport>
   <MDialog v-if="isShowDialog" @btnCloseDialog="closeDialog">
     <template v-slot:title>Cảnh báo</template>
-    <template v-slot:message>{{ this.warningDeleteMessage }}</template>
+    <template v-slot:message>
+      <li class="flex dialog-mgs">
+        <div
+          class="icon w-h-24 btn-dialog--close dialog__warning-icon"
+        ></div>
+        {{ this.warningDeleteMessage }}
+      </li>
+    </template>
     <template v-slot:footer>
       <MButton
         class="btn btn--primary dialog__btn--acept"
@@ -189,32 +219,26 @@
   </MDialog>
   <!-- Toast Success -->
   <MToast
-    v-show="isShowSuccessToast"
-    @btnCloseToast="isShowSuccessToast = false"
+    v-if="(isShowOnToast = false)"
+    @btnCloseToast="isShowOnToast"
+    :success="this.success"
   >
-    <template v-slot:icon>
-      <div class="icon w-h-24 toast-icon--success"></div>
-    </template>
-    <template v-slot:message>
-      <span class="toast__desc--status toast-status--success">Thành công!</span>
-      <span>{{
-        updateFunction
-          ? this.TextToastMsg.success.update
-          : this.TextToastMsg.success.insert
-      }}</span>
-    </template>
   </MToast>
 </template>
 <script>
+//Import Thư viện
 import axios from "axios";
 import resource from "../../../lib/resource.js";
+import _ from "lodash";
 import EmployeeDetail from "../EmployeeDetail/EmployeeDetail.vue";
+import commonJs from "@/script/common.js"
 //Base
 import MLoading from "../../../components/bases/Loading/MLoading.vue";
 // import MDropMenu from "../DropMenu/MDropMenu.vue";
 import MPaging from "../../../components/bases/Paging/MPaging.vue";
 import MDialog from "@/components/bases/Dialog/MDialog.vue";
 import MToast from "../../../components/bases/Toast/MToast.vue";
+
 export default {
   name: "EmployeeList",
   components: {
@@ -235,12 +259,14 @@ export default {
       isShowOnDropMenu: false,
       warningDeleteMessage: "",
       deleteEmployeeId: "",
-      isShowSuccessToast: false,
       updateFunction: false,
       isShowDialog: false,
       inputSearchFocused: false,
+      success: true,
+      //Toast
+
+      isShowOnToast: false,
       //Khai báo thời gian delay search
-      debounce: null,
       //#endregion
       text: "Thêm nhân viên ",
       employeeIdSelected: null,
@@ -249,6 +275,8 @@ export default {
       employeeSelected: [],
 
       isPrimary: true,
+
+      commonJs: commonJs,
 
       contentAdd: resource.TextVi.Content.Add,
       contentTitle: resource.TextVi.Content.Title,
@@ -295,14 +323,16 @@ export default {
   watch: {
     filter: {
       handler: function (newValue) {
-        console.log("value tìm kiếm", newValue);
-        this.listEmployees();
+        console.log(newValue);
+        this.searchEmployee();
       },
       deep: true,
     },
     currentPage: function (newValue) {
       this.pageNumber = newValue;
+      this.listEmployees();
       console.log("current Employee: ", newValue);
+      console.log("pageNumber: ", this.pageNumber);
     },
   },
   created() {
@@ -343,7 +373,7 @@ export default {
       try {
         //Hiển thị dialog
         this.isShowForm = true;
-        this.employeeIdSelected = item.EmployeeId;
+        this.employeeIdSelected = item.employeeId;
       } catch (error) {
         console.log(error);
       }
@@ -354,10 +384,16 @@ export default {
      */
     showOnDropMenu(e, deleteEmployeeId, deleteEmployeeCode) {
       try {
-        console.log(e, deleteEmployeeId, deleteEmployeeCode);
         //Xét vị trí cho dropdown
-        this.dropdownPositionX = e.clientX;
-        this.dropdownPositionY = e.clientY;
+        if (e.clientY > 575){
+          this.dropdownPositionY = 510;
+          this.dropdownPositionX = e.clientX;
+        }
+        else {
+          this.dropdownPositionX = e.clientX;
+          this.dropdownPositionY = e.clientY;
+
+        }
         //Hiển thị drop menu
         this.isShowOnDropMenu = !this.isShowOnDropMenu;
         this.warningDeleteMessage = `Bạn có thực sự muốn xóa ${deleteEmployeeCode} không?`;
@@ -366,16 +402,21 @@ export default {
         console.log(error);
       }
     },
-
+    hideOnDropMenu() {
+      try {
+        this.isShowOnDropMenu = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Hiển thị toast success
      * Author: Văn ANh (10/1/2023)
      */
     showSuccessToast() {
       try {
-        console.log("List show toast");
-        this.isShowSuccessToast = !this.isShowSuccessToast;
-        setTimeout(() => (this.isShowSuccessToast = false), 5000);
+        this.isShowOnToast = !this.isShowOnToast;
+        setTimeout(() => (this.isShowOnToast = false), 5000);
       } catch (error) {
         console.log(error);
       }
@@ -386,7 +427,6 @@ export default {
      */
     showOnDialogDelete() {
       try {
-        console.log("click");
         this.isShowDialog = true;
         this.isShowOnDropMenu = false;
       } catch (error) {
@@ -411,15 +451,16 @@ export default {
      */
     btnOnDelete(deleteId) {
       try {
-        console.log(deleteId);
         axios
-          .delete(`https://amis.manhnv.net/api/v1/Employees/${deleteId}`)
+          .delete(
+            // `https://amis.manhnv.net/api/v1/Employees/${deleteId}`
+            `https://localhost:7232/api/Employees/${deleteId}`
+            )
           .then((response) => {
             console.log("res", response);
             this.isShowDialog = false;
             this.listEmployees();
             this.deleteEmployeeId = "";
-            console.log("sau khi xoa", this.deleteEmployeeId);
           })
           .catch((error) => {
             console.log(error);
@@ -452,7 +493,6 @@ export default {
         } else {
           this.employeeSelected.push(selectedId);
         }
-        console.log(this.employeeSelected);
       } catch (error) {
         console.log(error);
       }
@@ -472,7 +512,6 @@ export default {
             }
           }
         }
-        console.log("employeeSelected: ", this.employeeSelected);
       } catch (error) {
         console.log(error);
       }
@@ -488,15 +527,18 @@ export default {
         this.isShowLoading = true;
         await axios
           .get(
-            `https://amis.manhnv.net/api/v1/Employees/filter?employeeFilter=${this.filter.employeeFilter}&pageSize=${this.filter.pageSize}&pageNumber=${this.currentPage}`
-            // "https://amis.manhnv.net/api/v1/Employees"
+            `https://localhost:7232/api/v1/Employees/filter?pageSize=20&pageNumber=1`
           )
           .then((response) => {
             // this.employees = response.data;
             // this.employeesLength = this.employees.length;
-            this.employees = response.data.Data;
-            this.totalRecord = response.data.TotalRecord;
-            this.totalPage = response.data.TotalPage;
+            console.log(response.data);
+            // this.employees = response.data.Data;
+            // this.totalRecord = response.data.TotalRecord;
+            // this.totalPage = response.data.TotalPage;
+            this.employees = response.data.data;
+            this.totalRecord = response.data.data.length;
+            this.totalPage = response.data.total;
             this.isShowLoading = false;
             console.log("currentPage: " + this.currentPage);
           })
@@ -511,56 +553,15 @@ export default {
      * Hàm xử lý tìm kiếm
      * Author: Văn Anh (11/1/2023)
      */
-    searchOnListEmployee() {
+    searchEmployee: _.debounce(function () {
       try {
-        clearTimeout(this.debounce);
-        this.debounce = setTimeout(() => {
-          this.listEmployees();
-        }, 600);
+        this.listEmployees();
       } catch (error) {
         console.log(error);
       }
-    },
+    }, 500),
     //#endregion
-    //#region Hàm định dạng các dữ liệu
-    /**
-     * Định dạng ngày tháng
-     * Author: Văn Anh (18/12/2022)
-     */
-    formatDate(date) {
-      try {
-        if (date) {
-          //Tạo đối tượng date
-          date = new Date(date);
-          //Khai báo biến year gán year hiện tại
-          let year = date.getFullYear();
-          //Khai báo biến month gán month vì month bắt đầu từ 0 nên ta + thêm 1
-          let month = date.getMonth() + 1;
-          //Dùng toán tử 3 ngôi để thêm 0 đằng trước ngày nhỏ hơn 10
-          // month < 10 ? `0${month}` : `${month}`;
-          if (month < 10) {
-            month = "0" + month;
-          } else {
-            month = "" + month;
-          }
-          //Khai báo biến day và gán day bằng ngày hiện tại
-          let day = date.getDate();
-          //Dùng toán tử 3 ngôi để thêm 0 đằng trước ngày nhỏ hơn 10
-          // day < 10 ? `0${day}` : `${day}`;
-          if (day < 10) {
-            day = "0" + day;
-          } else {
-            day = "" + day;
-          }
-          return `${day}/${month}/${year}`;
-        } else {
-          ("");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    //#endregion
+    
   },
   computed: {
     dropdownPosition() {

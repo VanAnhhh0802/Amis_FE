@@ -29,5 +29,6 @@ const MISAEnum = {
     ROW_DOWN: 40, //Phím down
     ROW_UP: 38, //Phím up
   },
+  KEY_RECORD: {},
 };
 export default MISAEnum;

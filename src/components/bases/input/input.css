@@ -40,9 +40,10 @@ label ~ * {
 .field--error {
   border: 1px solid #ff0000 !important;
 }
+
 .error-text {
   position: absolute;
-  top: 60px;
+  top: 58px;
   margin-top: 6px;
   font-size: 11px;
   width: 100%;
@@ -51,6 +52,7 @@ label ~ * {
 }
 .input-wrapper {
   width: 100%;
+  position: relative;
 }
 input[type="radio"] {
   /* Add if not using autoprefixer */

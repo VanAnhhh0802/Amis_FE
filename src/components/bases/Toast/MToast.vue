@@ -1,10 +1,34 @@
 <template lang="">
-  <div id="toast__success" class="toast">
+  <!-- <div id="toast__success" class="toast">
     <div class="flex w-full">
       <div class="flex toast__content">
-        <slot name="icon"> </slot>
+        <slot name="icon"></slot>
         <div class="flex toast__desc">
           <slot name="message"> </slot>
+        </div>
+        <div class="icon w-h-24 toast-right-icon" @click="closeToast"></div>
+      </div>
+    </div>
+  </div> -->
+  <div id="toast" class="toast">
+    <div class="flex w-full">
+      <div class="flex toast__content">
+        <div class="icon w-h-24">
+          <div class="toast-icon--success" v-if="success"></div>
+          <div class="toast-icon--warning"></div>
+          <div class="toast-icon--error"></div>
+        </div>
+        <div class="flex toast__desc">
+          <div>
+            <span class="toast__desc--status">
+              <span class="toast__desc--success" v-if="this.isSuccess"
+                >Thành công</span
+              >
+              <span class="toast__desc--warning" v-if="this.isWarning"></span>
+              <span class="toast__desc--error">{{}}</span>
+            </span>
+            <span>{{ toastMessage }}</span>
+          </div>
         </div>
         <div class="icon w-h-24 toast-right-icon" @click="closeToast"></div>
       </div>
@@ -14,6 +38,22 @@
 <script>
 export default {
   name: "MToast",
+  data() {
+    return {
+      isShowToast: false,
+      isSuccess:false,
+      isWarning:false,
+    };
+  },
+  props: {
+    toastMessage: String,
+    success: Boolean,
+    warning: Boolean 
+  },
+  updated(){
+    this.isSuccess = this.success;
+    this.isWarning = this.warning;
+  },
   methods: {
     /**
      * bắn sự kiển ẩn lên cha để ẩn toast
