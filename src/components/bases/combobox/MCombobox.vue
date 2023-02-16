@@ -23,6 +23,7 @@
         :tabindex="tabIndex"
         @focus="inputFocus"
         @blur="inputOutFocus"
+        :ref ="nameRef"
       />
       <button
         class="combobox__button"
@@ -77,6 +78,7 @@ export default {
     modelValue: String,
     tabIndex: Number,
     inputErrorCombobox: Boolean,
+    nameRef: String,
   },
   emits: ["update:modelValue", "inputFocus"],
   created() {
@@ -84,10 +86,10 @@ export default {
       axios
         .get(this.api)
         .then((data) => {
-          console.log(data.data);
-          this.entities = data.data;
+          this.entities = data.data.data;
+          
           //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
-          this.entitySearch = data.data;
+          this.entitySearch = data.data.data;
           this.setItemSelected();
         })
         .catch((response) => {
@@ -124,7 +126,6 @@ export default {
     inputOnKeyDown(event) {
       try {
         const keyCode = event.keyCode;
-        console.log(keyCode);
         switch (keyCode) {
           case this.MISAEnum.KEY_CODE.ENTER:
             //Xác định item đang chọn dựa vào index
@@ -157,6 +158,23 @@ export default {
         console.log(error);
       }
     },
+    /*
+     * Hàm xử lý  focus
+     * Author: Văn Anh (9/1/2023)
+     */
+     comboboxFocus(){
+      try {
+        this.$nextTick(function () {
+          this.$refs[this.nameRef].focus();
+        });
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm xử lý focus
+     */
     inputFocus() {
       try {
         this.inputOnFocus = true;
@@ -186,6 +204,7 @@ export default {
         var me = this;
         //Sau khi chọn 1 trường thì thực hiện reset lại danh sách
         this.entitySearch = this.entities;
+        console.log(this.entitySearch);
         //Gán item đang đc chọn cho entity
         this.itemSelected = entity;
 
@@ -223,7 +242,6 @@ export default {
      */
     onSearchItem() {
       try {
-        console.log(this.textSelected);
         var me = this;
         //Tìm các trường tương ứng với nhập liệu ở input
         this.entitySearch = this.entities.filter((item) =>

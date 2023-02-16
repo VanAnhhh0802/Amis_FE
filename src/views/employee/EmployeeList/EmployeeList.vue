@@ -22,7 +22,7 @@
           >
             <MInput
               border="none"
-              v-model.trim="this.filter.employeeFilter"
+              v-model.trim="this.filter.keyword"
               @inputFocus="inputSearchFocus"
               @inputOutFocus="this.inputSearchFocused = false"
               placeholder="Tìm kiếm theo mã, tên nhân viên"
@@ -87,7 +87,7 @@
               <td class="width-table-checkbox list-checkbox body-checkbox">
                 <MCheckbox
                   @btnCheck="this.selectEmployeeCheck(item)"
-                  @checkedEmployee="this.employeeSelected.includes(item)"
+                  
                 ></MCheckbox>
               </td>
               <td class="w-150 text-align-left employee-code">
@@ -95,46 +95,23 @@
               </td>
               <td class="text-align-left">{{ item.fullName }}</td>
               <td class="text-align-left w-150">
-                {{ item.gender }}
+                {{ this.formatGender(item.gender) }}
               </td>
               <td class="text-align-center w-150">
-                {{ this.commonJs.formatDate(item.dateOfBirth) }}
+                {{ this.formatDate(item.dateOfBirth) }}
               </td>
               <td class="text-align-left w-150">
                 {{ item.identityNumber }}
               </td>
-              <td class="text-align-left w-150">
-                {{ item.departmnetName }}
+              <td class="text-align-left">
+                {{ item.departmentName }}
               </td>
               <td class="text-align-left w-150">{{ item.positionName }}</td>
               <td class="text-align-left w-150">
                 {{ item.bankAccountNumber }}
               </td>
               <td class="text-align-left w-150">{{ item.bankName }}</td>
-              <td class="text-align-left w-200">{{ item.bankBranchName }}</td>
-              <!--  -->
-              <!-- <td class="w-150 text-align-left employee-code">
-                {{ item.EmployeeCode }}
-              </td>
-              <td class="text-align-left">{{ item.EmployeeName }}</td>
-              <td class="text-align-left w-150">
-                {{ item.GenderName }}
-              </td>
-              <td class="text-align-center w-150">
-                {{ this.commonJs.formatDate(item.DateOfBirth) }}
-              </td>
-              <td class="text-align-left w-150">
-                {{ item.IdentityNumber }}
-              </td>
-              <td class="text-align-left w-150">
-                {{ item.DepartmentName }}
-              </td>
-              <td class="text-align-left w-150">{{ item.PositionName }}</td>
-              <td class="text-align-left w-150">
-                {{ item.BankAccountNumber }}
-              </td>
-              <td class="text-align-left w-150">{{ item.BankName }}</td>
-              <td class="text-align-left w-200">{{ item.BankBranchName }}</td> -->
+              <td class="text-align-left w-200">{{ item.bankBranch}}</td>
               <td class="text-align-center w-150 tb-function">
                 <div class="flex table__function">
                   <button
@@ -161,8 +138,9 @@
     <!-- Pagination -->
     <MPaging
       :total="this.totalRecord"
-      :totalInPage="totalPage"
-      v-model:pageNumber="currentPage"
+      :totalInPage="this.totalPage"
+      v-model:pageNumber="this.filter.pageNumber"
+      :pageSizeNumber = "this.filter.pageSize"
     ></MPaging>
   </div>
   <!-- Dialog nhân viên -->
@@ -219,10 +197,14 @@
   </MDialog>
   <!-- Toast Success -->
   <MToast
-    v-if="(isShowOnToast = false)"
-    @btnCloseToast="isShowOnToast"
-    :success="this.success"
+    v-if="showSuccessToast()"
+    @btnCloseToast ="CloseToast"
   >
+    <template v-slot:icon><div class="icon w-h-24 toast-icon--success"></div></template>
+    <template v-slot:message>
+      <span class="toast__desc--status toast__desc--success">Thành công</span>
+      <span>Thêm nhân viên thành công</span>
+    </template>
   </MToast>
 </template>
 <script>
@@ -231,14 +213,13 @@ import axios from "axios";
 import resource from "../../../lib/resource.js";
 import _ from "lodash";
 import EmployeeDetail from "../EmployeeDetail/EmployeeDetail.vue";
-import commonJs from "@/script/common.js"
+// import commonJs from "@/script/common.js"
 //Base
 import MLoading from "../../../components/bases/Loading/MLoading.vue";
 // import MDropMenu from "../DropMenu/MDropMenu.vue";
 import MPaging from "../../../components/bases/Paging/MPaging.vue";
 import MDialog from "@/components/bases/Dialog/MDialog.vue";
 import MToast from "../../../components/bases/Toast/MToast.vue";
-
 export default {
   name: "EmployeeList",
   components: {
@@ -276,7 +257,6 @@ export default {
 
       isPrimary: true,
 
-      commonJs: commonJs,
 
       contentAdd: resource.TextVi.Content.Add,
       contentTitle: resource.TextVi.Content.Title,
@@ -308,13 +288,9 @@ export default {
         },
       },
       //Sử dụng ở tìm kiếm phân trang
-      totalRecord: 0,
-      totalPage: 0,
-      currentPage: 1,
       filter: {
-        employeeFilter: "",
-        pageSize: 10,
-        pageNumber: 3,
+        pageSize: 20,
+        pageNumber: 1,
         keyword: "",
       },
     };
@@ -329,7 +305,7 @@ export default {
       deep: true,
     },
     currentPage: function (newValue) {
-      this.pageNumber = newValue;
+      this.filter.pageNumber = newValue;
       this.listEmployees();
       console.log("current Employee: ", newValue);
       console.log("pageNumber: ", this.pageNumber);
@@ -365,6 +341,7 @@ export default {
         console.log(error);
       }
     },
+    
     /**
      * Thực hiện double click vào 1 nhân viên thì hiển thị form nhân viên
      * Author: Văn Anh (18/12/2022)
@@ -396,7 +373,7 @@ export default {
         }
         //Hiển thị drop menu
         this.isShowOnDropMenu = !this.isShowOnDropMenu;
-        this.warningDeleteMessage = `Bạn có thực sự muốn xóa ${deleteEmployeeCode} không?`;
+        this.warningDeleteMessage = `Bạn có thực sự muốn xóa <${deleteEmployeeCode}> không?`;
         this.deleteEmployeeId = deleteEmployeeId;
       } catch (error) {
         console.log(error);
@@ -415,8 +392,19 @@ export default {
      */
     showSuccessToast() {
       try {
-        this.isShowOnToast = !this.isShowOnToast;
+        this.isShowOnToast = true;
         setTimeout(() => (this.isShowOnToast = false), 5000);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm đóng toast 
+     * Author: Văn anh(18/12/2022)
+     */
+     CloseToast(){
+      try {
+        this.isShowOnToast = false
       } catch (error) {
         console.log(error);
       }
@@ -451,10 +439,10 @@ export default {
      */
     btnOnDelete(deleteId) {
       try {
+        console.log(deleteId);
         axios
           .delete(
-            // `https://amis.manhnv.net/api/v1/Employees/${deleteId}`
-            `https://localhost:7232/api/Employees/${deleteId}`
+            `https://localhost:44371/api/v1/Employees/${deleteId}`
             )
           .then((response) => {
             console.log("res", response);
@@ -527,20 +515,16 @@ export default {
         this.isShowLoading = true;
         await axios
           .get(
-            `https://localhost:7232/api/v1/Employees/filter?pageSize=20&pageNumber=1`
+            `https://localhost:44371/api/v1/Employees/filter?keyword=${this.filter.keyword}&pageSize=${this.filter.pageSize}&pageNumber=${this.filter.pageNumber}`
           )
           .then((response) => {
-            // this.employees = response.data;
-            // this.employeesLength = this.employees.length;
             console.log(response.data);
-            // this.employees = response.data.Data;
-            // this.totalRecord = response.data.TotalRecord;
-            // this.totalPage = response.data.TotalPage;
             this.employees = response.data.data;
-            this.totalRecord = response.data.data.length;
-            this.totalPage = response.data.total;
+            this.totalRecord = response.data.totalRecord;
+            this.totalPage = response.data.totalPage;
             this.isShowLoading = false;
-            console.log("currentPage: " + this.currentPage);
+            console.log("loading");
+            console.log("currentPage: " + this.filter.pageNumber);
           })
           .catch((error) => {
             console.log(error);
@@ -561,7 +545,57 @@ export default {
       }
     }, 500),
     //#endregion
-    
+    formatGender(gender){
+      try {
+        switch (gender) {
+        case 0:
+          return "Nam";
+        case 1:
+          return "Nữ";
+        case 2:
+          return "Khác";
+        default:
+          return ''
+
+      } 
+    }
+    catch (error) {
+      console.log(error);
+    }
+    },
+    formatDate(date) {
+        try {
+          if (date) {
+            //Tạo đối tượng date
+            date = new Date(date);
+            //Khai báo biến year gán year hiện tại
+            let year = date.getFullYear();
+            //Khai báo biến month gán month vì month bắt đầu từ 0 nên ta + thêm 1
+            let month = date.getMonth() + 1;
+            //Dùng toán tử 3 ngôi để thêm 0 đằng trước ngày nhỏ hơn 10
+            // month < 10 ? `0${month}` : `${month}`;
+            if (month < 10) {
+              month = "0" + month;
+            } else {
+              month = "" + month;
+            }
+            //Khai báo biến day và gán day bằng ngày hiện tại
+            let day = date.getDate();
+            //Dùng toán tử 3 ngôi để thêm 0 đằng trước ngày nhỏ hơn 10
+            // day < 10 ? `0${day}` : `${day}`;
+            if (day < 10) {
+              day = "0" + day;
+            } else {
+              day = "" + day;
+            }
+            return `${day}/${month}/${year}`;
+          } else {
+            ("");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+    }
   },
   computed: {
     dropdownPosition() {

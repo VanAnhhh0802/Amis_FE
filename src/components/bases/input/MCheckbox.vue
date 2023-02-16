@@ -1,21 +1,23 @@
 <template lang="">
-  <div class="flex input-checkbox">
-    <label>
-      <input
-        type="checkbox"
-        id="chkProdTomove"
-        @change="checkAll"
-        :checked="selectChecked"
-      />
-      <span class="check-box-effect"></span>
-    </label>
-  </div>
+  <input :disabled ="disabled" type="checkbox" name="" :id="id" class="m-input-checkbox" :checked="checked" @change="selectedCheckBox()" />
+  <label :for="id" class="m-checkbox-lable"  ><span></span></label>
 </template>
 <script>
 export default {
   name: "MCheckbox",
-
+  props: {
+    id : String,
+    checked : Boolean,
+    disabled : {
+      type : Boolean,
+      default : false
+    }
+  },
+  emits: ["checkbox-selected", "btnCheck"],
   methods: {
+      selectedCheckBox(){
+        this.$emit("checkbox-selected",!this.checked,this.id);
+      },
     /**
      * sự kiện check toàn bộ nhân viên
      * Author: Văn Anh (13/1/2023)

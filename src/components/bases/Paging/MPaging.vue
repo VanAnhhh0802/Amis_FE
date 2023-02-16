@@ -9,13 +9,11 @@
     </div>
     <div class="content--right">
       <div class="flex pagination">
-        <!-- <select class="flex combobox record-in-page">
-          <option>20 bản ghi trên trang</option>
-          <option>30 bản ghi trên trang</option>
-          <option>40 bản ghi trên trang</option>
-          <div class="icon w-h-24 pagination-icon"></div>
-        </select> -->
-        <MCombobox></MCombobox>
+        
+        <MDropCombobox
+        :pageNumberRecord="this.pagination"
+        @pageSize="this.pageSizeNumber"
+        ></MDropCombobox>
         <div class="flex">
           <div
             class="page__next page__prev--selected"
@@ -142,16 +140,43 @@
   </div>
 </template>
 <script>
+
+import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue"
 export default {
   name: "MPaging",
-  props: ["total", "totalInPage", "pageNumber"],
+  components: {
+    MDropCombobox
+  },
+  props: ["total", "totalInPage", "pageNumber", "pageSizeNumber"],
   computed: {},
   data() {
     return {
-      pageSize: 20, //Số lượng bản ghi/ trang
+      pageSize: 0, //Số lượng bản ghi/ trang
       totalRecord: null, //Tổng số bản ghi
       currentPage: null, // trang hiện tại đang chọn
       totalPage: null, //Tổng số trang
+      pagination : [
+        {
+          key: 10,
+          value: "10 sản phẩm trên 1 trang",
+        },
+        {
+          key: 20,
+          value: "20 sản phẩm trên 1 trang",
+        },
+        {
+          key: 30,
+          value: "30 sản phẩm trên 1 trang",
+        },
+        {
+          key: 50,
+          value: "50 sản phẩm trên 1 trang",
+        },
+        {
+          key: 100,
+          value: "100 sản phẩm trên 1 trang",
+        },
+      ]
     };
   },
   updated() {
@@ -178,7 +203,6 @@ export default {
         if (this.currentPage != 1) {
           //lùi xuống trang tiếp theo
           this.currentPage--;
-          console.log("currentPage-- : ", this.currentPage);
           //Gọi lại API
           this.loadApi();
         }
@@ -196,7 +220,6 @@ export default {
           this.currentPage++;
           //GỌi lại api
           this.loadApi();
-          console.log("next page");
         }
       } catch (error) {
         console.log(error);
@@ -213,7 +236,6 @@ export default {
           console.log(this.currentPage);
           //Gọi lại api
           this.loadApi();
-          console.log("trang dau");
         }
       } catch (error) {
         console.log(error);
@@ -237,7 +259,6 @@ export default {
   },
   watch: {
     currentPage: function (newValue) {
-      console.log("currentnewValue: " + newValue);
       this.$emit("update:pageNumber", newValue);
     },
     total(newValue) {
@@ -248,8 +269,10 @@ export default {
     },
     pageNumber(newValue) {
       this.currentPage = newValue;
-      console.log("new value currentPage", this.currentPage);
     },
+    pageSizeNumber : function (newValue) {
+      console.log("watch: pageSizeNumber",newValue);
+    }
   },
   //
 };

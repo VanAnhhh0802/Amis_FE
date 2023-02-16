@@ -15,8 +15,8 @@
       @focus="inputOnFocus"
       @blur="inputOutFocus"
       :placeholder="placeholder"
-      ref="refs"
       @input="input"
+      :ref="nameRef"
     />
     <!-- <div class="error-text" v-if="inputError">{{ inputErrorText }}</div> -->
   </div>
@@ -35,9 +35,9 @@ export default {
     border: String,
     inputError: Boolean,
     placeholder: String,
-    refs: String,
     inputErrorText: String,
     input:String,
+    nameRef:String
   },
 
   data() {
@@ -49,26 +49,23 @@ export default {
     };
   },
   watch: {
+    /**
+     * Theo dõi sự thay đổi của biến modelValue
+     * @param {} newValue 
+     */
     modelValue: function (newValue) {
       this.value = newValue;
     },
+    /**
+     * Theo dõi sự thay đổi của biến value
+     * @param {*} newValue 
+     */
     value: function (newValue) {
       this.$emit("update:model-Value", newValue);
     },
   },
   methods: {
-    /*
-     * Hàm xử lý biding 2 chiều
-     * Author: Văn Anh (9/1/2023)
-     */
-    // searchInput() {
-    //   try {
-    //     console.log("ádash");
-    //     this.$parent.searchEmployee();
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+    
     /*
      * Hàm xử lý Input focus
      * Author: Văn Anh (9/1/2023)
@@ -91,17 +88,22 @@ export default {
         console.log(error);
       }
     },
-    /*
-     * Hàm xử lý Tab order
+    
+    /**
+     * Hàm forcus vào input
      * Author: Văn Anh (9/1/2023)
      */
-    inputTabOrderFocus() {
+    inputFocus(){
       try {
-        this.$emit.refs.focus();
-      } catch (error) {
+        this.$nextTick(function () {
+          this.$refs[this.nameRef].focus();
+        });
+      }
+      catch (error) {
         console.log(error);
       }
-    },
+    }
+    
   },
 };
 </script>

@@ -31,7 +31,18 @@ const commonJs = {
         } catch (error) {
           console.log(error);
         }
-      },
+    },
+    formatGender(gender){
+      if (gender == 0){
+        gender = "Nam";
+      }
+      else if (gender == 1){
+        gender = "Nữ"
+      }
+      else {
+        gender = "Khác"
+      }
+    }
 }
 
 export default commonJs;

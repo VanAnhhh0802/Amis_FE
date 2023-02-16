@@ -56,11 +56,11 @@
   background-position: -844px -308px;
   margin-right: 8px;
 }
-.toast-icon--error {
+.toast-icon--warning {
   background-position: -593px -145px;
   margin-right: 8px;
 }
-.toast-icon--warring {
+.toast-icon--error {
   background-position: -538px -146px;
   margin-right: 8px;
 }
