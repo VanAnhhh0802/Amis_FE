@@ -89,6 +89,10 @@
   min-width: 200px;
   width: 200px;
 }
+.min-w-200{
+  min-width: 200px;
+  width: 230px;
+}
 .border-focus {
   border: 1px solid var(--main-color);
 }

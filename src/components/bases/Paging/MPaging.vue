@@ -1,20 +1,5 @@
 <template lang="">
-  <div class="content__footer">
-    <div class="content--left">
-      <div class="total-record">
-        Tổng số :
-        <b>{{ this.totalRecord }}</b>
-        bản ghi
-      </div>
-    </div>
-    <div class="content--right">
-      <div class="flex pagination">
-        
-        <MDropCombobox
-        :pageNumberRecord="this.pagination"
-        @pageSize="this.pageSizeNumber"
-        ></MDropCombobox>
-        <div class="flex">
+  <div class="flex">
           <div
             class="page__next page__prev--selected"
             @click="previousPage()"
@@ -135,18 +120,12 @@
             Sau
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 </template>
 <script>
 
-import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue"
 export default {
   name: "MPaging",
-  components: {
-    MDropCombobox
-  },
+  
   props: ["total", "totalInPage", "pageNumber", "pageSizeNumber"],
   computed: {},
   data() {
@@ -155,28 +134,7 @@ export default {
       totalRecord: null, //Tổng số bản ghi
       currentPage: null, // trang hiện tại đang chọn
       totalPage: null, //Tổng số trang
-      pagination : [
-        {
-          key: 10,
-          value: "10 sản phẩm trên 1 trang",
-        },
-        {
-          key: 20,
-          value: "20 sản phẩm trên 1 trang",
-        },
-        {
-          key: 30,
-          value: "30 sản phẩm trên 1 trang",
-        },
-        {
-          key: 50,
-          value: "50 sản phẩm trên 1 trang",
-        },
-        {
-          key: 100,
-          value: "100 sản phẩm trên 1 trang",
-        },
-      ]
+      
     };
   },
   updated() {
@@ -258,18 +216,23 @@ export default {
     },
   },
   watch: {
+    //Hàm theo dõi trang hiện tại
     currentPage: function (newValue) {
       this.$emit("update:pageNumber", newValue);
     },
+    //Hàm theo dõi tổng số bản ghi
     total(newValue) {
       this.totalRecord = newValue;
     },
+    //Hàm theo dõi tổng số bản ghi trên trang
     totalInPage(newValue) {
       this.totalPage = newValue;
     },
+    //Theo dõi trang hiện tại
     pageNumber(newValue) {
       this.currentPage = newValue;
     },
+    //Theo dõi bao nhiêu bản ghi / trang
     pageSizeNumber : function (newValue) {
       console.log("watch: pageSizeNumber",newValue);
     }

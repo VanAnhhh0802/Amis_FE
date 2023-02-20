@@ -13,33 +13,16 @@ export default {
       default : false
     }
   },
-  emits: ["checkbox-selected", "btnCheck"],
+  emits: ["checkbox-selected",],
   methods: {
-      selectedCheckBox(){
-        this.$emit("checkbox-selected",!this.checked,this.id);
-      },
     /**
      * sự kiện check toàn bộ nhân viên
      * Author: Văn Anh (13/1/2023)
      */
-    checkAll() {
-      try {
-        this.$emit("btnCheck");
-      } catch (error) {
-        console.log(error);
+     selectedCheckBox(){
+        this.$emit("checkbox-selected",!this.checked,this.id);
+        console.log("id: " + this.id);
       }
-    },
-    /**
-     * sự kiện check 1 nhân viên
-     * Author: Văn Anh (13/1/2023)
-     */
-    selectChecked() {
-      try {
-        this.$emit("checkedEmployee");
-      } catch (error) {
-        console.log(error);
-      }
-    },
   },
 };
 </script>

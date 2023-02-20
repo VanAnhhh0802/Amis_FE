@@ -4,7 +4,6 @@
     <div class="content__toolbar">
       <div class="content__title">
         Nhân viên
-        <!-- <p>{{ $t("message") }}</p> -->
       </div>
       <MButton
         @click="(updateFunction = false), btnAddEmployee()"
@@ -13,8 +12,22 @@
       ></MButton>
     </div>
     <div class="content__list">
-      <div class="flex list__header">
-        <div class="list-toolbar-wrapper">
+      <div class="flex list__header" style="justify-content: space-between;">
+        <div 
+        class="flex list-toolbar-left toolbar-no-active"
+        :class="{'toolbar-active': this.employeeSelected.length >=2}"
+        @click = "ShowOnSubToolbar()"
+        >
+          <span class="list-toolbar-left-text">Thực hiện hàng loạt</span>
+          <div class="icon toolbar-left-icon toolbar-icon-no-active"
+          :class="{'toolbar-icon-active': this.employeeSelected.length >=2}"
+          ></div>
+        </div>
+        <div class="toolbar-sub"
+        v-show="this.isShowSubToolbar"
+        @click="DeleteManyOnEmployee"
+        >Xóa</div>
+        <div class=" list-toolbar-wrapper">
           <div
             :class="{ 'border-focus': this.inputSearchFocused }"
             style="width: 260px"
@@ -42,6 +55,9 @@
             ></div>
             <div class="tooltip-text tooltip-reload">Lấy lại dữ liệu</div>
           </div>
+          <div class="icon export"
+            @click="exportFile(this.filter.keyword)"
+          ></div>
         </div>
       </div>
       <div class="list__table">
@@ -49,25 +65,20 @@
           <thead>
             <tr>
               <th class="width-table-checkbox list-checkbox">
-                <MCheckbox @btnCheck="this.checkAllEmployees()"></MCheckbox>
+                <MCheckbox 
+                id ="check-all"
+                @checkboxSelected="selectEmployeeCheck"
+                @checked ="checkAll"
+                ></MCheckbox>
               </th>
               <th class="text-align-left">{{ this.textEmployeeCode }}</th>
               <th class="text-align-left w-200">{{ this.textEmployeeName }}</th>
               <th class="text-align-left w-150">{{ this.textGender }}</th>
               <th class="text-align-center">{{ this.textDateOfBirth }}</th>
-              <th class="text-align-left">
-                <div class="tooltip">
-                  {{ this.textIdentity }}
-                  <div class="tooltip-text tooltip-indentity">
-                    Số chứng minh nhân dân
-                  </div>
-                </div>
-              </th>
               <th class="text-align-left">{{ this.textPositionName }}</th>
               <th class="text-align-left">{{ this.textDepartmentName }}</th>
               <th class="text-align-left">{{ this.textBankNumber }}</th>
               <th class="text-align-left">{{ this.textBankName }}</th>
-              <th class="text-align-left w-200">{{ this.textBankBranch }}</th>
               <th
                 class="text-align-center w-150 tb-function"
                 style="background-color: #f5f5f5"
@@ -83,11 +94,13 @@
               v-for="(item, index) in employees"
               :key="index"
               @dblclick="rowOnDbClick(item), (updateFunction = true)"
+              :class="{employee__active: this.employeeSelected.includes(item.employeeId)}"
             >
-              <td class="width-table-checkbox list-checkbox body-checkbox">
+              <td class="width-table-checkbox list-checkbox body-checkbox" :class="{employee__active: this.employeeSelected.includes(item.employeeId)}">
                 <MCheckbox
-                  @btnCheck="this.selectEmployeeCheck(item)"
-                  
+                :id ="item.employeeId" 
+                :checked ="this.employeeSelected.includes(item.employeeId)"
+                @checkboxSelected="selectEmployeeCheck"
                 ></MCheckbox>
               </td>
               <td class="w-150 text-align-left employee-code">
@@ -100,20 +113,16 @@
               <td class="text-align-center w-150">
                 {{ this.formatDate(item.dateOfBirth) }}
               </td>
-              <td class="text-align-left w-150">
-                {{ item.identityNumber }}
-              </td>
-              <td class="text-align-left">
+              <td class="text-align-left w-150">{{ item.positionName }}</td>
+              <td class="text-align-left min-w-200">
                 {{ item.departmentName }}
               </td>
-              <td class="text-align-left w-150">{{ item.positionName }}</td>
               <td class="text-align-left w-150">
                 {{ item.bankAccountNumber }}
               </td>
               <td class="text-align-left w-150">{{ item.bankName }}</td>
-              <td class="text-align-left w-200">{{ item.bankBranch}}</td>
-              <td class="text-align-center w-150 tb-function">
-                <div class="flex table__function">
+              <td class="text-align-center w-150 tb-function" :class="{employee__active: this.employeeSelected.includes(item.employeeId)}">
+                <div class="flex table__function" >
                   <button
                     class="btn-function-fix"
                     @click="rowOnDbClick(item), (updateFunction = true)"
@@ -135,13 +144,31 @@
         </table>
       </div>
     </div>
-    <!-- Pagination -->
-    <MPaging
-      :total="this.totalRecord"
-      :totalInPage="this.totalPage"
-      v-model:pageNumber="this.filter.pageNumber"
-      :pageSizeNumber = "this.filter.pageSize"
+    <!-- Footer -->
+    <div class="content__footer">
+    <div class="content--left">
+      <div class="total-record">
+        Tổng số :
+        <b>{{ this.totalRecord }}</b>
+        bản ghi
+      </div>
+    </div>
+    <div class="content--right">
+      <div class="flex pagination">
+        <MDropCombobox
+        :pageNumberRecord="this.pagination"
+        @pageSize="setPageSize"
+        ></MDropCombobox>
+        <MPaging
+        :total="this.totalRecord"
+        :totalInPage="this.totalPage"
+        v-model:pageNumber="this.filter.pageNumber"
+        :pageSizeNumber = "this.filter.pageSize"
     ></MPaging>
+      </div>
+    </div>
+  </div>
+    
   </div>
   <!-- Dialog nhân viên -->
   <EmployeeDetail
@@ -197,7 +224,7 @@
   </MDialog>
   <!-- Toast Success -->
   <MToast
-    v-if="showSuccessToast()"
+    v-if="isShowOnToast"
     @btnCloseToast ="CloseToast"
   >
     <template v-slot:icon><div class="icon w-h-24 toast-icon--success"></div></template>
@@ -220,19 +247,22 @@ import MLoading from "../../../components/bases/Loading/MLoading.vue";
 import MPaging from "../../../components/bases/Paging/MPaging.vue";
 import MDialog from "@/components/bases/Dialog/MDialog.vue";
 import MToast from "../../../components/bases/Toast/MToast.vue";
+import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue";
+
+
 export default {
   name: "EmployeeList",
   components: {
     EmployeeDetail,
     MLoading,
-    // MDropMenu,
     MPaging,
     MDialog,
     MToast,
+    MDropCombobox,
   },
   data() {
     return {
-      //#region Xử lý data liên quan đến sự kiện
+    //#region Xử lý data liên quan đến sự kiện
       isShowForm: false,
       isShowLoading: false,
       dropdownPositionX: 0,
@@ -252,12 +282,36 @@ export default {
       text: "Thêm nhân viên ",
       employeeIdSelected: null,
       employees: [],
-
+      checkAll : false,
       employeeSelected: [],
 
       isPrimary: true,
-
-
+      //Khai báo biến ở thực hiện hàng loạt
+      isShowSubToolbar: false,
+      //Paing 
+      pagination : [
+        {
+          key: 10,
+          value: "10 sản phẩm trên 1 trang",
+        },
+        {
+          key: 20,
+          value: "20 sản phẩm trên 1 trang",
+        },
+        {
+          key: 30,
+          value: "30 sản phẩm trên 1 trang",
+        },
+        {
+          key: 50,
+          value: "50 sản phẩm trên 1 trang",
+        },
+        {
+          key: 100,
+          value: "100 sản phẩm trên 1 trang",
+        },
+      ],
+      //RESOURCE
       contentAdd: resource.TextVi.Content.Add,
       contentTitle: resource.TextVi.Content.Title,
       //#region Text data Table
@@ -297,6 +351,9 @@ export default {
   },
 
   watch: {
+    /**
+     * Hàm theo dõi keyword mà thay đổi gọi hàm search
+     */
     filter: {
       handler: function (newValue) {
         console.log(newValue);
@@ -304,12 +361,7 @@ export default {
       },
       deep: true,
     },
-    currentPage: function (newValue) {
-      this.filter.pageNumber = newValue;
-      this.listEmployees();
-      console.log("current Employee: ", newValue);
-      console.log("pageNumber: ", this.pageNumber);
-    },
+    
   },
   created() {
     this.listEmployees();
@@ -379,6 +431,10 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * Hàm ẩn drop menu
+     * Author: Văn ANh (21/12/2023)
+     */
     hideOnDropMenu() {
       try {
         this.isShowOnDropMenu = false;
@@ -390,14 +446,15 @@ export default {
      * Hiển thị toast success
      * Author: Văn ANh (10/1/2023)
      */
-    showSuccessToast() {
-      try {
-        this.isShowOnToast = true;
-        setTimeout(() => (this.isShowOnToast = false), 5000);
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    // showSuccessToast() {
+    //   try {
+    //     console.log("click");
+    //     // this.isShowOnToast = true;
+    //     // setTimeout(() => (this.isShowOnToast = false), 5000);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
     /**
      * Hàm đóng toast 
      * Author: Văn anh(18/12/2022)
@@ -439,10 +496,9 @@ export default {
      */
     btnOnDelete(deleteId) {
       try {
-        console.log(deleteId);
         axios
           .delete(
-            `https://localhost:44371/api/v1/Employees/${deleteId}`
+            `https://localhost:7232/api/v1/Employees/${deleteId}`
             )
           .then((response) => {
             console.log("res", response);
@@ -472,15 +528,42 @@ export default {
      * Check  nhân viên
      * Author: Văn Anh (12/10/2023)
      */
-    selectEmployeeCheck(selectedId) {
+    selectEmployeeCheck(isChecked, id) {
       try {
-        if (this.employeeSelected.includes(selectedId)) {
-          this.employeeSelected = this.employeeSelected.filter(
-            (value) => value != selectedId
-          );
-        } else {
-          this.employeeSelected.push(selectedId);
+        //checl all 
+         if (id == "check-all"){
+          if (!isChecked) {
+            //Kiểm tra khi bỏ check all
+            this.employees.map(x => x.employeeId).forEach(e => {
+              this.employeeSelected = this.employeeSelected.filter(x => x != e)
+            });
+            this.checkAll = false;
+            this.isActiveToolbar = false;
+          }
+          else{
+            //Kiểm tra khi check all
+            this.employeeSelected = this.employeeSelected.concat(
+              this.employees.filter(
+                x => !this.employeeSelected.includes(x.employeeId)
+                ).map(x => x.employeeId));
+            this.checkAll = true;
+            this.isActiveToolbar = true;
+          }
         }
+        else {
+          //Kiểm tra các item check
+          if (!isChecked) {
+            this.employeeSelected = this.employeeSelected.filter(x => x != id);
+          }
+          else {
+            this.employeeSelected.push(id);
+            if (this.employeeSelected.length >= 2) {
+              this.isActiveToolbar = true;
+            }
+          }
+          this.testCheckAll();
+        }
+        console.log(JSON.stringify(this.employeeSelected));
       } catch (error) {
         console.log(error);
       }
@@ -489,17 +572,67 @@ export default {
      * Check all nhân viên
      * Author: Văn Anh (12/10/2023)
      */
-    checkAllEmployees() {
+    testCheckAll(){
       try {
-        if (this.employeeSelected.length == this.employees.length) {
-          this.employeeSelected = [];
-        } else {
-          for (const employee of this.employees) {
-            if (!this.employeeSelected.includes(employee.employeeId)) {
-              this.employeeSelected.push(employee.employeeId);
-            }
+        var count = 0;
+      this.employees
+        .map(x => x.employeeId)
+        .forEach(e => {
+          if(this.employeeSelected.filter(x => x == e).length > 0) {
+            count++;
           }
+        });
+        //Kiểm tra để check
+        if (count == this.employees.length) {
+          this.checkAll = true;
         }
+        else if (count < this.employees.length) {
+          this.checkAll = false;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      
+    },
+    /**
+     * Hàm set lại giá trị cho page size
+     * Author: Văn ANh (20/2/2023)
+     */
+    setPageSize(size){
+      try {
+        this.filter.pageSize = size;
+        this.filter.pageNumber = 1;
+        this.listEmployees();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm ẩn hiện sub toolbar
+     * Author: Văn ANh (20/2/2023)
+     */
+    ShowOnSubToolbar(){
+      try {
+          this.isShowSubToolbar = !this.isShowSubToolbar;
+          console.log("click");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    ,
+    /**
+     * Thực hiện xóa nhiều nhân viên
+     * Author: Văn ANh (20/2/2023)
+     */
+    async DeleteManyOnEmployee(){
+      try {
+        await axios.post("https://localhost:7232/api/v1/Employees/DeleteMany", this.employeeIdSelected)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.log(error);
+        })
       } catch (error) {
         console.log(error);
       }
@@ -515,7 +648,7 @@ export default {
         this.isShowLoading = true;
         await axios
           .get(
-            `https://localhost:44371/api/v1/Employees/filter?keyword=${this.filter.keyword}&pageSize=${this.filter.pageSize}&pageNumber=${this.filter.pageNumber}`
+            `https://localhost:7232/api/v1/Employees/filter?keyword=${this.filter.keyword}&pageSize=${this.filter.pageSize}&pageNumber=${this.filter.pageNumber}`
           )
           .then((response) => {
             console.log(response.data);
@@ -524,7 +657,8 @@ export default {
             this.totalPage = response.data.totalPage;
             this.isShowLoading = false;
             console.log("loading");
-            console.log("currentPage: " + this.filter.pageNumber);
+            console.log("currentPage: " + this.filter.keyword);
+
           })
           .catch((error) => {
             console.log(error);
@@ -540,11 +674,18 @@ export default {
     searchEmployee: _.debounce(function () {
       try {
         this.listEmployees();
+        if (this.filter.keyword != "") {
+          this.filter.pageNumber = 1;
+        }
       } catch (error) {
         console.log(error);
       }
     }, 500),
     //#endregion
+    /**
+     * Hàm format giới tính 
+     * Author: Văn Anh (11/1/2023)  
+     */
     formatGender(gender){
       try {
         switch (gender) {
@@ -563,6 +704,11 @@ export default {
       console.log(error);
     }
     },
+    /**
+     * Hàm format ngày tháng năm
+     * @param {*} date 
+     * Author: Văn ANh (21/12/2023)
+     */
     formatDate(date) {
         try {
           if (date) {
@@ -595,9 +741,45 @@ export default {
         } catch (error) {
           console.log(error);
         }
+    },
+    /**
+     * Hàm export thành danh sách nhân viên
+     * Author: Văn ANh (17/2/2023)
+     */
+    async exportFile(keyword){
+      try {
+        await axios.post("https://localhost:7232/api/v1/Employees/export", keyword, {
+          headers: {
+              "Access-Control-Allow-Origin": "*",
+            "accept": "*/*",
+            "Content-Type": "application/json;charset=UTF-8"
+            },
+            responseType : 'blob'
+          }
+        ) 
+        .then(response => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+
+          link.href = url;
+          link.setAttribute('download', "Danh_sách_nhân_viên.xlsx");
+          document.body.appendChild(link);
+          link.click();
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      } 
+      catch (error) {
+        console.log(error);
+      }
     }
   },
   computed: {
+    /**
+     * Hàm tính toán vị trí của dropdown function
+     */
     dropdownPosition() {
       return {
         top: `calc(${this.dropdownPositionY}px + 10px)`,

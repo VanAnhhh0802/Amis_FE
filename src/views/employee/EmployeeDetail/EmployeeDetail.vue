@@ -10,11 +10,11 @@
             </h1>
             <span class="flex col-gap">
               <MCheckbox></MCheckbox>
-              <span>Là khách hàng</span>
+              <span style = "margin-top: 0;">Là khách hàng</span>
             </span>
             <span class="flex col-gap">
               <MCheckbox></MCheckbox>
-              <span>Là nhà cung cấp</span>
+              <span style = "margin-top: 0;">Là nhà cung cấp</span>
             </span>
           </div>
           <div class="flex form-icon">
@@ -65,7 +65,7 @@
                     :isRequired="true"
                     propName="departmentName"
                     propValue="departmentId"
-                    api="https://localhost:44371/api/v1/Departments/filter?pageSize=10&pageNumber=1"
+                    api="https://localhost:7232/api/v1/Departments/filter?pageSize=10&pageNumber=1"
                     v-model="newEmployee.departmentId"
                     :isShowError="false"
                     :tabIndex="3"
@@ -141,11 +141,14 @@
                 </div>
               </div>
               <div class="row col-gap">
-                <MInput 
-                label="CMND" 
-                :tabIndex="9"
-                v-model:modelValue = "newEmployee.identityNumber"
-                ></MInput>
+                <div class="tooltip" style="width: 100%">
+                  <MInput 
+                  label="Số CMND" 
+                  :tabIndex="9"
+                  v-model:modelValue = "newEmployee.identityNumber"
+                  ></MInput>
+                  <div class="tooltip-text tooltip-reload">Số chứng minh nhân dân</div>
+                </div>
                 <MInput
                   :label="this.textLabelIdentityDate"
                   type="date"
@@ -177,17 +180,21 @@
             <div class="row form-popup-container-top">
               <div class="w-full flex col-gap">
                 <div class="w-full flex col-gap">
-                  
-                  <MInput
+                  <div class="tooltip" style="width: 100%">
+                    <MInput
                     :label="this.textLabelPhone"
                     :tabIndex="13"
                     v-model:modelValue="newEmployee.phoneNumber"
                   ></MInput>
+                  <div class="tooltip-text tooltip-reload">Điện thoại di động</div>
+                </div><div class="tooltip" style="width: 100%">
                   <MInput
                     :label="this.textLabelTelephone"
                     :tabIndex="14"
                     v-model:modelValue="newEmployee.telephoneNumber"
                   ></MInput>
+                  <div class="tooltip-text tooltip-reload">Điện thoại cố định</div>
+                </div>
                 </div>
                 <div class="w-full">
                   <MInput
@@ -357,7 +364,6 @@ export default {
   emits: [
     "btnCloseForm",
     "showSuccessToast",
-    "showSuccessToast",
     "inputFocusDetail",
   ],
   computed: {
@@ -404,6 +410,7 @@ export default {
       isDateOfBirthError: false,
       nameInput: "",
       //resource 
+      //#region 
       DetailTile:resource.TextVi.Detail.DetailTitle,
       textLabelCode:resource.TextVi.Detail.EmployeeCode,
       textLabelName:resource.TextVi.Detail.EmployeeName,
@@ -439,20 +446,8 @@ export default {
       textTooltipTelePhone:resource.TextVi.ToolTip.TelePhone,
       textTooltipSave:resource.TextVi.ToolTip.Save,
       textTooltipSaveAndAdd:resource.TextVi.ToolTip.SaveAndAdd,
+    //#endregion
     };
-  },
-  watch: {
-    // newEmployee: {
-    //   handler: function (newValue) {
-    //     console.log("newEmployee thay doi: ", newValue);
-    //     console.log("newEmployeeCode thay doi: ", newValue.EmployeeCode);
-    //     console.log("newEmployeeName thay doi: ", newValue.EmployeeName);
-    //     console.log("department thay doi: ", newValue.DepartmentId);
-    //   },getNewEmployeeCode
-    //   deep: true,
-    // },
-    
-    
   },
   async created() {
     if (!this.valueIsEmpty(this.employeeId)) {
@@ -470,7 +465,7 @@ export default {
     async getEmployeeId(id) {
       try {
         await axios
-          .get(`https://localhost:44371/api/v1/Employees/${id}`)
+          .get(`https://localhost:7232/api/v1/Employees/${id}`)
           .then((response) => {
             this.newEmployee = response.data;
             this.newEmployee.dateOfBirth = this.bidingDate(
@@ -498,7 +493,7 @@ export default {
     async getNewEmployeeCode() {
       try {
         await axios
-          .get("https://localhost:44371/api/v1/Employees/newEmployeeCode")
+          .get("https://localhost:7232/api/v1/Employees/newEmployeeCode")
           .then((response) => {
             this.newEmployee.employeeCode = response.data;
             // Focus vào ô nhập đầu tiên
@@ -520,14 +515,10 @@ export default {
     async addEmployee(employee) {
       try {
         await axios
-          .post("https://localhost:44371/api/v1/Employees", 
+          .post("https://localhost:7232/api/v1/Employees", 
           employee)
           .then((res) => {
             console.log(res);
-            //Ẩn load ding
-            this.$parent.showSuccessToast();
-
-            //Ẩn form và load lại dữ liệu
           })
           .catch((err) => {
             console.log(err);
@@ -557,10 +548,14 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * Hàm gọi API sửa nhân  viên
+     * Author: Văn Anh (21/12/2023)
+     */
     async editEmployee(id) {
       try {
         await axios
-          .put(`https://localhost:44371/api/v1/Employees/${id}`, {
+          .put(`https://localhost:7232/api/v1/Employees/${id}`, {
             employeeCode: this.newEmployee.employeeCode,
             fullName: this.newEmployee.fullName,
             departmentId: this.newEmployee.departmentId,
@@ -582,7 +577,6 @@ export default {
             this.isShowLoading = false;
             this.newEmployee.DateOfBirth = this.bidingDate(res.DateOfBirth);
             console.log("Sửa", res);
-            this.$emit("showSuccessToast");
             //Gán message cho toast
             this.errorToastMessage = "Thông tin nhân viên đã được thay đổi";
 
@@ -654,7 +648,6 @@ export default {
             //Sửa nhân viên
             await this.editEmployee(this.employeeId);
             this.newEmployee = {}
-            this.$emit("showSuccessToast");
           }
           this.isShowLoading = false;
           this.getNewEmployeeCode();
@@ -695,7 +688,6 @@ export default {
         console.log(error);
       }
     },
-
     /**
      * Hàm ẩn dialog
      * Author: Văn Anh (6/1/2023)
@@ -748,12 +740,12 @@ export default {
     /**
      * Hàm xử lý khi người dùng tab đến button hủy tab lần nữa quay lại ô input đầu tiên
      * Author: Văn Anh(26/12/2022)
+     * TODO:
      */
     tabOrder(e) {
       try {
         console.log("taborder: ", e);
         this.$refs.EmployeeCode.inputFocus();
-        
       } catch (error) {
         console.log(error);
       }
@@ -761,6 +753,7 @@ export default {
     /**
      * Xử lý sự kiện khi người dùng bấm nút cất
      * Author: Văn Anh (19/12/2022)
+     * TODO:
      */
     validateData() {
       try {
@@ -814,7 +807,6 @@ export default {
      */
     checkvalidateEmpty(value, errorName, message){
       try {
-
         if (this.valueIsEmpty(value)){
           errorName = true;
           this.errorMessage.push(message);
@@ -839,6 +831,10 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * Hàm check định dạng email
+     * @param {Giá trị của email} value 
+     */
     validateEmail(value) {
       try {
         var email =  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -851,10 +847,6 @@ export default {
         console.log(error);
       }
     },
-    //#endregion
-    
-    //#region Các hàm liên quan đến hiển thị toast, dialog
-
     //#endregion
   },
 };

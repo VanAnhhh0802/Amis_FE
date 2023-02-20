@@ -1,5 +1,5 @@
 <template>
-         <div class="dropdown">
+    <div class="dropdown">
         <input 
         v-model="textSelectTed" 
         disabled
@@ -8,20 +8,19 @@
         type="text">
         <div class="dropdown__button iconBtndropdown" @click="onShowHideData"></div>
         <div v-show="isShowData" class="dropdown__data">
-           <div class="dropdown-item"
-           v-for="(item,index) in NumberRecord" 
-           :key="index"
-           :class="{'item-select': index == indexItemSelect}"
-           @click="itemOnSelect(item,index)"
-           >
+            <div class="dropdown-item"
+            v-for="(item,index) in NumberRecord" 
+            :key="index"
+            :class="{'item-select': index == indexItemSelect}"
+            @click="itemOnSelect(item,index)"
+            >   
             {{item.value}}
-           </div>
+            </div>
         </div>
    </div>
 </template>
 <script>
 export default {
-    inject:['diy'],
     name:"MDropdown",
     emits:["update:modelValue"],
     props:["id","pageNumberRecord"],
@@ -46,7 +45,7 @@ export default {
             this.textSelectTed = item.value;
             this.isShowData = false;
             this.indexItemSelect = index;
-            
+            this.$emit('pageSize', item.key);
         },
     },
     data(){
@@ -80,7 +79,7 @@ export default {
          */
         pageNumberRecord: function(newValue){
             console.log("pageNumberRecord", newValue);
-
+            this.$parent.listEmployees();
         }
 
     }

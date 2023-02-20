@@ -98,6 +98,9 @@ export default {
     }
   },
   computed: {
+    /**
+     * Hàm tính toán 
+     */
     findIdexSelected: function () {
       var me = this;
       //Tìm index của item đã được chọn

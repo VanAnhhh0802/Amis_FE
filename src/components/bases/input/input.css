@@ -57,6 +57,7 @@ label ~ * {
   width: 100%;
   position: relative;
 }
+
 input[type="radio"] {
   /* Add if not using autoprefixer */
   -webkit-appearance: none;
@@ -110,8 +111,8 @@ input[type="radio"]:checked {
 }
 
 .m-checkbox-lable{
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: inline-flex;
   border: 1px solid #afafaf;
   justify-content: center;
