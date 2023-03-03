@@ -4,12 +4,11 @@
       >{{ label }}
       <span class="input--required" v-if="isRequired">*</span>
     </label>
-
     <div
       class="combobox"
       :class="{
         'border-focus': inputOnFocus,
-        'field--error': inputErrorCombobox,
+        'field--error': isError,
       }"
     >
       <input
@@ -32,9 +31,13 @@
       >
         <i class="icofont-rounded-down"></i>
       </button>
-      <!-- <div class="error-text" v-if="inputErrorCombobox">
-        Đơn vị không được để trống
-      </div> -->
+      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;
+    left: 44px">
+        <div class="error-arrow error-bg" style="left: 50%;
+    top: -15%;"></div>
+        <div class="error-text">{{ tooltipContent }}</div>
+      </div>
+      
     </div>
     <div class="combobox__data" v-show="isShowData">
       <a
@@ -56,6 +59,7 @@ export default {
   name: "MCombobox",
   data() {
     return {
+      isError: false,
       isShowData: false,
       indexItemSelect: 0,
       textSelected: null,
@@ -79,8 +83,10 @@ export default {
     tabIndex: Number,
     inputErrorCombobox: Boolean,
     nameRef: String,
+    tooltipError: Boolean,
+    tooltipContent: String,
   },
-  emits: ["update:modelValue", "inputFocus"],
+  emits: ["update:modelValue", "inputFocus", "comboboxOutFocus"],
   created() {
     if (this.api) {
       axios
@@ -96,6 +102,36 @@ export default {
           console.log(response);
         });
     }
+  },
+  watch: {
+    modelValue: {
+      handler: function (newValue) {
+        if (!newValue) {
+          this.textSelected = "";
+        }
+      },immediate: true,
+    },
+    inputErrorCombobox: function () {
+      console.log("combobox",this.inputErrorCombobox);
+      if (!this.inputErrorCombobox){
+        this.isError = false;
+      }
+      else {
+        this.isError = true;
+      }
+    },
+    /**
+     * Hàm theo dõi text combobox sau khi đc chọn
+     */
+    textSelected: {
+      handler: function (newValue) {
+        if (!newValue) {
+          this.$emit("update:modelValue", "");
+        }
+      },
+      immediate: true,
+    },
+
   },
   computed: {
     /**
@@ -194,6 +230,8 @@ export default {
       try {
         this.inputOnFocus = false;
         this.isShowData = false;
+        this.$emit("comboboxOutFocus");
+        
       } catch (error) {
         console.log(error);
       }

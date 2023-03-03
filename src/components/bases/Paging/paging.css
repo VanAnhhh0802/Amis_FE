@@ -14,11 +14,11 @@
 .page__prev,
 .page__next {
   cursor: pointer;
-  margin: 0 4px;
+  margin: 0 8px;
 }
 
 .page__next {
-  margin-left: 8px;
+  margin: 0 8px;
 }
 .page__prev {
   margin-right: 8px;

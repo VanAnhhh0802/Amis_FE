@@ -3,11 +3,7 @@
  * Author: Văn Anh (26/12/2022)
  */
 export default {
-  Url: {
-    Employees: "https://amis.manhnv.net/api/v1/Employees",
-    Departments: "https://amis.manhnv.net/api/v1/Departments",
-    Positions: "https://amis.manhnv.net/api/v1/Positions",
-  },
+  
   //Các thông báo exception gửi từ backend hiển thị cho người dùng
   ExceptionMsg: {
     BADREQUEST: "Dữ liệu đầu vào không hợp lệ.",
@@ -16,12 +12,51 @@ export default {
     NOTFOUND: "Server không tìm thấy bất kì tài nguyên nào.",
     NTERNALSERVERERROR: "Có lỗi xảy ra phía máy chủ. Vui lòng liên hệ MISA!.",
   },
+  //Mã lỗi
+  STATUSCODE: {
+    OK: 200,
+    Created: 201,
+    BadRequest: 400,
+    NotFound: 404,
+    ServerError: 500,
+  },
+  //
+  FORM_MODE: {
+    ADD: "ADD",
+    EDIT: "EDIT",
+    DUPLICATE: "DUPLICATE",
+    DELETE: "DELETE",
+    ERROR:"ERROR"
+  },
+  NOTIFICATION_TITLE: {
+    SUCCESS: "Thành công",
+    ERROR: "Lỗi! ",
+    INFO: "Thông tin",
+    WARNING: "Cảnh báo",
+  },
+  FORM_MESSAGE: {
+    SUCCESS: {
+      ADD: "Thêm mới nhân viên thành công!",
+      EDIT: "Sửa nhân viên thành công!",
+      DELETE: "Xóa nhân viên thành công",
+    }
+  },
   //Thông báo nhập thiếu
   IsEmpty: {
     Code: "Mã không được để trống",
     Name: "Tên nhân viên không được để trống",
     DepartmentName: "Phòng ban không được để trống",
   },
+  IsErrorFormat : {
+    Email : "Email không đúng định dạng",
+    Phone : "Số điện thoại không đúng định dạng",
+    Date: "Ngày khồn được lớn hơn ngày hiện tại"
+  },
+  IsOutLength : {
+    Code:"Mã nhân viên không được nhập quá 20 ký tự",
+    Name : "Tên nhân viên không được nhập quá 100 ký tự"
+  },
+
   //Thông báo lỗi
   ErrorMsg: {
     CloseMsg: "Bạn có muốn hủy bỏ khai báo này không", // Lời nhắn khi đóng form mà chưa lưu
@@ -90,7 +125,7 @@ export default {
       Phone: "ĐT di động",
       Telephone: "ĐT cố định",
       Email: "Email",
-      BankAccountNumber: "Tài khoản ngân hàng",
+      BankAccountNumber: "TK ngân hàng",
       BankName: "Tên ngân hàng",
       BankBranch: "Chi nhánh",
 
@@ -116,6 +151,7 @@ export default {
       Accept: "Đồng ý",
       Title: {
         Delete: "Xoá nhân viên",
+        DeleteMany : "Bạn có thực sự muốn xóa những nhân viên đã chọn không?",
         Warning: "Cảnh báo",
         Change: "Dữ liệu đã bị thay đổi. Bạn có muốn cất không? ",
         Error: "Có lỗi!",

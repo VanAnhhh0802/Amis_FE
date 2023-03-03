@@ -174,6 +174,7 @@ export default {
      */
     nextPage() {
       try {
+        console.log("nextPage");
         if (this.currentPage != this.totalPage) {
           this.currentPage++;
           //GỌi lại api

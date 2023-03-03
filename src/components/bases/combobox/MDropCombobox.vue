@@ -22,7 +22,7 @@
 <script>
 export default {
     name:"MDropdown",
-    emits:["update:modelValue"],
+    emits:["update:modelValue", "pageSize"],
     props:["id","pageNumberRecord"],
     updated(){
         // Nhận giá trị tổng bản ghi

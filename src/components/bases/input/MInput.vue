@@ -2,23 +2,33 @@
   <div class="input-wrapper">
     <label for="" v-if="label"
       >{{ label }}
-      <span class="input--required" v-if="inputRequired">*</span></label
-    >
-    <input
-      :type="inputType"
-      autocomplete="off"
-      class="input"
-      :style="{ width: width, border: border }"
-      v-model="value"
-      :tabindex="tabIndex"
-      :class="{ 'input--error': inputError }"
-      @focus="inputOnFocus"
-      @blur="inputOutFocus"
-      :placeholder="placeholder"
-      @input="input"
-      :ref="nameRef"
-    />
-    <!-- <div class="error-text" v-if="inputError">{{ inputErrorText }}</div> -->
+      <span class="input--required" v-if="inputRequired">*</span>
+      <div class="error-info" v-if="tooltip">
+        <div class="error-text">{{ tooltipMessage }}</div>
+        <div class="error-arrow"></div>
+      </div>
+    </label>
+    <div class="input_content" >
+      <input
+        :type="inputType"
+        autocomplete="off"
+        class="input"
+        :style="{ width: width, border: border }"
+        v-model="value"
+        :tabindex="tabIndex"
+        :class="{ 'input--error': isError }"
+        @focus="inputOnFocus"
+        @blur="inputOutFocus"
+        :placeholder="placeholder"
+        @input="input"
+        :ref="nameRef"
+      />
+      <div class="error-info error-bg" v-if="tooltipError" style="top: 33px;left: -32px">
+        <div class="error-arrow error-bg" style="left: 50%;
+    top: -15%;"></div>
+        <div class="error-text">{{ tooltipContent }}</div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -30,14 +40,16 @@ export default {
     inputType: String,
     inputRequired: Boolean,
     modelValue: String,
-    isBorderError: String,
     tabIndex: Number,
     border: String,
-    inputError: Boolean,
     placeholder: String,
-    inputErrorText: String,
     input:String,
-    nameRef:String
+    nameRef:String,
+    tooltip: String,
+    tooltipContent: String,
+    error: Boolean,
+    tooltipError:Boolean,
+    tooltipMessage: String,
   },
 
   data() {
@@ -46,8 +58,10 @@ export default {
       isRequiredShow: false,
       isEmployeeCodeError: false,
       value: null,
+      isError: false,
     };
   },
+  emits: ["update:model-Value", "inputFocus", "inputOutFocus"],
   watch: {
     /**
      * Theo dõi sự thay đổi của biến modelValue
@@ -63,6 +77,14 @@ export default {
     value: function (newValue) {
       this.$emit("update:model-Value", newValue);
     },
+    error: function () {
+      if (!this.error){
+        this.isError = false;
+      }
+      else {
+        this.isError = true;
+      }
+    }
   },
   methods: {
     

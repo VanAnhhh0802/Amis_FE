@@ -1,7 +1,12 @@
 <template lang="">
-  <div id="form__add" class="form">
+  <div id="form__add" class="form"
+    
+  >
     <div class="flex" style="justify-content: center; height: 100%">
-      <div class="form__wrapper">
+      <div class="form__wrapper"
+        v-on:keydown.esc="btnClose"
+        
+      >
         <div class="flex form__header">
           <div class="flex col-gap-16 form__header--left">
             <h1 id="form__title" class="heading form__title">
@@ -42,9 +47,11 @@
                   :tabIndex="1"
                   ref="EmployeeCode"
                   nameRef ="EmployeeCode"
+                  @inputOutFocus="this.errorBorderCode = false"
                   :name="this.nameInput"
-                  :inputError="this.isEmployeeCodeError"
-                  @inputFocus="this.isEmployeeCodeError = false"
+                  :error = "this.errorBorderCode"
+                  :tooltipError = "this.errorBorderCode"
+                  :tooltipContent = "this.tooltipContentCode"
                 ></MInput>
                 <MInput
                   :label="this.textLabelName"
@@ -53,8 +60,10 @@
                   :tabIndex="2"
                   ref="FullName"
                   nameRef ="FullName"
-                  :inputError="this.isFullNameError"
-                  @inputFocus="this.isFullNameError = false"
+                  @inputOutFocus="this.errorBorderName = false"
+                  :error = "this.errorBorderName"
+                  :tooltipError = "this.errorBorderName"
+                  :tooltipContent = "this.tooltipContentName"
                 ></MInput>
               </div>
               <div class="row">
@@ -69,10 +78,12 @@
                     v-model="newEmployee.departmentId"
                     :isShowError="false"
                     :tabIndex="3"
-                    :inputErrorCombobox="this.isDepartmentError"
-                    @inputFocus="this.isDepartmentError = false"
                     ref="DepartmentName"
                     nameRef="DepartmentName"
+                    @comboboxOutFocus="this.errorBorderDepartment = false"
+                    :inputErrorCombobox = "this.errorBorderDepartment"
+                    :tooltipError = "this.errorBorderDepartment"
+                    :tooltipContent = "this.tooltipContentDepartment"
                   ></MCombobox>
                 </div>
               </div>
@@ -87,13 +98,21 @@
             </div>
             <div class="form-content--right">
               <div class="row col-gap">
-                <MInput
-                  :label="this.textLabelDateOfBirth"
-                  style="width: 150px"
-                  inputType="date"
-                  :tabIndex="5"
-                  v-model:modelValue="newEmployee.dateOfBirth"
-                ></MInput>
+                <div style = "height: 62px">
+                  <label>Ngày sinh</label>
+                  <br>
+                  <MDatePicker
+                    v-model="newEmployee.dateOfBirth"
+                    :tabIndex="5"
+                    :name="'DateOfBirth'"
+                    dateName="'DateOfBirthPicker'"
+                    ref="DateOfBirth"
+                    :isErrorInput = "this.errorBorderDateOfBirth"
+                    :tooltipError = "this.errorBorderDateOfBirth"
+                    @blurInput = "this.errorBorderDateOfBirth"
+                    tooltipContent = "Ngày không được lớn hơn ngày hiện tại"
+                  />
+                </div>
                 <div class="form__sex-wrapper input-wrapper">
                   <label for="" class="form__sex">Giới tính</label>
                   <div class="flex form__male-wrapper">
@@ -106,9 +125,8 @@
                         value="0"
                         name=" gender"
                         class="input__form-sex-male"
-                        v-model="newEmployee.Gender"
+                        v-model="newEmployee.gender"
                       /> 
-                      
                       <label for="" style="padding-top: 2px">Nam</label>
                     </div>
                     <div class="flex m-8">
@@ -120,7 +138,7 @@
                         value="1"
                         name=" gender"
                         class="input__form-sex-female"
-                        v-model="newEmployee.Gender"
+                        v-model="newEmployee.gender"
 
                       /><label for="" style="padding-top: 2px">Nữ</label>
                     </div>
@@ -133,7 +151,7 @@
                         name=" gender"
                         property-name="employeeGender"
                         class="input__form-sex-female"
-                        v-model="newEmployee.Gender"
+                        v-model="newEmployee.gender"
                       />
                       <label for="" style="padding-top: 2px">Khác</label>
                     </div>
@@ -141,23 +159,28 @@
                 </div>
               </div>
               <div class="row col-gap">
-                <div class="tooltip" style="width: 100%">
                   <MInput 
                   label="Số CMND" 
                   :tabIndex="9"
                   v-model:modelValue = "newEmployee.identityNumber"
+                  tooltip="true"
+                  tooltipMessage="Số chứng minh nhân dân"
                   ></MInput>
-                  <div class="tooltip-text tooltip-reload">Số chứng minh nhân dân</div>
+                  <div style = "height: 62px">
+                  <label>Ngày sinh</label>
+                  <br>
+                  <MDatePicker
+                    v-model="newEmployee.identityDate"
+                    :tabIndex="10"
+                    :name="'IdentityDate'"
+                    dateName="'IdentityDatePicker'"
+                    ref="IdentityDate"
+                    :isErrorInput = "this.errorBorderIdentityDate"
+                    :tooltipError = "this.errorBorderIdentityDate"
+                    @blurInput = "this.errorBorderIdentityDate"
+                    tooltipContent = "Ngày không được lớn hơn ngày hiện tại"
+                  />
                 </div>
-                <MInput
-                  :label="this.textLabelIdentityDate"
-                  type="date"
-                  width="150px"
-                  style="width: 150px"
-                  inputType="date"
-                  :tabIndex="10"
-                  v-model:modelValue="newEmployee.identityDate"
-                ></MInput>
               </div>
               <div class="row">
                 <MInput
@@ -180,30 +203,47 @@
             <div class="row form-popup-container-top">
               <div class="w-full flex col-gap">
                 <div class="w-full flex col-gap">
-                  <div class="tooltip" style="width: 100%">
                     <MInput
+                    inputType="text"
                     :label="this.textLabelPhone"
                     :tabIndex="13"
                     v-model:modelValue="newEmployee.phoneNumber"
+                    tooltip= "true"
+                    tooltipMessage = "Số điện thoại di động"
+                    nameRef ="PhoneNumber"
+                    ref="PhoneNumber"
+                    @inputOutFocus="this.errorBorderPhoneNumber = false"
+                    :error = "this.errorBorderPhoneNumber"
+                    :tooltipError = "this.errorBorderPhoneNumber"
+                    tooltipContent = "Số điện thoại không đúng định dạng"
                   ></MInput>
-                  <div class="tooltip-text tooltip-reload">Điện thoại di động</div>
-                </div><div class="tooltip" style="width: 100%">
                   <MInput
+                  inputType="text"
                     :label="this.textLabelTelephone"
                     :tabIndex="14"
                     v-model:modelValue="newEmployee.telephoneNumber"
+                    tooltip= "true"
+                    tooltipMessage = "Số điện thoại cố định"
+                    ref="PhoneNumber"
+                    nameRef ="PhoneNumber"
+                  @inputOutFocus="this.errorBorderTelephoneNumber = false"
+                    :error = "this.errorBorderTelephoneNumber"
+                    :tooltipError = "this.errorBorderTelephoneNumber"
+                    tooltipContent = "Số điện thoại không đúng định dạng"
                   ></MInput>
-                  <div class="tooltip-text tooltip-reload">Điện thoại cố định</div>
-                </div>
                 </div>
                 <div class="w-full">
                   <MInput
                     :label="this.textLabelEmail"
                     style="width: 260px"
                     :tabIndex="15"
-                    :inputError="this.isEmailError"
-                  @inputFocus="this.isEmailError = false"
+                    @inputOutFocus="this.errorBorderCode = false"
                     v-model:modelValue="newEmployee.email"
+                    :error = "this.errorBorderEmail"
+                    ref="Email"
+                    nameRef ="Email"
+                    :tooltipError = "this.errorBorderEmail"
+                    tooltipContent = "Email không đúng định dạng"
                   ></MInput>
                 </div>
               </div>
@@ -215,6 +255,8 @@
                     :label="this.textLabelBankAccountNumber"
                     :tabIndex="16"
                     v-model:modelValue="newEmployee.bankAccountNumber"
+                    tooltip = "true"
+                    tooltipContent = "Tài khoản ngân hàng"
                   ></MInput>
                   <MInput
                     :label="this.textLabelBankName"
@@ -242,7 +284,7 @@
               @click="btnClose"
               :text="this.textButtonCancel"
               :tabIndex="21"
-              @keydown.tab="tabOrder"
+              @keydown.tab.prevent="tabOrder"
             >
             </MButton>
           </div>
@@ -253,7 +295,7 @@
                 id="btn--save"
                 class="btn btn--secondary"
                 :tabIndex="19"
-                @click="btnSaveOnClick"
+                @click="btnSaveOnClick(false)"
                 :text="this.textButtonSave"
               >
               </MButton>
@@ -264,7 +306,7 @@
                 class="btn btn--primary btn-save-add btnClass"
                 :text="this.textButtonSaveAndAdd"
                 :tabIndex="20"
-                @click="btnSaveAndAddOnClick"
+                @click="btnSaveOnClick(true)"
               >
               </MButton>
               <div class="tooltip-text tooltip-save">
@@ -283,9 +325,8 @@
         <div
           class="icon w-h-24 btn-dialog--close dialog__error-icon"
         ></div>
-        {{ this.errorMessage[0] }}
+        {{ this.dialogMessage }}
       </li>
-    
     </template>
     <template v-slot:footer>
       <button class="btn btn--primary dialog__btn--acept" @click="closeDialog">
@@ -322,7 +363,7 @@
           </MButton>
           <MButton
             class="btn--primary dialog__btn--acept"
-            @click="btnOnDelete(this.deleteEmployeeId)"
+            @click="btnSaveOnClick"
             :text="this.textDialogButtonYes"
           >
           </MButton>
@@ -330,26 +371,18 @@
       </div>
     </template>
   </MDialog>
-  <MLoading v-if="isShowLoading"></MLoading>newEmployee
-  <MToast
-    v-if="isShowOnToast"
-    @btnCloseToast="closeToast"
-  >
-  <template v-slot:icon><div class="icon w-h-24 toast-icon--error"></div></template>
-  <template v-slot:message>
-    <span class="toast__desc--status toast__desc--error">Lỗi</span>
-    <span>{{this.errorMessageToast}}</span>
-  </template>
-  </MToast>
+  
+  <MLoading v-if="isShowLoading"></MLoading>
 </template>
 <script>
-import axios from "axios";
 import resource from "@/lib/resource"
 import MDialog from "../../../components/bases/Dialog/MDialog.vue";
 import MInput from "@/components/bases/input/MInput.vue";
 import MCombobox from "@/components/bases/combobox/MCombobox.vue";
 import MLoading from "@/components/bases/Loading/MLoading";
-import MToast from "@/components/bases/Toast/MToast.vue";
+import MDatePicker from "@/components/bases/DatePicker/MDatePicker.vue";
+import { HTTPEmployees } from "@/script/api.js"; 
+import MISAEnum from "@/lib/enum.js"
 
 export default {
   name: "EmployeeDetail",
@@ -358,14 +391,28 @@ export default {
     MInput,
     MCombobox,
     MLoading,
-    MToast,
+    MDatePicker,
+    // MToast,
   },
-  props: ["employee", "employeeId"],
+  props: ["employee", "employeeId", "isDuplicate"],
   emits: [
     "btnCloseForm",
     "showSuccessToast",
     "inputFocusDetail",
+    "changeToastMsg",
+    "onshowToast",
   ],
+  watch: {
+    isDuplicate: {
+      async handle(newValue){
+        if (newValue == true){
+          const newCode = await this.getNewEmployeeCode();
+          this.newEmployee.employeeCode = newCode;
+        }
+      },
+      immediate:true
+    }
+  },
   computed: {
     //Tính toán nếu mà không tồn tại id thì là thêm ngược lại là sửa
     isAdd: function () {
@@ -388,17 +435,36 @@ export default {
   },
   data() {
     return {
+      //Khai báo các trường hợp mã lỗi
+      errorBorderCode: false,
+      errorBorderName: false,
+      errorBorderDepartment: false,
+      errorBorderEmail: false,
+      errorBorderDate: false,
+      errorBorderPhoneNumber: false,
+      errorBorderTelephoneNumber: false,
+      errorBorderDateOfBirth:false,
+      errorBorderIdentityDate:false,
+      tooltipContentName: null,
+      tooltipContentCode: null,
+      tooltipContentDepartment: null,
+      // errorBorder: false,
+    
+      isValid: false,
+      isSaveAndAdd: false,
       newEmployee: {},
       errorMessage: [],
       id: null,
       isShowDialog: false,
       isShowDialogWarning: false,
       isShowLoading: false,
+      dialogMessage: null,
       //Toast
       isShowOnToast: false,
-
+      isErrorToast: false,
+      isTitleToast: null,
+      isMessageToast: null,
       // khai báo message cho toast
-      CodeDuplicate: null,
       toastSuccessAdd: null,
       toastSuccessUpdate: null,
       errorToastMessage: null,
@@ -415,10 +481,6 @@ export default {
       textLabelCode:resource.TextVi.Detail.EmployeeCode,
       textLabelName:resource.TextVi.Detail.EmployeeName,
       textLabelDepartment:resource.TextVi.Detail.DepartmentName,
-      textLabelDateOfBirth:resource.TextVi.Detail.DateOfBirth,
-      textLabelGender:resource.TextVi.Detail.Gender,
-      textLabelIdentityNumber:resource.TextVi.Detail.IdentityNumber,
-      textLabelIdentityDate:resource.TextVi.Detail.IdentityDate,
       textLabelPositionName:resource.TextVi.Detail.PositionName,
       textLabelIdentityPlace:resource.TextVi.Detail.IdentityPlace,
       textLabelAddress:resource.TextVi.Detail.Address,
@@ -441,9 +503,6 @@ export default {
       //ToolTip
       textTooltipHelp:resource.TextVi.ToolTip.Help,
       textTooltipClose:resource.TextVi.ToolTip.Close,
-      textTooltipIdentityNumber:resource.TextVi.ToolTip.IdentityNumber,
-      textTooltipPhone:resource.TextVi.ToolTip.Phone,
-      textTooltipTelePhone:resource.TextVi.ToolTip.TelePhone,
       textTooltipSave:resource.TextVi.ToolTip.Save,
       textTooltipSaveAndAdd:resource.TextVi.ToolTip.SaveAndAdd,
     //#endregion
@@ -456,7 +515,48 @@ export default {
       this.getNewEmployeeCode();
     }
   },
+  mounted(){
+    document.addEventListener("keydown", function(event) {
+      console.log(event);
+      if (event.key === 16 && event.key === "Tab") {
+        var me = this;
+        if(this.isShowForm) {
+          if(event.ctrlKey &&  event.key === "s") {
+          event.preventDefault();
+          me.btnSaveOnClick(false);
+        }
+        else if (event.ctrlKey && event.key === "S") {
+          event.preventDefault();
+          me.btnSaveOnClick(true)
+        }
+        else if(event.key == "Escape") {
+        event.preventDefault();
+        }
+      }
+    }});
+  //   // document.addEventListener("keydown", function(event){
+  //   //   var me = this;
+  //   //     if(this.isShowForm) {
+  //   //       if(event.ctrlKey &&  event.key === "s") {
+  //   //       event.preventDefault();
+  //   //       me.btnSaveOnClick(false);
+  //   //     }
+  //   //     else if (event.ctrlKey && event.key === "S") {
+  //   //       event.preventDefault();
+  //   //       me.btnSaveOnClick(true)
+  //   //     }
+  //   //     else if(event.key == "Escape") {
+  //   //     event.preventDefault();
+  //   //     }
+  //   //   }
+  //   // }
+  //  );
+  },
+  unmounted() {
+    document.removeEventListener("keydown", this.onKeyDown);
+  },
   methods: {
+
     /**
      * Hàm hiển thị nhân viên theo Id
      * Author: Văn Anh (06/02/2023)
@@ -464,26 +564,23 @@ export default {
      */
     async getEmployeeId(id) {
       try {
-        await axios
-          .get(`https://localhost:7232/api/v1/Employees/${id}`)
-          .then((response) => {
+        var me = this
+         await HTTPEmployees.get(`/${id}`)
+         .then(response => {
             this.newEmployee = response.data;
-            this.newEmployee.dateOfBirth = this.bidingDate(
-              response.data.dateOfBirth
-            );
-            this.newEmployee.identityDate = this.bidingDate(
-              response.data.identityDate
-            );
-            //Focus vào ô nhập liệu khác ô mã nhân viên
-            this.$nextTick(function () {
+         })
+         .then(async function () {
+           if (me.isDuplicate){
+              this.newEmployee.employeeCode= await me.getNewEmployeeCode();
+           }
+         })
+
+        this.$nextTick(function () {
               this.$refs.EmployeeCode.inputFocus();
             });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+
       } catch (error) {
-        console.log(error);
+        this.handleException(error)
       }
     },
     /**
@@ -492,105 +589,53 @@ export default {
      */
     async getNewEmployeeCode() {
       try {
-        await axios
-          .get("https://localhost:7232/api/v1/Employees/newEmployeeCode")
-          .then((response) => {
-            this.newEmployee.employeeCode = response.data;
-            // Focus vào ô nhập đầu tiên
-            this.$nextTick(function () {
-              this.$refs.EmployeeCode.inputFocus();
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        const res = await HTTPEmployees.get(`/newEmployeeCode`);
+        this.newEmployee.employeeCode = res.data;
+        this.$refs.EmployeeCode.inputFocus();
       } catch (error) {
-        console.log(error);
+        this.handleException(error)
       }
     },
     /**
-     * Hàm gọi api thêm nhân viên
-     * Author: Văn Anh (6/1/2023)
+     * Hàm xử lý lỗi trả về
+     * @param {Mã lỗi} error 
+     * Author: Văn ANh(3/2/2023)
      */
-    async addEmployee(employee) {
-      try {
-        await axios
-          .post("https://localhost:7232/api/v1/Employees", 
-          employee)
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-            //Lấy ra mã bị lỗi
-            var statusCode = err.response.status;
-            console.log(statusCode);
-            switch (statusCode) {
-              case 400:
-                this.isShowLoading = false;
-                //Hiển thị toast message thông báo mã bị trùng
-                //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
-                this.errorMessageToast = err.response.data.data.toString();
-                this.isShowOnToast = true;
-                this.CodeDuplicate = employee.EmployeeCode;
-                console.log(this.CodeDuplicate);
-                break;
-              case 500:
-                this.isShowOnToast = true;
-                this.errorMessageToast = err.response.data.data.userMsg;
-                console.log(err);
-                break;
-              default:
-                break;
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Hàm gọi API sửa nhân  viên
-     * Author: Văn Anh (21/12/2023)
-     */
-    async editEmployee(id) {
-      try {
-        await axios
-          .put(`https://localhost:7232/api/v1/Employees/${id}`, {
-            employeeCode: this.newEmployee.employeeCode,
-            fullName: this.newEmployee.fullName,
-            departmentId: this.newEmployee.departmentId,
-            gender: this.newEmployee.gender,
-            dateOfBirth: this.newEmployee.dateOfBirth,
-            phoneNumber: this.newEmployee.phoneNumber,
-            email: this.newEmployee.email,
-            identityNumber: this.newEmployee.identityNumber,
-            identityDate: this.newEmployee.identityDate,
-            identityPlace: this.newEmployee.identityPlace,
-            telephoneNumber: this.newEmployee.telephoneNumber,
-            bankAccountNumber: this.newEmployee.bankAccountNumber,
-            bankName: this.newEmployee.bankName,
-            bankBranchName: this.newEmployee.bankBranchName,
-            positionName: this.newEmployee.positionName,
-          })
-          .then((res) => {
-            //Ẩn load ding
+    handleException(error) {
+      console.log(error);
+      if (error.response.status == resource.STATUSCODE.BadRequest) {
+        switch (error.response.data.errorCode) {
+          case MISAEnum.ERRORCODE.DuplicateCode:
             this.isShowLoading = false;
-            this.newEmployee.DateOfBirth = this.bidingDate(res.DateOfBirth);
-            console.log("Sửa", res);
-            //Gán message cho toast
-            this.errorToastMessage = "Thông tin nhân viên đã được thay đổi";
-
-            this.$emit("btnCloseForm");
-            this.$parent.listEmployees();
-            console.log("newEmployeeSave: " + this.newEmployee);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } catch (error) {
-        console.log(error);
+            //Hiển thị toast message thông báo mã bị trùng
+            //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
+            this.dialogMessage = error.response.data.userMsg;
+            console.log(this.dialogMessage);
+            this.isShowDialog = true;
+            this.$refs.EmployeeCode.inputFocus();
+            break;
+          // eslint-disable-next-line
+          case MISAEnum.ERRORCODE.InvalidInput:
+            // this.onShowDialogChangeData(false,true, null,"", error.response.data.MoreInfo.MoreInfo[0]);
+            break;
+          default:
+            break;
+        }
+      } 
+      else if (error.response.status == resource.STATUSCODE.ServerError) {
+        this.dialogMessage = error.response.data.userMsg;
+                this.isShowDialog = true;
       }
+      // else {
+      //   for(const property in resource.STATUSCODES) {
+      //     if(error.response.status == property.Code) {
+      //       this.$emit("changeToastMsg",resource.FORM_MODE.ERROR,true,false,property.Message);
+      //       this.$emit("onshowToast");
+      //     }
+      //   }
+      // }
     },
+    
     //#region Sự kiện liên quan đến button
     /**
      * Hàm ẩn hiện dialog
@@ -626,61 +671,51 @@ export default {
         console.log(error);
       }
     },
+   
     /**
-     * Sự kiện nút cất và thêm
-     * Author: Văn ANh 16/12/2022
+     * Hàm xử lý khi thêm hoặc sửa
+     * Author: Văn Anh 5/1/2023
      */
-    async btnSaveAndAddOnClick(){
+    async handleOnSave(isSaveAndAdd, isAdd ,  toastMessage){
       try {
-        //Validate dữ liệu
-        let isValid = this.validateData();
-        if (isValid) {
-          this.isShowDialog = true;
-        } else {
-          //Gọi Api: Chú ý là cất khi thêm hoặc khi sửa
-          this.isShowLoading = true;
-          if (this.isAdd) {
-            //Thêm nhân viên mới
-            await this.addEmployee(this.newEmployee);
-            this.newEmployee = {}
-            
-          } else {
-            //Sửa nhân viên
-            await this.editEmployee(this.employeeId);
-            this.newEmployee = {}
-          }
-          this.isShowLoading = false;
+         const response = isAdd
+          ? await HTTPEmployees.post("", this.newEmployee)
+          : await HTTPEmployees.put(`/${this.newEmployee.employeeId}`,this.newEmployee);
+          console.log(response);
+          this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
+          this.$emit("onshowToast");
+          await this.$parent.listEmployees();
+          if (isSaveAndAdd) {
+          this.newEmployee ={};
           this.getNewEmployeeCode();
-        }
+          }
+          else {
+            this.$emit("btnCloseForm");
+          }
       } catch (error) {
-        console.log(error);
+        this.handleException(error)
       }
     },
     /**
-     * Khi người dùng bấm nút cất
+     * Khi người dùng bấm nút cất hoặc cất và thêm mới
      * Author: Văn Anh (19/12/2022)
      */
-    async btnSaveOnClick() {
+    async btnSaveOnClick(isSaveAndAdd) {
       try {
         //Hiển thị loading
+        var valid = this.validateData();
         //Validate dữ liệu
-        let isValid = this.validateData();
-        if (isValid) {
+        if (valid) {
+          this.dialogMessage = this.errorMessage[0];
           this.isShowDialog = true;
         } else {
-          //Gọi Api: Chú ý là cất khi thêm hoặc khi sửa
           this.isShowLoading = true;
+          this.newEmployee.gender = parseInt(this.newEmployee.gender);
           if (this.isAdd) {
-            //Thêm nhân viên mới
-            await this.addEmployee(this.newEmployee);
-            this.newEmployee = {}
-            this.$parent.listEmployees();
-            this.toastSuccessAdd = "Thêm nhân viên thành công";
-            this.$emit("btnCloseForm");
-          } else {
-            //Sửa nhân viên
-            this.editEmployee(this.employeeId);
-            this.newEmployee = {}
+            this.handleOnSave(isSaveAndAdd, true, resource.FORM_MODE.ADD)
+          }
+          else {
+            this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
           }
           this.isShowLoading = false;
         }
@@ -742,9 +777,8 @@ export default {
      * Author: Văn Anh(26/12/2022)
      * TODO:
      */
-    tabOrder(e) {
+    tabOrder() {
       try {
-        console.log("taborder: ", e);
         this.$refs.EmployeeCode.inputFocus();
       } catch (error) {
         console.log(error);
@@ -757,43 +791,83 @@ export default {
      */
     validateData() {
       try {
+        //reset lại mã lõi
         this.errorMessage = [];
 
-        //Mã nhân viên không được phép để trống
-        let errorMessageCode = "Mã nhân viên không được để trống";
-        if (this.checkvalidateEmpty(this.newEmployee.employeeCode,this.isEmployeeCodeError, errorMessageCode)){
-            this.$refs.EmployeeCode.inputFocus();
+        //Mã nhân viên trống
+        if (this.valueIsEmpty(this.newEmployee.employeeCode)){
+          this.errorMessage.push(resource.IsEmpty.Code);
+          this.errorBorderCode = true;
+          this.tooltipContentCode = resource.IsEmpty.Code
+
+          // this.$refs.EmployeeCode.inputFocus();
+        } else if (this.outLengthValid(this.newEmployee.employeeCode, 20)){
+          //Check độ dài nhập quá độ dài
+          this.errorMessage.push(resource.IsOutLength.Code);
+          this.errorBorderCode = true;
+          this.tooltipContentCode = resource.IsOutLength.Code.
+          this.$nextTick(function () {
+            // this.$refs.EmployeeCode.inputFocus();
+            });
         }
         
-        //Tên nhân viên không được phép để trống
-        let errorMessageFullName = "Tên nhân viên không được để trống";
-        if (this.checkvalidateEmpty(this.newEmployee.fullName,this.isFullNameError, errorMessageFullName)){
-            this.$refs.FullName.inputFocus();
+        //Tên nhân viên trống
+        if (this.valueIsEmpty(this.newEmployee.fullName)){
+          this.errorMessage.push(resource.IsEmpty.Name);
+          this.errorBorderName = true;
+          this.tooltipContentName = resource.IsEmpty.Name
+
+          this.$nextTick(function () {
+            // this.$refs.FullName.inputFocus();
+            });
+
+        } else if (this.outLengthValid(this.newEmployee.fullName, 100)){
+          //Check độ dài nhập quá độ dài
+          this.errorMessage.push(resource.IsOutLength.Name);
+          this.errorBorderName = true;
+          this.tooltipContentName = resource.IsOutLength.Name
+
+          this.$nextTick(function () {
+            // this.$refs.FullName.inputFocus();
+            });
         }
-        //Tên đơn vị không được để trống
-        let errorMessageDepartment = "Đơn vị không được để trống";
-        if (this.checkvalidateEmpty(this.newEmployee.departmentId,this.isDepartmentError, errorMessageDepartment) && !this.checkvalidateEmpty(this.newEmployee.fullName,this.isFullNameError, errorMessageFullName)){
-            this.$refs.DepartmentName.comboboxFocus();
+        
+        //Phòng ban trống
+        if (this.valueIsEmpty(this.newEmployee.departmentId)){
+          this.errorMessage.push(resource.IsEmpty.DepartmentName);
+          this.errorBorderDepartment = true;
+          this.tooltipContentDepartment = resource.IsEmpty.DepartmentName
+
+          this.$nextTick(function () {
+            // this.$refs.DepartmentName.inputFocus();
+            });
+
         }
-        else {
-          this.checkvalidateEmpty(this.newEmployee.departmentId,this.isDepartmentError, errorMessageDepartment)
-        }
-        //Email phải đúng định dạng
-        if (this.validateEmail(this.newEmployee.email)){
-          this.isEmailError = true;
-          this.errorMessage.push("Email không đúng định dạng");
-          
-        }
+
         //Ngày không được lớn hơn ngày hiện tại
-        if (this.valueIsEmpty(this.newEmployee.dateOfBirth)){
-          const dateOfBirth = new Date(this.newEmployee.DateOfBirth);
-          const today = new Date();
-          if (dateOfBirth > today){
-            this.isDateOfBirthError = true;
-            this.errorMessage.push("Ngày không được lớn hơn ngày hiện tại");
+        if(this.validateDate(this.newEmployee.dateOfBirth)){
+          this.errorBorderDateOfBirth = true;
+        }
+        //Email Khồng đúng định dạng 
+        if(!this.valueIsEmpty(this.newEmployee.email)){
+          if (!this.validateEmail(this.newEmployee.email)){
+            this.errorMessage.push(resource.IsErrorFormat.Email);
+            this.errorBorderEmail = true;
+            // this.$refs.Email.inputFocus();
+
           }
         }
-        if (this.errorMessage.length > 0) {
+        
+        //Số điện thoại không đúng định dạng, độ dài
+        if(this.validatePhone(this.newEmployee.phoneNumber)){
+            this.errorBorderPhoneNumber = true;
+        }
+        if(this.validatePhone(this.newEmployee.telephoneNumber)){
+            this.errorBorderTelephoneNumber = true;
+        }
+       
+        //Kiểm tra nêu errors mà tồn tại lỗi
+        if (this.errorMessage.length > 0){
           return true;
         }
         return false;
@@ -801,21 +875,36 @@ export default {
         console.log(error);
       }
     },
-
     /**
-     * Hàm dùng chung checkvalidateEmpty
+     * Hàm xử lý lỗi nhập sai số đt
+     * @param {Số điện thoại} phone 
+     * Author: Văn ANh (2/3/2023)
      */
-    checkvalidateEmpty(value, errorName, message){
-      try {
-        if (this.valueIsEmpty(value)){
-          errorName = true;
-          this.errorMessage.push(message);
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.log(error);
+    validatePhone(phone){
+      if (!this.valueIsEmpty(phone)) {
+          var phoneRegex = /((09|03|07|08|05)+([0-9]{8})\b)/g;
+
+          if (!phoneRegex.test(phone)) {
+            this.errorMessage.push(resource.IsErrorFormat.Phone);
+            return true;
+          }
       }
+      return false;
+    },
+    /**
+     * Hàm xử lý lỗi ngày tháng
+     * @param {Ngày nhập} date 
+     */
+    validateDate(date){
+      if (!this.valueIsEmpty(date)){
+          const dateOfBirth = new Date(date);
+          const today = new Date();
+          if (dateOfBirth.getTime() >= today.getTime()){
+            this.errorMessage.push(resource.IsErrorFormat.Date);
+            return true;
+          }
+        }
+        return false
     },
     /**
      * Hàm check value
@@ -831,24 +920,57 @@ export default {
         console.log(error);
       }
     },
+    //Hàm dùng chung xử lý lỗi nhập vượt quá độ dài
+    outLengthValid (value, number){
+      try {
+        if (value.length > number){
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Hàm check định dạng email
      * @param {Giá trị của email} value 
      */
     validateEmail(value) {
       try {
-        var email =  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-        if (value.isMatch(email)) {
-          return true;
-        }
-        return false;
+          const email =  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (value.match(email)) {
+            return true;
+          }
+          return false;
       }
       catch (error){
         console.log(error);
       }
     },
+    /**
+     * author:Văn Anh(2/3/2023)
+     * Hàm onKeyDown xử lí khi nhấn phím tắt
+     */
+    onKeyDown(event) {
+        var me = this;
+        if(this.isShowForm) {
+          if(event.ctrlKey &&  event.key === "s") {
+          event.preventDefault();
+          me.btnSaveOnClick(false);
+        }
+        else if (event.ctrlKey && event.key === "S") {
+          event.preventDefault();
+          // me.onSavebtn(true)
+          me.btnSaveOnClick(true)
+        }
+        else if(event.key == "Escape") {
+        event.preventDefault();
+        }
+      }
+    }
     //#endregion
   },
+  
 };
 </script>
 <style scoped>

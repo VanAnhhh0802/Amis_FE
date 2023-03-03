@@ -29,6 +29,15 @@ const MISAEnum = {
     ROW_DOWN: 40, //Phím down
     ROW_UP: 38, //Phím up
   },
+  ERRORCODE: {
+    Exception: 0,
+    DuplicateCode: 7,
+    EmptyCode: 6,
+    InsertFailed: 1,
+    UpdateFailed: 3,
+    DeleteFailed:2,
+    InvalidInput: 8,
+  },
   KEY_RECORD: {},
 };
 export default MISAEnum;

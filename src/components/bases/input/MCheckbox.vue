@@ -1,6 +1,18 @@
 <template lang="">
-  <input :disabled ="disabled" type="checkbox" name="" :id="id" class="m-input-checkbox" :checked="checked" @change="selectedCheckBox()" />
-  <label :for="id" class="m-checkbox-lable"  ><span></span></label>
+  <input 
+  :disabled ="disabled" 
+  type="checkbox" 
+  name="" 
+  :id="id" 
+  class="m-input-checkbox" 
+  :checked="checked" 
+  @change="selectedCheckBox" 
+  />
+  <label 
+  :for="id" 
+  class="m-checkbox-lable"  
+  ><span></span>
+  </label>
 </template>
 <script>
 export default {
@@ -8,6 +20,7 @@ export default {
   props: {
     id : String,
     checked : Boolean,
+    
     disabled : {
       type : Boolean,
       default : false
@@ -19,9 +32,8 @@ export default {
      * sự kiện check toàn bộ nhân viên
      * Author: Văn Anh (13/1/2023)
      */
-     selectedCheckBox(){
-        this.$emit("checkbox-selected",!this.checked,this.id);
-        console.log("id: " + this.id);
+     selectedCheckBox(e){
+        this.$emit("checkbox-selected",e.target.checked,this.id);
       }
   },
 };

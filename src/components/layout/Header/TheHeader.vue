@@ -13,7 +13,7 @@
       <button class="header__user">
         <div class="icon user__avt"></div>
         <div class="user__name">Hồ Văn Anh</div>
-        <div class="icon w-h-24 user__icon-drop-down"></div>
+        <div class="icon user__icon-drop-down"></div>
       </button>
     </div>
   </div>
