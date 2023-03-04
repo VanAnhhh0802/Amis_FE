@@ -1,5 +1,5 @@
 <template lang="">
-  <button class="btn" :tabindex="tabIndex">{{ text }}</button>
+  <button class="btn" :tabindex="tabIndex" :ref="refName" >{{ text }}</button>
 </template>
 <script>
 export default {
@@ -7,7 +7,22 @@ export default {
   props: {
     text: String,
     tabIndex: Number,
+    refName: String,
   },
+  methods:{
+    /**\
+     * Hàm xử lý btn focus 
+     * Văn Anh (3/3/2023)
+     */
+    buttonFocus(){
+      try {
+        this.$refs[this.refName].focus();
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }
+  }
 };
 </script>
 <style scoped>

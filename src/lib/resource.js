@@ -38,7 +38,8 @@ export default {
     SUCCESS: {
       ADD: "Thêm mới nhân viên thành công!",
       EDIT: "Sửa nhân viên thành công!",
-      DELETE: "Xóa nhân viên thành công",
+      DELETE: "Xóa nhân viên thành công!",
+      DUPLICATE: "Nhân bản nhân viên thành công!"
     }
   },
   //Thông báo nhập thiếu

@@ -42,7 +42,7 @@
                   :label="this.textLabelCode"
                   width="150px"
                   style="width: 150px"
-                  v-model:modelValue="newEmployee.employeeCode"
+                  v-model:modelValue.trim()="newEmployee.employeeCode"
                   :inputRequired="true"
                   :tabIndex="1"
                   ref="EmployeeCode"
@@ -52,10 +52,11 @@
                   :error = "this.errorBorderCode"
                   :tooltipError = "this.errorBorderCode"
                   :tooltipContent = "this.tooltipContentCode"
+                  @keydown.shift.tab.prevent="onFocusCancelButton()"
                 ></MInput>
                 <MInput
                   :label="this.textLabelName"
-                  v-model:modelValue="newEmployee.fullName"
+                  v-model:modelValue.trim()="newEmployee.fullName"
                   :inputRequired="true"
                   :tabIndex="2"
                   ref="FullName"
@@ -92,7 +93,7 @@
                   :label="this.textLabelPositionName"
                   type="text"
                   :tabIndex="4"
-                  v-model:modelValue="newEmployee.positionName"
+                  v-model:modelValue.trim()="newEmployee.positionName"
                 ></MInput>
               </div>
             </div>
@@ -102,7 +103,7 @@
                   <label>Ngày sinh</label>
                   <br>
                   <MDatePicker
-                    v-model="newEmployee.dateOfBirth"
+                    v-model.trim()="newEmployee.dateOfBirth"
                     :tabIndex="5"
                     :name="'DateOfBirth'"
                     dateName="'DateOfBirthPicker'"
@@ -162,7 +163,7 @@
                   <MInput 
                   label="Số CMND" 
                   :tabIndex="9"
-                  v-model:modelValue = "newEmployee.identityNumber"
+                  v-model:modelValue.trim() = "newEmployee.identityNumber"
                   tooltip="true"
                   tooltipMessage="Số chứng minh nhân dân"
                   ></MInput>
@@ -187,7 +188,7 @@
                   :label="this.textLabelIdentityPlace"
                   class="w-full"
                   :tabIndex="11"
-                  v-model:modelValue="newEmployee.identityPlace"
+                  v-model:modelValue.trim()="newEmployee.identityPlace"
                 ></MInput>
               </div>
             </div>
@@ -197,7 +198,7 @@
               <MInput
                 :label="this.textLabelAddress"
                 :tabIndex="12"
-                v-model:modelValue="newEmployee.address"
+                v-model:modelValue.trim()="newEmployee.address"
               ></MInput>
             </div>
             <div class="row form-popup-container-top">
@@ -207,7 +208,7 @@
                     inputType="text"
                     :label="this.textLabelPhone"
                     :tabIndex="13"
-                    v-model:modelValue="newEmployee.phoneNumber"
+                    v-model:modelValue.trim()="newEmployee.phoneNumber"
                     tooltip= "true"
                     tooltipMessage = "Số điện thoại di động"
                     nameRef ="PhoneNumber"
@@ -221,7 +222,7 @@
                   inputType="text"
                     :label="this.textLabelTelephone"
                     :tabIndex="14"
-                    v-model:modelValue="newEmployee.telephoneNumber"
+                    v-model:modelValue.trim()="newEmployee.telephoneNumber"
                     tooltip= "true"
                     tooltipMessage = "Số điện thoại cố định"
                     ref="PhoneNumber"
@@ -238,7 +239,7 @@
                     style="width: 260px"
                     :tabIndex="15"
                     @inputOutFocus="this.errorBorderCode = false"
-                    v-model:modelValue="newEmployee.email"
+                    v-model:modelValue.trim()="newEmployee.email"
                     :error = "this.errorBorderEmail"
                     ref="Email"
                     nameRef ="Email"
@@ -254,14 +255,14 @@
                   <MInput
                     :label="this.textLabelBankAccountNumber"
                     :tabIndex="16"
-                    v-model:modelValue="newEmployee.bankAccountNumber"
+                    v-model:modelValue.trim()="newEmployee.bankAccountNumber"
                     tooltip = "true"
                     tooltipContent = "Tài khoản ngân hàng"
                   ></MInput>
                   <MInput
                     :label="this.textLabelBankName"
                     :tabIndex="17"
-                    v-model:modelValue="newEmployee.bankName"
+                    v-model:modelValue.trim()="newEmployee.bankName"
                   ></MInput>
                 </div>
                 <div class="w-full">
@@ -269,7 +270,7 @@
                     :label="this.textLabelBankBranch"
                     style="width: 260px"
                     :tabIndex="18"
-                    v-model:modelValue="newEmployee.bankBranch"
+                    v-model:modelValue.trim()="newEmployee.bankBranch"
                   ></MInput>
                 </div>
               </div>
@@ -284,11 +285,13 @@
               @click="btnClose"
               :text="this.textButtonCancel"
               :tabIndex="21"
-              @keydown.tab.prevent="tabOrder"
+              @keydown.shift.tab.prevent="onFocusBtn()"
+              @keydown.tab.prevent="tabOrder()"
+              refName="Cancel"
+              ref ="Cancel"
             >
             </MButton>
           </div>
-
           <div class="flex form__footer-right">
             <div class="tooltip">
               <MButton
@@ -307,6 +310,8 @@
                 :text="this.textButtonSaveAndAdd"
                 :tabIndex="20"
                 @click="btnSaveOnClick(true)"
+                refName="SaveAndAdd"
+                ref ="SaveAndAdd"
               >
               </MButton>
               <div class="tooltip-text tooltip-save">
@@ -404,7 +409,7 @@ export default {
   ],
   watch: {
     isDuplicate: {
-      async handle(newValue){
+      async handler(newValue){
         if (newValue == true){
           const newCode = await this.getNewEmployeeCode();
           this.newEmployee.employeeCode = newCode;
@@ -421,6 +426,7 @@ export default {
       }
       return false;
     },
+      
     //set giá trị cho class primary
     btnClass: function () {
       return { "btn--primary": true };
@@ -448,6 +454,7 @@ export default {
       tooltipContentName: null,
       tooltipContentCode: null,
       tooltipContentDepartment: null,
+      isDuplicateResponse: false,
       // errorBorder: false,
     
       isValid: false,
@@ -509,54 +516,37 @@ export default {
     };
   },
   async created() {
-    if (!this.valueIsEmpty(this.employeeId)) {
+    if (this.employeeId || this.isDuplicate) {
       this.getEmployeeId(this.employeeId);
-    } else {
+    } 
+    
+    if(this.isAdd || this.isDuplicate) {
       this.getNewEmployeeCode();
     }
   },
-  mounted(){
-    document.addEventListener("keydown", function(event) {
-      console.log(event);
-      if (event.key === 16 && event.key === "Tab") {
-        var me = this;
-        if(this.isShowForm) {
-          if(event.ctrlKey &&  event.key === "s") {
-          event.preventDefault();
-          me.btnSaveOnClick(false);
-        }
-        else if (event.ctrlKey && event.key === "S") {
-          event.preventDefault();
-          me.btnSaveOnClick(true)
-        }
-        else if(event.key == "Escape") {
-        event.preventDefault();
-        }
-      }
-    }});
-  //   // document.addEventListener("keydown", function(event){
-  //   //   var me = this;
-  //   //     if(this.isShowForm) {
-  //   //       if(event.ctrlKey &&  event.key === "s") {
-  //   //       event.preventDefault();
-  //   //       me.btnSaveOnClick(false);
-  //   //     }
-  //   //     else if (event.ctrlKey && event.key === "S") {
-  //   //       event.preventDefault();
-  //   //       me.btnSaveOnClick(true)
-  //   //     }
-  //   //     else if(event.key == "Escape") {
-  //   //     event.preventDefault();
-  //   //     }
-  //   //   }
-  //   // }
-  //  );
-  },
-  unmounted() {
-    document.removeEventListener("keydown", this.onKeyDown);
-  },
   methods: {
-
+    /*
+    * Hãm xử lý focus vao button Cất và thêm
+    Author: Văn Anh (3/3/2023)
+    */
+    onFocusBtn(){
+      try {
+        this.$refs.SaveAndAdd.buttonFocus()
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm xử lý Shift tab focus lại btn hủy
+     * Author: Văn Anh (3/3/2023)
+     */
+    onFocusCancelButton(){
+      try {
+        this.$refs.Cancel.buttonFocus()
+      } catch (error) {
+        console.log(error);
+      }
+    },
     /**
      * Hàm hiển thị nhân viên theo Id
      * Author: Văn Anh (06/02/2023)
@@ -564,21 +554,13 @@ export default {
      */
     async getEmployeeId(id) {
       try {
-        var me = this
          await HTTPEmployees.get(`/${id}`)
          .then(response => {
             this.newEmployee = response.data;
          })
-         .then(async function () {
-           if (me.isDuplicate){
-              this.newEmployee.employeeCode= await me.getNewEmployeeCode();
-           }
-         })
-
         this.$nextTick(function () {
               this.$refs.EmployeeCode.inputFocus();
             });
-
       } catch (error) {
         this.handleException(error)
       }
@@ -678,7 +660,7 @@ export default {
      */
     async handleOnSave(isSaveAndAdd, isAdd ,  toastMessage){
       try {
-         const response = isAdd
+         const response = isAdd || this.isDuplicate
           ? await HTTPEmployees.post("", this.newEmployee)
           : await HTTPEmployees.put(`/${this.newEmployee.employeeId}`,this.newEmployee);
           console.log(response);
@@ -713,6 +695,9 @@ export default {
           this.newEmployee.gender = parseInt(this.newEmployee.gender);
           if (this.isAdd) {
             this.handleOnSave(isSaveAndAdd, true, resource.FORM_MODE.ADD)
+          }
+          else if (this.isDuplicate) {
+            this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
           }
           else {
             this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.EDIT)

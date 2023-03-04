@@ -247,12 +247,13 @@ th {
 /* Paging */
 
 .pagination {
-  margin-left: 20px;
+  margin-left: 16px;
   margin-right: 4px;
   list-style: none;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-left: 0;
 }
 .page-item {
   margin: 0 8px;

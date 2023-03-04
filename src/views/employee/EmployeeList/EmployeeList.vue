@@ -187,7 +187,7 @@
     @inputFocusDetail="isShowForm"
     @onshowToast="onshowToast"
     @changeToastMsg="changeToastMsg"
-    :isDuplicate="isDuplicate"
+    :isDuplicate="isDuplicateEmployee"
   ></EmployeeDetail>
   <!-- Loading -->
   <MLoading v-if="isShowLoading"></MLoading>
@@ -300,7 +300,7 @@ export default {
       warningDeleteMessage: "",
       deleteEmployeeId: "",
       updateFunction: false,
-      isDuplicate: false,
+      isDuplicateEmployee: false,
       isShowToast: false,
       //Dialog
       isShowDialog: false,
@@ -445,7 +445,7 @@ export default {
      */
     closeForm() {
       try {
-        this.isDuplicate = false;
+        this.isDuplicateEmployee = false;
         //Đóng dialog
         this.isShowForm = false;
         //Load lại dữ liệu
@@ -771,7 +771,7 @@ export default {
     btnReplicationOnDetail(){
       try {
         
-        this.isDuplicate = true;
+        this.isDuplicateEmployee = true;
         this.isShowOnDropMenu = false;
         this.isShowForm = true;
         this.employeeIdSelected = this.deleteEmployeeId;
