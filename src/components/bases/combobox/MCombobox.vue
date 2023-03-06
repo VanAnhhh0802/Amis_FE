@@ -18,7 +18,7 @@
         class="input combobox__input"
         v-model="textSelected"
         @input="onSearchItem"
-        @keydown="inputOnKeyDown"
+        @keydown.prevent="inputOnKeyDown"
         :tabindex="tabIndex"
         @focus="inputFocus"
         @blur="inputOutFocus"
@@ -59,6 +59,8 @@ export default {
   name: "MCombobox",
   data() {
     return {
+      //Khai báo biến ngăn chặn tăng indexItemSelected
+      unIndexItemSelect: true,
       isError: false,
       isShowData: false,
       indexItemSelect: 0,
@@ -109,10 +111,10 @@ export default {
         if (!newValue) {
           this.textSelected = "";
         }
+
       },immediate: true,
     },
     inputErrorCombobox: function () {
-      console.log("combobox",this.inputErrorCombobox);
       if (!this.inputErrorCombobox){
         this.isError = false;
       }
@@ -127,6 +129,7 @@ export default {
       handler: function (newValue) {
         if (!newValue) {
           this.$emit("update:modelValue", "");
+          
         }
       },
       immediate: true,
@@ -168,16 +171,21 @@ export default {
         switch (keyCode) {
           case this.MISAEnum.KEY_CODE.ENTER:
             //Xác định item đang chọn dựa vào index
+            this.unIndexItemSelect = true;
             //eslint-disable-next-line no-case-declarations
             const item = this.entitySearch[this.indexItemSelect];
             this.itemOnSelect(item);
+            
             break;
           case this.MISAEnum.KEY_CODE.ROW_UP:
             if (!this.isShowData) {
               this.isShowData = true;
             }
-            if (this.indexItemSelect > 0) {
+            if (this.indexItemSelect > 0 && !this.unIndexItemSelect) {
               this.indexItemSelect--;
+            }
+            else {
+              this.unIndexItemSelect = false;
             }
             break;
           case this.MISAEnum.KEY_CODE.ROW_DOWN:
@@ -186,8 +194,11 @@ export default {
             }
             //eslint-disable-next-line no-case-declarations
             let maxLength = this.entitySearch.length;
-            if (this.indexItemSelect < maxLength - 1) {
+            if (this.indexItemSelect < maxLength - 1 && !this.unIndexItemSelect) {
               this.indexItemSelect++;
+            }
+            else {
+              this.unIndexItemSelect = false;
             }
             break;
           default:
@@ -245,7 +256,6 @@ export default {
         var me = this;
         //Sau khi chọn 1 trường thì thực hiện reset lại danh sách
         this.entitySearch = this.entities;
-        console.log(this.entitySearch);
         //Gán item đang đc chọn cho entity
         this.itemSelected = entity;
 

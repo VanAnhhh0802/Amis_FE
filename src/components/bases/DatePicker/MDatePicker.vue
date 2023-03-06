@@ -53,7 +53,7 @@ import commonJS from "@/script/common.js"
 import DatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 export default {
-  name: "BaseDatePicker",
+  name: "MDatePicker",
   emits: ["errorInputMessage","update:modelValue", "blurInput"],
   components: {
     DatePicker
@@ -95,20 +95,7 @@ export default {
       this.$emit("update:modelValue", date, this.name);
       this.$refs[this.dateName].closeMenu();
     },
-    /**
-     * Check vaidate theo rules truyền vào
-     * Author : Văn anh (05/1/2023)
-     // checkValidate() {
-     */
-      //     var msgErrorInput =  inputValidation(
-    //   if (this.rules.length > 0) {
-    //       this.rules,
-    //       this.name,
-    //       this.modelValue
-    //     );
-    //     this.$emit("errorInputMessage", this.name, msgErrorInput);
-    //   }
-    // },
+    
     /**
      * Xử lý khi blur input
      * Author : Văn Anh (05/1/2023)
@@ -116,6 +103,7 @@ export default {
     blurInputValue(event){
       if(this.isValidDate(event)){
         const newDate = new Date(event.target.value.split('/').reverse().join('-'));
+        console.log("newDate", newDate);
         this.$emit('update:modelValue',newDate, this.name);
         this.$emit("blurInput");
        }else{
@@ -123,7 +111,6 @@ export default {
         this.$refs[this.name] = "";
         this.$emit('update:modelValue',undefined, this.name);
        }
-      //  this.$refs[this.dateName].closeMenu();
     }, 
     /**
      * Xử lý khi nhập input
@@ -133,6 +120,7 @@ export default {
       if(this.isValidDate(event)){
         const newDate = new Date(event.target.value.split('/').reverse().join('-'));
         this.$emit('update:modelValue',newDate, this.name);
+        console.log(newDate);
         }
     },
       /**
@@ -159,6 +147,20 @@ export default {
     onFocus() {
       this.$refs[this.name].focus();
     },
+    /**
+     * Hàm forcus vào input khi có lỗi
+     * Author: Văn Anh (9/1/2023)
+     */
+     inputFocus(){
+      try {
+        this.$nextTick(function () {
+          this.$refs[this.name].focus();
+        });
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }
   },
   watch: {
     /**
@@ -167,6 +169,7 @@ export default {
      */
     modelValue: function () {
       this.date = this.modelValue;
+      console.log("date: " + this.date);
     },
     /**
      * Hàm theo dõi sự thay đổi của isErrorInput mỗi khi validate
@@ -181,12 +184,7 @@ export default {
 
       }
     }
-    // date: {
-    //   handler: function() {
-    //     this.$emit("update:modelValue", this.date, this.name);
-    //   },
-    //   immediate:true
-    // }
+   
   },
   computed: {
     /**

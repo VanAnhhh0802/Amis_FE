@@ -165,7 +165,7 @@
         ></MDropCombobox>
         <Paginate
           v-model="this.filter.pageNumber"
-          :page-count="this.totalPage"
+          :page-count="totalPage"
           :page-range="2"
           :margin-pages="1"
           :click-handler="clickCallback"
@@ -182,6 +182,7 @@
   <!-- Dialog nhân viên -->
   <EmployeeDetail
     v-if="isShowForm"
+    :isShow="isShowForm"
     @btnCloseForm="closeForm"
     :employeeId="employeeIdSelected"
     @inputFocusDetail="isShowForm"
@@ -327,7 +328,7 @@ export default {
       isShowSubToolbar: false,
       //Paing 
       totalRecord : null,
-      totalPage : null,
+      totalPage : 0,
       pagination : [
         {
           key: 10,
@@ -399,8 +400,6 @@ export default {
     async clickCallback(pageNum){
       try {
         this.filter.pageNumber = pageNum;
-        console.log("this.filter.pageNumber: " ,this.filter.pageNumber);
-      // this.isCheckAll = false;
       await this.listEmployees();
       this.testCheckAll();
       } catch (error) {

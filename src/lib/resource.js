@@ -5,6 +5,7 @@
 export default {
   
   //Các thông báo exception gửi từ backend hiển thị cho người dùng
+  
   ExceptionMsg: {
     BADREQUEST: "Dữ liệu đầu vào không hợp lệ.",
     UNAUTHORIZED: "Hệ thống MISA chưa được ủy quyền.",
@@ -19,6 +20,21 @@ export default {
     BadRequest: 400,
     NotFound: 404,
     ServerError: 500,
+    
+  },
+  STATUSCODES: {
+    Unauthorized: {
+      Code: 401,
+      Message: "Không được xác thực"
+    },
+    Not_Found: {
+      Code: 404,
+      Message: "Không tìm thấy tài nguyên"
+    },
+    Gateway_Timeout: {
+      Code: 504,
+      Message:"Không nhận được phản hồi từ máy chủ"
+    }
   },
   //
   FORM_MODE: {
@@ -51,7 +67,7 @@ export default {
   IsErrorFormat : {
     Email : "Email không đúng định dạng",
     Phone : "Số điện thoại không đúng định dạng",
-    Date: "Ngày khồn được lớn hơn ngày hiện tại"
+    Date: "Ngày không được lớn hơn ngày hiện tại"
   },
   IsOutLength : {
     Code:"Mã nhân viên không được nhập quá 20 ký tự",

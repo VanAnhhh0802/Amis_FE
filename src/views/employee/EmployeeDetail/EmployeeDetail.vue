@@ -5,7 +5,6 @@
     <div class="flex" style="justify-content: center; height: 100%">
       <div class="form__wrapper"
         v-on:keydown.esc="btnClose"
-        
       >
         <div class="flex form__header">
           <div class="flex col-gap-16 form__header--left">
@@ -76,7 +75,7 @@
                     propName="departmentName"
                     propValue="departmentId"
                     api="https://localhost:7232/api/v1/Departments/filter?pageSize=10&pageNumber=1"
-                    v-model="newEmployee.departmentId"
+                    v-model.trim()="newEmployee.departmentId"
                     :isShowError="false"
                     :tabIndex="3"
                     ref="DepartmentName"
@@ -105,7 +104,7 @@
                   <MDatePicker
                     v-model.trim()="newEmployee.dateOfBirth"
                     :tabIndex="5"
-                    :name="'DateOfBirth'"
+                    name="DateOfBirth"
                     dateName="'DateOfBirthPicker'"
                     ref="DateOfBirth"
                     :isErrorInput = "this.errorBorderDateOfBirth"
@@ -168,12 +167,12 @@
                   tooltipMessage="Số chứng minh nhân dân"
                   ></MInput>
                   <div style = "height: 62px">
-                  <label>Ngày sinh</label>
+                  <label>Ngày cấp</label>
                   <br>
                   <MDatePicker
-                    v-model="newEmployee.identityDate"
+                    v-model.trim()="newEmployee.identityDate"
                     :tabIndex="10"
-                    :name="'IdentityDate'"
+                    name="IdentityDate"
                     dateName="'IdentityDatePicker'"
                     ref="IdentityDate"
                     :isErrorInput = "this.errorBorderIdentityDate"
@@ -323,7 +322,7 @@
       </div>
     </div>
   </div>
-  <MDialog v-if="isShowDialog" @btnCloseDialog="closeDialog">
+  <MDialog v-if="isShowDialog" @btnCloseDialog="closeDialog" style= "z-index: 999">
     <template v-slot:title>Dữ liệu không hợp lệ</template>
     <template v-slot:message>
       <li class="flex dialog-mgs">
@@ -334,7 +333,7 @@
       </li>
     </template>
     <template v-slot:footer>
-      <button class="btn btn--primary dialog__btn--acept" @click="closeDialog">
+      <button class="btn btn--primary dialog__btn--acept" @click="closeDialogError">
         Đóng
       </button>
     </template>
@@ -368,7 +367,7 @@
           </MButton>
           <MButton
             class="btn--primary dialog__btn--acept"
-            @click="btnSaveOnClick"
+            @click="btnWarningClickYes"
             :text="this.textDialogButtonYes"
           >
           </MButton>
@@ -399,7 +398,7 @@ export default {
     MDatePicker,
     // MToast,
   },
-  props: ["employee", "employeeId", "isDuplicate"],
+  props: ["employee", "employeeId", "isDuplicate","isShow"],
   emits: [
     "btnCloseForm",
     "showSuccessToast",
@@ -446,7 +445,6 @@ export default {
       errorBorderName: false,
       errorBorderDepartment: false,
       errorBorderEmail: false,
-      errorBorderDate: false,
       errorBorderPhoneNumber: false,
       errorBorderTelephoneNumber: false,
       errorBorderDateOfBirth:false,
@@ -589,16 +587,14 @@ export default {
         switch (error.response.data.errorCode) {
           case MISAEnum.ERRORCODE.DuplicateCode:
             this.isShowLoading = false;
-            //Hiển thị toast message thông báo mã bị trùng
             //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
             this.dialogMessage = error.response.data.userMsg;
-            console.log(this.dialogMessage);
             this.isShowDialog = true;
             this.$refs.EmployeeCode.inputFocus();
             break;
           // eslint-disable-next-line
           case MISAEnum.ERRORCODE.InvalidInput:
-            // this.onShowDialogChangeData(false,true, null,"", error.response.data.MoreInfo.MoreInfo[0]);
+            this.dialogMessage = error.response.data.userMsg;
             break;
           default:
             break;
@@ -606,16 +602,16 @@ export default {
       } 
       else if (error.response.status == resource.STATUSCODE.ServerError) {
         this.dialogMessage = error.response.data.userMsg;
-                this.isShowDialog = true;
+        this.isShowDialog = true;
       }
-      // else {
-      //   for(const property in resource.STATUSCODES) {
-      //     if(error.response.status == property.Code) {
-      //       this.$emit("changeToastMsg",resource.FORM_MODE.ERROR,true,false,property.Message);
-      //       this.$emit("onshowToast");
-      //     }
-      //   }
-      // }
+      else {
+        for(const property in resource.STATUSCODES) {
+          if(error.response.status == property.Code) {
+            this.dialogMessage = property.Message;
+            this.isShowDialog = true;
+          }
+        }
+      }
     },
     
     //#region Sự kiện liên quan đến button
@@ -688,6 +684,7 @@ export default {
         var valid = this.validateData();
         //Validate dữ liệu
         if (valid) {
+          this.isShowDialogWarning = false;
           this.dialogMessage = this.errorMessage[0];
           this.isShowDialog = true;
         } else {
@@ -697,16 +694,24 @@ export default {
             this.handleOnSave(isSaveAndAdd, true, resource.FORM_MODE.ADD)
           }
           else if (this.isDuplicate) {
-            this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
+            this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.ADD)
           }
           else {
             this.handleOnSave(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
           }
           this.isShowLoading = false;
+          this.isShowDialogWarning = false;
         }
       } catch (error) {
         console.log(error);
       }
+    },
+    /**
+     * Hàm xử lý khi nhân có ở dialogwarning
+     * Author: Văn Anh (6/3/2023)
+     */
+    btnWarningClickYes(){
+      this.btnSaveOnClick(false);
     },
     /**
      * Hàm ẩn dialog
@@ -770,6 +775,42 @@ export default {
       }
     },
     /**
+     * Hàm đóng input và focus vào input lỗi đầu tiên
+     * Athor: Văn Anh (6/2/2023)
+     */
+    closeDialogError(){
+      this.isShowDialog = false;
+      this.inputErrorFocus();
+    },
+    /**
+     * Hàm focus khi có lỗi xảy ra
+     */
+    inputErrorFocus() {
+      try {
+        if (this.errorBorderCode){
+          this.$refs.EmployeeCode.inputFocus();
+        }
+        else if (this.errorBorderName){
+          this.$refs.FullName.inputFocus();
+        }
+        else if (this.errorBorderDepartment){
+          this.$refs.DepartmentName.comboboxFocus();
+        }
+        else if (this.errorBorderDateOfBirth){
+          this.$refs.DateOfBirth.inputFocus();
+        }
+        else if (this.errorBorderIdentityDate){
+          this.$refs.IdentityDate.inputFocus();
+        }
+        else if (this.errorBorderEmail){
+          this.$refs.Email.inputFocus();
+        }
+
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * Xử lý sự kiện khi người dùng bấm nút cất
      * Author: Văn Anh (19/12/2022)
      * TODO:
@@ -784,16 +825,11 @@ export default {
           this.errorMessage.push(resource.IsEmpty.Code);
           this.errorBorderCode = true;
           this.tooltipContentCode = resource.IsEmpty.Code
-
-          // this.$refs.EmployeeCode.inputFocus();
         } else if (this.outLengthValid(this.newEmployee.employeeCode, 20)){
           //Check độ dài nhập quá độ dài
           this.errorMessage.push(resource.IsOutLength.Code);
           this.errorBorderCode = true;
-          this.tooltipContentCode = resource.IsOutLength.Code.
-          this.$nextTick(function () {
-            // this.$refs.EmployeeCode.inputFocus();
-            });
+          this.tooltipContentCode = resource.IsOutLength.Code
         }
         
         //Tên nhân viên trống
@@ -801,20 +837,11 @@ export default {
           this.errorMessage.push(resource.IsEmpty.Name);
           this.errorBorderName = true;
           this.tooltipContentName = resource.IsEmpty.Name
-
-          this.$nextTick(function () {
-            // this.$refs.FullName.inputFocus();
-            });
-
         } else if (this.outLengthValid(this.newEmployee.fullName, 100)){
           //Check độ dài nhập quá độ dài
           this.errorMessage.push(resource.IsOutLength.Name);
           this.errorBorderName = true;
           this.tooltipContentName = resource.IsOutLength.Name
-
-          this.$nextTick(function () {
-            // this.$refs.FullName.inputFocus();
-            });
         }
         
         //Phòng ban trống
@@ -822,32 +849,28 @@ export default {
           this.errorMessage.push(resource.IsEmpty.DepartmentName);
           this.errorBorderDepartment = true;
           this.tooltipContentDepartment = resource.IsEmpty.DepartmentName
-
-          this.$nextTick(function () {
-            // this.$refs.DepartmentName.inputFocus();
-            });
-
         }
 
         //Ngày không được lớn hơn ngày hiện tại
         if(this.validateDate(this.newEmployee.dateOfBirth)){
           this.errorBorderDateOfBirth = true;
         }
+        if (this.validateDate(this.newEmployee.identityDate)){
+          this.errorBorderIdentityDate = true;
+        }
         //Email Khồng đúng định dạng 
         if(!this.valueIsEmpty(this.newEmployee.email)){
           if (!this.validateEmail(this.newEmployee.email)){
             this.errorMessage.push(resource.IsErrorFormat.Email);
             this.errorBorderEmail = true;
-            // this.$refs.Email.inputFocus();
-
           }
         }
         
         //Số điện thoại không đúng định dạng, độ dài
-        if(this.validatePhone(this.newEmployee.phoneNumber)){
+        if(!this.valueIsEmpty(this.newEmployee.phoneNumber)){
             this.errorBorderPhoneNumber = true;
         }
-        if(this.validatePhone(this.newEmployee.telephoneNumber)){
+        if(!this.valueIsEmpty(this.newEmployee.telephoneNumber)){
             this.errorBorderTelephoneNumber = true;
         }
        
@@ -861,30 +884,14 @@ export default {
       }
     },
     /**
-     * Hàm xử lý lỗi nhập sai số đt
-     * @param {Số điện thoại} phone 
-     * Author: Văn ANh (2/3/2023)
-     */
-    validatePhone(phone){
-      if (!this.valueIsEmpty(phone)) {
-          var phoneRegex = /((09|03|07|08|05)+([0-9]{8})\b)/g;
-
-          if (!phoneRegex.test(phone)) {
-            this.errorMessage.push(resource.IsErrorFormat.Phone);
-            return true;
-          }
-      }
-      return false;
-    },
-    /**
      * Hàm xử lý lỗi ngày tháng
      * @param {Ngày nhập} date 
      */
     validateDate(date){
       if (!this.valueIsEmpty(date)){
-          const dateOfBirth = new Date(date);
+          let dateInput = new Date(date);
           const today = new Date();
-          if (dateOfBirth.getTime() >= today.getTime()){
+          if (dateInput.getTime() >= today.getTime()){
             this.errorMessage.push(resource.IsErrorFormat.Date);
             return true;
           }
@@ -937,9 +944,10 @@ export default {
      * Hàm onKeyDown xử lí khi nhấn phím tắt
      */
     onKeyDown(event) {
+      console.log(event);
         var me = this;
-        if(this.isShowForm) {
-          if(event.ctrlKey &&  event.key === "s") {
+        if(this.isShow) {
+          if(event.ctrlKey  &&  event.key === "s") {
           event.preventDefault();
           me.btnSaveOnClick(false);
         }
@@ -955,7 +963,13 @@ export default {
     }
     //#endregion
   },
-  
+  mounted() {
+    document.addEventListener("keydown",this.onKeyDown);
+  },
+  unmounted() {
+    document.removeEventListener("keydown",this.onKeyDown);
+
+  }
 };
 </script>
 <style scoped>

@@ -54,11 +54,7 @@
     },
     methods: {
     changeToastContent() {
-      console.log("chay");
       switch(this.toastType){
-        case resource.FORM_MODE.DUPLICATE:
-          this.toastContent = resource.FORM_MESSAGE.SUCCESS.DUPLICATE
-          break;
         case resource.FORM_MODE.ADD:
           this.toastContent = resource.FORM_MESSAGE.SUCCESS.ADD
           break;
