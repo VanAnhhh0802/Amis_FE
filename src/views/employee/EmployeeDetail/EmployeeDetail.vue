@@ -70,7 +70,7 @@
                 <div class="form__unit">
                   <MCombobox
                     id="cbxDepartment"
-                    :label="this.textLabelDepartment"
+                    :label="this.textLabelDepartment "
                     :isRequired="true"
                     propName="departmentName"
                     propValue="departmentId"
@@ -212,10 +212,6 @@
                     tooltipMessage = "Số điện thoại di động"
                     nameRef ="PhoneNumber"
                     ref="PhoneNumber"
-                    @inputOutFocus="this.errorBorderPhoneNumber = false"
-                    :error = "this.errorBorderPhoneNumber"
-                    :tooltipError = "this.errorBorderPhoneNumber"
-                    tooltipContent = "Số điện thoại không đúng định dạng"
                   ></MInput>
                   <MInput
                   inputType="text"
@@ -226,10 +222,6 @@
                     tooltipMessage = "Số điện thoại cố định"
                     ref="PhoneNumber"
                     nameRef ="PhoneNumber"
-                  @inputOutFocus="this.errorBorderTelephoneNumber = false"
-                    :error = "this.errorBorderTelephoneNumber"
-                    :tooltipError = "this.errorBorderTelephoneNumber"
-                    tooltipContent = "Số điện thoại không đúng định dạng"
                   ></MInput>
                 </div>
                 <div class="w-full">
@@ -375,7 +367,6 @@
       </div>
     </template>
   </MDialog>
-  
   <MLoading v-if="isShowLoading"></MLoading>
 </template>
 <script>
@@ -440,13 +431,12 @@ export default {
   },
   data() {
     return {
+      tabIndex: 1,
       //Khai báo các trường hợp mã lỗi
       errorBorderCode: false,
       errorBorderName: false,
       errorBorderDepartment: false,
       errorBorderEmail: false,
-      errorBorderPhoneNumber: false,
-      errorBorderTelephoneNumber: false,
       errorBorderDateOfBirth:false,
       errorBorderIdentityDate:false,
       tooltipContentName: null,
@@ -865,15 +855,6 @@ export default {
             this.errorBorderEmail = true;
           }
         }
-        
-        //Số điện thoại không đúng định dạng, độ dài
-        if(!this.valueIsEmpty(this.newEmployee.phoneNumber)){
-            this.errorBorderPhoneNumber = true;
-        }
-        if(!this.valueIsEmpty(this.newEmployee.telephoneNumber)){
-            this.errorBorderTelephoneNumber = true;
-        }
-       
         //Kiểm tra nêu errors mà tồn tại lỗi
         if (this.errorMessage.length > 0){
           return true;
@@ -944,7 +925,6 @@ export default {
      * Hàm onKeyDown xử lí khi nhấn phím tắt
      */
     onKeyDown(event) {
-      console.log(event);
         var me = this;
         if(this.isShow) {
           if(event.ctrlKey  &&  event.key === "s") {
@@ -953,12 +933,10 @@ export default {
         }
         else if (event.ctrlKey && event.key === "S") {
           event.preventDefault();
-          // me.onSavebtn(true)
           me.btnSaveOnClick(true)
         }
-        else if(event.key == "Escape") {
-        event.preventDefault();
-        }
+        
+        
       }
     }
     //#endregion

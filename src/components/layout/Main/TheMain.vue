@@ -2,6 +2,7 @@
   <div class="main">
     <TheHeader></TheHeader>
     <EmployeeList></EmployeeList>
+    
   </div>
 </template>
 <script>

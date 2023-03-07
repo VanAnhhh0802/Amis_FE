@@ -18,7 +18,7 @@
         class="input combobox__input"
         v-model="textSelected"
         @input="onSearchItem"
-        @keydown.prevent="inputOnKeyDown"
+        @keydown="inputOnKeyDown"
         :tabindex="tabIndex"
         @focus="inputFocus"
         @blur="inputOutFocus"
@@ -106,6 +106,9 @@ export default {
     }
   },
   watch: {
+    tabIndex: function(newValue) {
+      console.log(newValue);
+    },
     modelValue: {
       handler: function (newValue) {
         if (!newValue) {
@@ -167,6 +170,7 @@ export default {
      */
     inputOnKeyDown(event) {
       try {
+        console.log(event);
         const keyCode = event.keyCode;
         switch (keyCode) {
           case this.MISAEnum.KEY_CODE.ENTER:
@@ -175,7 +179,6 @@ export default {
             //eslint-disable-next-line no-case-declarations
             const item = this.entitySearch[this.indexItemSelect];
             this.itemOnSelect(item);
-            
             break;
           case this.MISAEnum.KEY_CODE.ROW_UP:
             if (!this.isShowData) {

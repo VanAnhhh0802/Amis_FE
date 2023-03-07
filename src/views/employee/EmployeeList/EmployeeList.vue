@@ -57,9 +57,12 @@
             ></div>
             <div class="tooltip-text tooltip-reload">Lấy lại dữ liệu</div>
           </div>
-          <div class="icon export"
+          <div class="tooltip">
+            <div class="icon export" style="background-position: -705px -258px;"
             @click="exportFile(this.textSearch)"
           ></div>
+            <div class="tooltip-text tooltip-reload">Xuất khẩu</div>
+          </div>
         </div>
       </div>
       <div class="list__table">
@@ -266,6 +269,7 @@
     :isSuccessToast="isSuccessToast"
     :isErrorToast="isErrorToast"
   />
+  
 </template>
 <script>
 //Import Thư viện
@@ -669,7 +673,6 @@ export default {
           this.testCheckAll();
         }
         this.isShowHideToolbarLeft();
-        console.log(this.employeeSelected);
       } catch (error) {
         console.log(error);
       }
