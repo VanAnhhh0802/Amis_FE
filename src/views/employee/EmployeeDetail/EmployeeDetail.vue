@@ -272,7 +272,7 @@
         <div class="flex form__footer">
           <div class="">
             <MButton
-              class="btn btn--secondary btn--close"
+              class="btn btn--secondary"
               @click="btnClose"
               :text="this.textButtonCancel"
               :tabIndex="21"
@@ -845,15 +845,28 @@ export default {
         if(this.validateDate(this.newEmployee.dateOfBirth)){
           this.errorBorderDateOfBirth = true;
         }
+        else {
+            this.errorBorderDateOfBirth = false ;
+
+          }
+          
         if (this.validateDate(this.newEmployee.identityDate)){
-          this.errorBorderIdentityDate = true;
-        }
+          this.errorBorderDateOfBirth = true;
+        }else {
+            this.errorBorderDateOfBirth = false ;
+
+          }
         //Email Khồng đúng định dạng 
         if(!this.valueIsEmpty(this.newEmployee.email)){
           if (!this.validateEmail(this.newEmployee.email)){
             this.errorMessage.push(resource.IsErrorFormat.Email);
             this.errorBorderEmail = true;
           }
+          else {
+            this.errorBorderEmail = false ;
+
+          }
+
         }
         //Kiểm tra nêu errors mà tồn tại lỗi
         if (this.errorMessage.length > 0){
@@ -871,9 +884,14 @@ export default {
     validateDate(date){
       if (!this.valueIsEmpty(date)){
           let dateInput = new Date(date);
+          let dataEx = new Date("2020-01-01 00:00:00")
           const today = new Date();
           if (dateInput.getTime() >= today.getTime()){
             this.errorMessage.push(resource.IsErrorFormat.Date);
+            return true;
+          }
+          if (dateInput.getTime() === dataEx.getTime()){
+            this.errorMessage.push("Không được nhập ngày 01/01/2020");
             return true;
           }
         }

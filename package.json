@@ -11,12 +11,16 @@
     "@vuepic/vue-datepicker": "^4.1.0",
     "axios": "^1.2.1",
     "core-js": "^3.8.3",
+    "devextreme": "^22.2.4",
+    "devextreme-vue": "^22.2.4",
     "i18n": "^0.15.1",
     "lodash": "^4.17.21",
     "vue": "^3.2.13",
     "vue-axios": "^3.5.2",
     "vue-datepicker-next": "^1.0.2",
     "vue-debounce": "^4.0.0",
+    "vue-resizable": "^2.1.7",
+    "vue-router": "^4.1.6",
     "vuejs-paginate-next": "^1.0.2"
   },
   "devDependencies": {

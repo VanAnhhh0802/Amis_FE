@@ -10,41 +10,34 @@
     <div id="sidebar-wrapper">
       <div class="menu">
         <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link menu-item__link--active" href="#">
+            <router-link to="/" class="menu-item__link " 
+            @click="this.number = 1"
+            :class="{'menu-item__link--active': this.number == 1}"
+            >
               <div class="icon w-h-24 m-12 sidebar__dashboard"></div>
               <div class="menu-item__title">Tổng quan</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
+            </router-link>
         </div>
         <div class="menu__item">
-          <div class="tooltip">
-            
-            <a class="menu-item__link" href="#">
+            <router-link to="/cash/procedure" class="menu-item__link"
+            @click="this.number = 2"
+            :class="{'menu-item__link--active': this.number == 2}"
+            >
               <div class="icon w-h-24 m-12 sidebar__cash"></div>
               <div class="menu-item__title">Tiền mặt</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
+            </router-link>
         </div>
         <div class="menu__item">
-          <div class="tooltip">
             <a class="menu-item__link" href="#">
               <div class="icon w-h-24 m-12 sidebar__bank"></div>
               <div class="menu-item__title">Tiền gửi</div>
             </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
         </div>
         <div class="menu__item">
-          <div class="tooltip">
             <a class="menu-item__link" href="#">
               <div class="icon w-h-24 m-12 sidebar__purchase"></div>
               <div class="menu-item__title">Mua hàng</div>
             </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
         </div>
         <div class="menu__item">
           <div class="tooltip">
@@ -150,8 +143,15 @@
   </div>
 </template>
 <script>
+
 export default {
   name: "TheSidebar",
+  data(){
+    return {
+      number: 1,
+    }
+  },
+ 
 };
 </script>
 <style scoped>

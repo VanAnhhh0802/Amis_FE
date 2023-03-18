@@ -1,5 +1,5 @@
 .date-picker__icon {
-    top: -4px;
+    top: -8px;
     right: 8px;
     position: absolute;
     background: url("../../../assets/img/Sprites.64af8f61.svg") no-repeat -128px -312px;
@@ -81,7 +81,7 @@
     border: 1px solid var(--border-color);
     min-width: 150px; 
     width: 150px;
-    height: 36px;
+    height: 26px;
     position:relative;
     padding: 8px 8px  8px 12px;
   }

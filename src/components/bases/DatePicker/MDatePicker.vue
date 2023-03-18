@@ -176,13 +176,13 @@ export default {
      * Author: Văn ANh(2/3/2023)
      */
     isErrorInput: function () {
-      if (!this.isErrorInput){
-        this.isError = false;
-      }
-      else {
-        this.isError = true;
-
-      }
+      this.isError = this.isErrorInput ;
+      // if (!this.isErrorInput){
+      //   this.isError = false;
+      // }
+      // else {
+      //   this.isError = true;
+      // }
     }
    
   },

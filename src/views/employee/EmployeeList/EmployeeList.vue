@@ -210,7 +210,10 @@
         <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete">
           Xóa
         </li>
-        <li class="dropdown_list-item">Ngừng sử dụng</li>
+        <div class="tooltip">
+            <li class="dropdown_list-item">Ngừng sử dụng</li>
+            <div class="tooltip-text tooltip-reload">Đang phát triển</div>
+          </div>
       </ul>
     </div>
   </teleport>
@@ -662,7 +665,6 @@ export default {
           }
           else {
             this.employeeSelected.push(id);
-            console.log(this.employeeSelected);
             if (this.employeeSelected.length > 0) {
               this.isShowToolbarLeft = true;
             }
@@ -729,7 +731,8 @@ export default {
      resetCheckAllEmployee(){
       try {
         this.employeeSelected = [];
-        console.log(this.employeeSelected);
+        this.isShowToolbarLeft = false
+        
         //Tính toán lại check all
         this.testCheckAll();
       } catch (error) {
@@ -977,9 +980,9 @@ export default {
         ) 
         .then(response => {
           this.isShowLoading = false;
-          //
+          //Tạo 1 chuỗi ulr cho data trả về
           const url = window.URL.createObjectURL(new Blob([response.data]));
-          
+          //Khởi tạo 1 element mới
           const link = document.createElement('a');
 
           link.href = url;

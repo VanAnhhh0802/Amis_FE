@@ -204,4 +204,218 @@ export default {
       SaveAndAdd: "Cất và Thêm (Ctrl+Shift+S)",
     }
   },
+  Vi: {
+    Detail: {
+      TitleDetail: "Chi phiếu PC0003",
+      Code: "Mã nhà cung cấp",
+      Name: "Tên nhà cung cấp",
+      AccountingDate: "Ngày hạch toán",
+      Receiver: "Người nhận",
+      Address: "Địa chỉ",
+      CheckDate: "Ngày chi phiếu",
+      ReasonSpend: "Lý do chi",
+      OrderNumber: "Số chi phiếu",
+      Employee: "Nhân viên",
+      Attach : "Kèm theo",
+      Explain : "Diễn giải",
+      Accounting: "Hach toán",
+      TotalAmount: "Tổng tiền",
+      Instruct: "Hướng dẫn"
+    },
+    Button: {
+      AddRow: "Thêm dòng",
+      DeleteAllRows: "Xóa hết dòng",
+      Save: "Cất",
+      SaveAndAdd: "Cất và Thêm",
+      SaveAddEsc: "Cất và Đóng",
+      SaveAndPrint: "Cất vầ In",
+      Cancel: "Hủy"
+    },
+    Combobox: [
+      {
+        key: 1,
+        value: "Trả tiền nhà cung cấp(không theo hóa đơn)",
+      },
+      {
+        key: 2,
+        value: "Tạm ứng cho nhân viên",
+      },
+      {
+        key: 3,
+        value: "Chi mua ngoài có hóa đơn",
+      },
+      {
+        key: 4,
+        value: "Trả lương nhân viên",
+      },
+      {
+        key: 5,
+        value: "Chuyển tiền cho chi nhánh khác",
+      },
+      {
+        key: 6,
+        value: "Gửi tiền vào tài khoản ngân hàng",
+      },
+      {
+        key: 7,
+        value: "Chi khác",
+      },
+    ],
+    Tab: [
+      {
+        tabName: "Quy trình",
+        tabLink: "/cash/procedure"
+      },
+      {
+        tabName: "Chi tiền",
+        tabLink: "/cash/pay"
+      }
+    ],
+    ColumsTableAccount: [
+      {
+        name: "Số tài khoản",
+      },
+      {
+        name: "Tên tài khoản",
+        isLarge: true,
+      },
+      {
+          name: "Tính chất",
+          isLarge: false,
+      },
+      {
+          name: "Tên tiếng anh",
+          isLarge: true,
+      },
+      {
+          name: "Diễn giải",
+          isLarge: true,
+      },
+      {
+          name: "Trạng thái",
+          isLarge: false,
+      },
+    ],
+    ColumsTablePay: {
+      AccountingDate: "Ngày hạch toán",
+      VouchersDate: "Ngày chứng từ",
+      NumberOfVouchers: "Số chứng từ",
+      Explain: "Diễn giải",
+      Money: "Số tiền",
+      SubjectId: "Mã Đối tượng",
+      Subject: "Đối tượng",
+      SubjectName: "Tên đối tượng",
+      Branch: "Chi nhánh",
+      Function: "Chức năng",
+      AccountDebt: "TK Nợ",
+      AccountHas:"TK Có",
+
+    },
+    ColumnsTablePayDetail: [
+        {
+            columnName: "#",
+            width: "34px",
+            align: "left",
+            isMoney: false,
+            isSticky: true,
+        },
+        {
+            columnName: "Diễn giải",
+            width: "522px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "TK Nợ",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "TK Có",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "Số tiền",
+            width: "150px",
+            align: "right",
+            isMoney: true,
+            isSticky: false,
+        },
+        {
+            columnName: "Đối tượng",
+            width: "150px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "Tên đối tượng",
+            width: "280px",
+            align: "left",
+            isMoney: false,
+            isSticky: false,
+        },
+        {
+            columnName: "",
+            width: "35px",
+            align: "center",
+            isMoney: false,
+            isSticky: true,
+            isLast: true,
+        },
+    ],
+  },
+  paging: [
+    {
+      key: 10,
+      value: "10 nhân viên trên 1 trang",
+    },
+    {
+      key: 20,
+      value: "20 nhân viên trên 1 trang",
+    },
+    {
+      key: 30,
+      value: "30 nhân viên trên 1 trang",
+    },
+    {
+      key: 50,
+      value: "50 nhân viên trên 1 trang",
+    },
+    {
+      key: 100,
+      value: "100 nhân viên trên 1 trang",
+    },
+  ],
+  TRACK_TYPE: [
+    {
+        optionId: 0,
+        optionName: "Bắt buộc nhập",
+    },
+    {
+        optionId: 1,
+        optionName: "Chỉ cảnh báo",
+    },
+  ],
+  OBJECT_TYPE: [
+    {
+        optionId: 0,
+        optionName: "Nhà cung cấp",
+    },
+    {
+        optionId: 1,
+        optionName: "Khách hàng",
+    },
+    {
+        optionId: 2,
+        optionName: "Nhân viên",
+    },
+],
 };
+

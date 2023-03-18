@@ -56,6 +56,12 @@
   min-width: 36px;
   min-height: 36px;
 }
+.w-h-60 {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+}
 .flex {
   display: flex;
   align-items: center;
@@ -122,6 +128,10 @@
 .col-gap-16 {
   column-gap: 16px;
 }
+.col-gap-12{
+  column-gap: 12px;
+
+}
 .no-border {
   border: none;
 }
@@ -137,5 +147,19 @@
 }
 .m-8 {
   margin-right: 8px;
+}
+.m-t-8{
+  margin-top: 8px;
+}
+.p-r-36{
+  padding-right: 36px;
+}
+.m-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 /*  */

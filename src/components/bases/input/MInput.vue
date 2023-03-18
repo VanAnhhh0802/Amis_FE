@@ -1,5 +1,5 @@
 <template>
-  <div class="input-wrapper">
+  <div class="input-wrapper" :class="{'border-focus': isBorder}">
     <label for="" v-if="label"
       >{{ label }}
       <span class="input--required" v-if="inputRequired">*</span>
@@ -8,15 +8,17 @@
         <div class="error-arrow"></div>
       </div>
     </label>
-    <div class="input_content" >
+    <div class="input_content" 
+    
+    >
       <input
         :type="inputType"
         autocomplete="off"
         class="input"
-        :style="{ width: width, border: border }"
+        :style="{ width: width, height: height, border: border}"
         v-model="value"
         :tabindex="tabIndex"
-        :class="{ 'input--error': isError }"
+        :class="{ 'input--error': isError}"
         @focus="inputOnFocus"
         @blur="inputOutFocus"
         :placeholder="placeholder"
@@ -37,6 +39,7 @@ export default {
   props: {
     label: String,
     width: String,
+    height: String,
     inputType: String,
     inputRequired: Boolean,
     modelValue: String,
@@ -49,6 +52,7 @@ export default {
     tooltipContent: String,
     error: Boolean,
     tooltipError:Boolean,
+    borderSearch: Boolean,
     tooltipMessage: String,
   },
 
@@ -59,9 +63,13 @@ export default {
       isEmployeeCodeError: false,
       value: null,
       isError: false,
+      isBorder: false,
     };
   },
   emits: ["update:model-Value", "inputFocus", "inputOutFocus"],
+  updated(){
+    this.isBorder = this.borderSearch;
+  },
   watch: {
     /**
      * Theo dõi sự thay đổi của biến modelValue
@@ -78,11 +86,14 @@ export default {
       this.$emit("update:model-Value", newValue);
     },
     error: function () {
-      if (!this.error){
-        this.isError = false;
+        this.isError = this.error;
+    },
+    borderSearch: function(){
+      if(this.borderSearch){
+        this.isBorder = this.borderSearch;
       }
       else {
-        this.isError = true;
+        this.isBorder = false
       }
     }
   },
@@ -106,6 +117,7 @@ export default {
     inputOutFocus() {
       try {
         this.$emit("inputOutFocus");
+        this.isBorder = false;
       } catch (error) {
         console.log(error);
       }
@@ -131,4 +143,5 @@ export default {
 </script>
 <style scoped>
 @import url(./input.css);
+
 </style>

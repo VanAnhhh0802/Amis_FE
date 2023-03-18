@@ -43,53 +43,23 @@ const commonJs = {
         gender = "Khác"
       }
     },
-    // inputValidation (rules,name,value) {
-    //   const FORM_FIELD = RESOURCES.FORM_FIELD;
-    //   const {NOT_EMPTY,ADULT,HAS_FORMAT,MAX_LENGTH} = RESOURCES.FORM_RULES;
-  
-    //   const ERROR = RESOURCES.ERROR;
-    //   const regexConstant = regexConstants;
-    //   for (const rule of rules) {
-    //     var arrRule = rule.split("|");
-    //     var nameRule = arrRule[0];
-    //     var keyRule = arrRule[1];
-    //     switch (nameRule) {
-    //       case NOT_EMPTY:{
-    //         if(!value.trim()) return ERROR[rule](FORM_FIELD[name]);
-    //         break;
-    //       }
-    //       case ADULT:{
-    //         if (value) {
-    //           const date = new Date(value).getTime();
-    //           const dateNow = new Date().getTime();
-    //           if (date > dateNow) {
-    //             return ERROR[rule](FORM_FIELD[name]);
-    //           }
-    //           if(FORM_FIELD[name] == RESOURCES.FORM_FIELD.DateOfBirth) {
-    //             if(new Date().getFullYear() - new Date(value).getFullYear() < 18)
-    //               return ERROR[rule](FORM_FIELD[name]);
-    //           }
-    //         }
-    //         break;
-    //       }
-    //       case HAS_FORMAT:{
-            
-    //         if(value.trim() && !regexConstant[name].test(value))
-    //         {
-    //           return ERROR[rule](FORM_FIELD[name]);
-    //         }
-    //         break;
-    //       }
-    //       case MAX_LENGTH: {
-    //         if (value && value.length > keyRule)
-    //         return ERROR[nameRule](FORM_FIELD[name], keyRule);
-    //       break;
-    //       }
-    //       default:
-    //         break;
-    //     }
-    //   }
-    // }
+    formatMoney(money){
+      try {
+        if (money){
+          money = new Intl.NumberFormat("vi-VI").format(
+            money
+        )
+        }
+        else{
+          money = "0"
+        }
+        return money;
+
+      }
+      catch(error) {
+        return "";
+      }
+    }
 }
 
 export default commonJs;

@@ -38,6 +38,10 @@ const MISAEnum = {
     DeleteFailed:2,
     InvalidInput: 8,
   },
-  KEY_RECORD: {},
+  HEIGHT: {
+    HEIGHT_PAY_CONTENT: 647, // Chiều cao phần content trang phiếu chi
+    HEIGHT_PAY_MASTER: 370, // Chiều cao phần master trang phiếu chi
+    HEIGHT_PAY_DETAIL: 230,
+  }
 };
 export default MISAEnum;

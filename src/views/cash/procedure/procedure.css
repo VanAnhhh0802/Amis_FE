@@ -1,0 +1,90 @@
+
+
+.main-content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+}
+.content-wrapper {
+    width: 700px;
+    height: 380px;
+    background-color: #fff;
+    border-radius: 4px;
+
+
+}
+.content-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e5e5;
+    height: 40px;
+    box-sizing: border-box;
+}
+.content-container {
+    height: 340px;
+    box-sizing: border-box;
+    background: url(../../../assets/img/ảnh\ bảng.svg);
+    position: relative;
+}
+.content-item{
+    position: absolute;
+    width: 90px;
+    padding-top: 60px;
+    position: absolute;
+    transition: all .2s ease;
+    text-align: center;
+    cursor: pointer;
+}
+.content-item:hover {
+    box-shadow: 0 3px 6px rgb(0 0 0 / 25%);
+}
+.collect-money{
+    top: 40px;
+    left: 90px;
+
+}
+.pay-item{
+    top: 215px;
+    left: 90px;
+    text-decoration: none;
+    color: #212121;
+}
+.fund-inventory{
+    top: 125px;
+    left: 335px;
+    width: 125px!important;
+}
+.content-footer{
+    margin-top: 10px;
+    background-color: #fff;
+    height: 66px;
+    width: 700px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.footer-content {
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-decoration: none;
+    color: #212121;
+}
+/* .footer-content:hover {
+    box-shadow: 0 3px 6px rgb(0 0 0 / 25%); 
+    
+}*/
+.footer-account-icon{
+    background-position: -1376px -256px;
+}

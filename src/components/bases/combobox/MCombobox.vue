@@ -1,4 +1,4 @@
-<template lang="">
+<template >
   <div class="a-combobox">
     <label v-if="label"
       >{{ label }}
@@ -29,7 +29,6 @@
         @click="onShowHideData"
         @keydown="inputOnKeyDown"
       >
-        <i class="icofont-rounded-down"></i>
       </button>
       <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;
     left: 44px">
@@ -87,9 +86,11 @@ export default {
     nameRef: String,
     tooltipError: Boolean,
     tooltipContent: String,
+    list: Array,
   },
   emits: ["update:modelValue", "inputFocus", "comboboxOutFocus"],
   created() {
+    
     if (this.api) {
       axios
         .get(this.api)
@@ -103,6 +104,9 @@ export default {
         .catch((response) => {
           console.log(response);
         });
+    }
+    else {
+      this.entities = this.list;
     }
   },
   watch: {

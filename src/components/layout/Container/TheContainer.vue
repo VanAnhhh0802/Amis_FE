@@ -1,17 +1,20 @@
 <template>
   <div class="container">
     <TheSidebar></TheSidebar>
-    <TheMain></TheMain>
+    <div class="main">
+      <TheHeader></TheHeader>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 <script>
 import TheSidebar from "../SideBar/TheSidebar.vue";
-import TheMain from "../Main/TheMain.vue";
+import TheHeader from "../Header/TheHeader.vue";
 export default {
   name: "TheContainer",
   components: {
     TheSidebar,
-    TheMain,
+    TheHeader
   },
 };
 </script>
@@ -19,6 +22,10 @@ export default {
 .container {
   display: flex;
   width: 100%;
+  height: 100vh;
+}
+.main {
+  width: calc(100% - 200px);
   height: 100vh;
 }
 </style>

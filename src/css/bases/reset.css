@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-size: 14px;
+  font-size: 13px;
   box-sizing: border-box;
   font-family: "Roboto";
   font-weight: 400;
@@ -9,4 +9,6 @@ body {
   overflow: hidden;
   color: var(--primary-text-color);
 }
-
+.icon-new {
+  background: url(../../assets/img/Sprites.svg) no-repeat;
+}
