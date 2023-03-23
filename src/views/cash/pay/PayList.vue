@@ -16,7 +16,7 @@
                         </div> 
                     </div>
                     <div 
-                    class=" list-toolbar-wrapper" 
+                    class="col-gap list-toolbar-wrapper" 
                     
                     >
                         <div
@@ -37,6 +37,7 @@
                             <div
                             class="icon w-h-24 btn btn--small"
                             id="btn__reload"
+                            style="background-position: -1097px -83px;"
                             @click="btnReload"
                             ></div>
                             <div class="tooltip-text tooltip-reload">Lấy lại dữ liệu</div>
@@ -47,19 +48,14 @@
                             ></div>
                             <div class="tooltip-text tooltip-reload">Xuất khẩu</div>
                         </div>
-                        <div class="tooltip">
-                            <div class="icon w-h-24 btn--small setting" style="background-position: -88px -200px; margin: 8px; cursor: pointer;"
-                            ></div>
-                            <div class="tooltip-text  tooltip-reload">Cài đặt</div>
-                        </div>
+                        
                         <div class="flex toolbar-right-wrapper">
                             <router-link to="/pay/pay-detail"
                             class="btn"
                                 :class="{ 'btn--primary': true }"
                                 text="Chi tiền"
-                                style="order: 0; border-top-left-radius: 40px;box-sizing: border-box ;border-bottom-left-radius: 40px; height: 28px; text-decoration: none;"
+                                style="order: 0; border-radius: 40px;box-sizing: border-box ; height: 28px; text-decoration: none;"
                             ></router-link>
-                            <div class="icon w-h-24 btn-dropdown-toolbar"></div>
                         </div>
                     </div>
                 </div>

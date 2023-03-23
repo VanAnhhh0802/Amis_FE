@@ -63,14 +63,14 @@
 .combobox__button {
 --w-h: 24px;
   width: var(--w-h);
-  height: var(--w-h);
+  height: 100%;
   background-color: #fff;
   border: none;
   border-left: 1px solid #e6e6e6;
   cursor: pointer;
   outline: none;
   box-sizing: border-box;
-  padding: 0 12px;
+  /* padding: 0 12px; */
   top: 0;
   right: 0;
   text-align: center;
@@ -85,6 +85,7 @@
   width: 100%;
   position: absolute;
   max-height: 308px;
+  overflow-y: auto;
   background-color: #fff;
   z-index: 9999;
   cursor: pointer;
@@ -194,4 +195,29 @@
 .item-select{
   background-color: #2ca01c;
   color: #fff;
+}
+/* Combobox */
+.combobox{
+  border-radius: 2px;
+  height: 26px;
+}
+.combobox__input{
+  border: none;
+  height: 17px;
+
+}
+.combobox__button{
+  border-radius: 2px;
+  border: none;
+  width: 30px;
+}
+.combobox__button:hover {
+  background: #ECEEF1;
+ }
+ 
+.btn-combobox-icon {
+  width: 30px;height: 100%;
+  border: none;
+  background:  
+  url(http://localhost:8080/img/Sprites.64af8f61.2ff7618a.svg) no-repeat -551px -354px;
 }

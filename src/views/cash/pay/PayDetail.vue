@@ -9,6 +9,8 @@
                 <div class="checkbox-wrapper">
                     <MDropCombobox
                     :total="listPayDetail"
+                    :default="this.listPayDetail[6].value"
+                    styleData="top: 30px!important"
                     name="true"
                     ></MDropCombobox>
                 </div>
@@ -33,23 +35,23 @@
             <div style="display: flex; background-color: #eceef1;margin: 0 -24px; padding: 6px 24px 12px; justify-content: flex-start;">
                 <div class="container-left">
                     <div class="row col-gap-12">
-                        <div style="width: 270px;">
+                        <div style="width: 363px;">
                             <label for="">Mã đối tượng  </label>
-                            <MDropCombobox
-                            style="width: 270px"
-                            ></MDropCombobox>
+                            <MCombobox
+                            style="width: 363px"
+                            ></MCombobox>
                         </div>
-                        <MInput label="Tên đối tượng" style="width: 373px" bottom="8px" />
+                        <MInput label="Tên đối tượng" style="width: 500px" bottom="8px" />
                     </div>
                     <div class="row col-gap-12">
-                        <MInput label="Người nhận" style="width: 270px;" width="270px"/>
-                        <MInput label="Địa chỉ" style="width: 373px" bottom="8px" />
+                        <MInput label="Người nhận" style="width: 363px;"/>
+                        <MInput label="Địa chỉ" style="width: 500px"  />
                     </div>
                     <div class="row">
-                        <MInput label="Lý do chi"  style="width: 655px" bottom="8px"  />
+                        <MInput label="Lý do chi"  style="width: 100%" bottom="8px"  />
                     </div>
                     <div class="row col-gap-12">
-                        <MInput label="Nhân viên" style="width: 270px;" bottom="8px" />
+                        <MInput label="Nhân viên" style="width: 363px;" bottom="8px" />
                             <MInput label="Kèm theo" style="width: 150px;" bottom="8px" />
                         <div class="row-text" style="margin-top: 17px;">chứng từ gốc</div>
                     </div>
@@ -60,11 +62,16 @@
                 <div class="container-center">
                     <div>
                         <label for="">Ngày hạch toán</label>
-                        <MDatePicker  bottom="8px" width="166px" />
+                        <MDatePicker  style="width: 166px;" 
+                            dateName="AccountingDate"
+                        />
                     </div>
-                    <div style="margin: 16px 0;">
+                    <div style="margin: 16px 0; width: 166px">
                         <label for="">Ngày phiếu chi</label>
-                        <MDatePicker  bottom="8px" width="166px" />
+                        <MDatePicker 
+                            style="width: 166px;" 
+                            dateName="VoucherDay"
+                        />
                     </div>
                     <MInput label="Số phiếu chi" width="166px" value="PC001" />
                 </div>
@@ -126,6 +133,7 @@ import resource from "@/lib/resource";
 import MInput from "@/components/bases/input/MInput.vue";
 import MTableDetail from "@/components/bases/Table/MTableDetail.vue";
 import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue";
+import MCombobox from "@/components/bases/combobox/MCombobox.vue";
 import MDatePicker from "@/components/bases/DatePicker/MDatePicker.vue";
 import MButton from "@/components/bases/Button/MButton.vue";
 
@@ -134,6 +142,7 @@ export default {
     components: {
     MInput,
     MDropCombobox,
+    MCombobox,
     MTableDetail,
     MDatePicker,
     MButton,

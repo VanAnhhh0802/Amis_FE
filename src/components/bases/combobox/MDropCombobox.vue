@@ -7,10 +7,16 @@
             :id="id" 
             class="dropdown__input" 
             :class="{'drop-combobox-input': name}"
-            type="text">
-            <div class="dropdown__button iconBtndropdown" @click="onShowHideData"></div>
+            :style="style"
+            @blur="!this.active"
+            type="text"
+            >
+            <div class="dropdown__button iconBtndropdown" @click="onShowHideData"
+            v-click-outside-element="hideData"
+            
+            ></div>
         </div>
-        <div v-show="isShowData" class="dropdown__data" :class="{'drop-combobox-data': name}">
+        <div v-show="isShowData" :style="styleData" class="dropdown__data" :class="{'drop-combobox-data': name}">
             <div class="dropdown-item"
             v-for="(item,index) in listRecords" 
             :key="index"
@@ -30,6 +36,9 @@ export default {
         id : String,
         total: Array,
         name: Boolean,
+        default: String,
+        style: String,
+        styleData: String,
     },
     updated(){
         // Nhận giá trị tổng bản ghi
@@ -37,6 +46,10 @@ export default {
     },
     
     methods:{
+        hideData(){
+            this.active = false;
+            this.isShowData = false;
+        },
         /**
          * Hàm hiển thị Comboboxdata
          * CreatedBy: 
@@ -65,7 +78,7 @@ export default {
             // Khai báo biến chứa entity bị thay đổi
             entitySearch: [],
             // Khai báo biến cho input
-            textSelectTed : null,
+            textSelectTed : this.default,
             // Khai báo biến index trong comboxbox__data
             indexItemSelect: 1,
             // Khai báo biến giá trị cho func

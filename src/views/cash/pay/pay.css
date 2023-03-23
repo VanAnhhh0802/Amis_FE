@@ -207,7 +207,7 @@
 
 .row-text {
     position: relative;
-    top: 12px;
+    top: 8px;
     left: 8px;
 }
 
@@ -295,3 +295,31 @@
 .content-wrapper-payment {
     height: calc(100vh - 48px - 55px - 10px);
 }
+.dropdown__data{
+    top: 30px!important
+}
+/* Combobox */
+.combobox{
+    border-radius: 2px;
+    height: 26px;
+  }
+  .combobox__input{
+    border: none;
+    height: 26px;
+  
+  }
+  .combobox__button{
+    border-radius: 2px;
+    border: none;
+    width: 30px;
+  }
+  .combobox__button:hover {
+    background: #ECEEF1;
+   }
+   
+  .btn-combobox-icon {
+    width: 30px;height: 100%;
+    border: none;
+    background:  
+    url(http://localhost:8080/img/Sprites.64af8f61.2ff7618a.svg) no-repeat -551px -354px;
+  }

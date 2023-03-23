@@ -14,11 +14,12 @@
         :ref="dateName"
         auto-apply
         close-on-scroll
+
         show-now-button
-        :format="formatDate"
+        format="dd/MM/yyyy"
         :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
       >
-        <template #dp-input="{ value }">
+        <template #dp-input="{ value }">  
           <div class="date-picker__wrapper">
             <input
               :class="{
@@ -30,6 +31,7 @@
               :ref="name"
               :name="name"
               :value="value"
+              :style="style"
               autocomplete="off"
               :tabindex="tabIndex"
               @blur="blurInputValue"
@@ -85,6 +87,7 @@ export default {
     dateName:String,
     tooltipError: Boolean,
     tooltipContent: String,
+    style:String,
   },
   methods: {
     /**
@@ -192,6 +195,7 @@ export default {
      * Author : Văn anh (05/1/2023)
      */
     formatDate() {
+      console.log(this.modelValue);
       return commonJS.formatDate(this.modelValue);
     },
   },

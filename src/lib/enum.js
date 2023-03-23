@@ -41,7 +41,14 @@ const MISAEnum = {
   HEIGHT: {
     HEIGHT_PAY_CONTENT: 647, // Chiều cao phần content trang phiếu chi
     HEIGHT_PAY_MASTER: 370, // Chiều cao phần master trang phiếu chi
-    HEIGHT_PAY_DETAIL: 230,
+    HEIGHT_PAY_DETAIL: 230, // CHiều cao phần detail trang phiếu chi
+  },
+  TypeAccount:{
+    DEBT: 1, // Dư nơ
+    HERMAPHRODITE: 2, //Lưỡng tính
+    SURPLUS: 3, //Dư có
+    NOBALANCE: 4, //Khống có số dư
   }
+
 };
-export default MISAEnum;
+export  default MISAEnum;

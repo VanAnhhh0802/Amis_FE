@@ -7,7 +7,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.2);
-  z-index: 10;
+  z-index: 99;
 }
 .dialog__content {
   background-color: #fff;
@@ -48,6 +48,7 @@
 .dialog-mgs {
   padding: 4px;
   list-style: none;
+  white-space: normal;
 }
 
 .dialog-warring-footer {

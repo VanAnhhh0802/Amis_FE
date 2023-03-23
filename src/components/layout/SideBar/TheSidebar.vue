@@ -9,10 +9,11 @@
     </div>
     <div id="sidebar-wrapper">
       <div class="menu">
-        <div class="menu__item">
+        <div class="menu-wrapper">
+          <div class="menu__item">
             <router-link to="/" class="menu-item__link " 
-            @click="this.number = 1"
-            :class="{'menu-item__link--active': this.number == 1}"
+            active-class="menu-item__link--active"
+            exact-active-class="menu-item__link--active"
             >
               <div class="icon w-h-24 m-12 sidebar__dashboard"></div>
               <div class="menu-item__title">Tổng quan</div>
@@ -20,8 +21,7 @@
         </div>
         <div class="menu__item">
             <router-link to="/cash/procedure" class="menu-item__link"
-            @click="this.number = 2"
-            :class="{'menu-item__link--active': this.number == 2}"
+            active-class="menu-item__link--active"
             >
               <div class="icon w-h-24 m-12 sidebar__cash"></div>
               <div class="menu-item__title">Tiền mặt</div>
@@ -84,59 +84,13 @@
             <div class="tooltip-text">Tính năng đang phát triển</div>
           </div>
         </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__tax"></div>
-              <div class="menu-item__title">Thuế</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
         </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__price"></div>
-              <div class="menu-item__title">Giá thành</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
-        </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__general"></div>
-              <div class="menu-item__title">Tổng hợp</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
-        </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__budget"></div>
-              <div class="menu-item__title">Ngân sách</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
-        </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__report"></div>
-              <div class="menu-item__title">Báo cáo</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
-        </div>
-        <div class="menu__item">
-          <div class="tooltip">
-            <a class="menu-item__link" href="#">
-              <div class="icon w-h-24 m-12 sidebar__finance"></div>
-              <div class="menu-item__title">Phân tích tài chính</div>
-            </a>
-            <div class="tooltip-text">Tính năng đang phát triển</div>
-          </div>
+        <div class="menu__item" style="margin-bottom: 8px; ">
+          <hr/>
+            <router-link to="/category" class="menu-item__link">
+              <div class=" w-h-24 m-12 sidebar__category"></div>
+              <div class="menu-item__title">Danh mục</div>
+            </router-link>
         </div>
       </div>
     </div>

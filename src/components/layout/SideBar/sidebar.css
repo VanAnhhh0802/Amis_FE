@@ -71,11 +71,20 @@
   width: 100%;
   height: 100%;
 }
+.category{
+  display: block;
+  height: 44px;
+  width: 100%;
+}
 .menu {
   width: 100%;
   height: calc(100% - 56px);
   overflow-y: auto;
   background-color: var(--background-menu-color);
+  display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 8px;
 }
 
 .menu-item__link {
@@ -157,6 +166,9 @@
 .table-icon-filter {
   background-position: -1600px -88px;
 }
+.sidebar__category{
+  background: url(../../../assets/img/Sprites.svg) no-repeat -1707px -30px;
+}
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
@@ -180,4 +192,8 @@
 a[data-c-tooltip] {
 }
 a[data-c-tooltip]::after {
+}
+
+.category {
+
 }

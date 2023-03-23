@@ -3,7 +3,7 @@
         <div :class="{ 'account-form': true, 'account-form--extend': isResize }">
             <div class="modal__header">
                 <div class="modal__header-left">
-                    <div class="modal__header-left-text">Thêm Tài khoản</div>
+                    <div class="modal__header-left-text">{{this.titleForm}}</div>
                 </div>
                 <div class="modal__header-right">
                     <div class="icon w-h-24 tooltip form-icon--help">
@@ -20,22 +20,35 @@
             <div class="account-main">
                 <div class="row">
                     <MInput
+                        v-model="newAccount.AccountNumber"
                         label="Số tài khoản"
                         inputRequired="true"
                         width="25%"
                         bottom="12px"
-                        full-width
+                        ref="AccountNumber"
+                        nameRef="AccountNumber"
+                        @inputOutFocus="this.borderAccountNumberError = false"
+                        :name="this.nameInput"
+                        :error = "this.borderAccountNumberError"
+                        :tooltipError = "this.borderAccountNumberError"
+                        :tooltipContent = "this.tooltipContentNumber"
                     />
                 </div>
                 <div class="row">
                     <MInput
+                    v-model="newAccount.AccountName"
                         label="Tên tài khoản"
                         inputRequired="true"
                         width="100%"
                         bottom="12px"
-                        full-width
+                        @inputOutFocus="this.borderAccountNameError = false"
+                        :name="this.nameInput"
+                        :error = "this.borderAccountNameError"
+                        :tooltipError = "this.borderAccountNameError"
+                        :tooltipContent = "this.tooltipContentName"
                     />
                     <MInput
+                    v-model="newAccount.EnglishName"
                         label="Tên tiếng Anh"
                         width="100%"
                         bottom="12px"
@@ -46,14 +59,22 @@
                 <div class="row">
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <label for="">Tài khoản tổng hợp</label>
-                        <MDropCombobox
-                        ></MDropCombobox>
+                        <MCombobox
+                        api="https://localhost:7232/api/v1/Accounts"
+                        propName="AccountNumber"
+                        :columns = "this.comboboxAccount"
+                        isTable="true"
+                        ></MCombobox>
                     </div>
                     <div class="checkbox-wrapper" style="width: 25%">
-                        <label for="">Tài khoản tổng hợp</label>
-                        <MDropCombobox
-                        
-                        ></MDropCombobox>
+                        <label for="">Tính chất
+                            <span class="input--required">*</span>
+                        </label>
+
+                        <MCombobox
+                            :list="this.comboboxNature"
+                            isTable = "false"
+                        ></MCombobox>
                     </div>
                 </div>
                 <div class="row" style="width: 100%">
@@ -73,12 +94,11 @@
                         <input
                             type="checkbox"
                             id="accounting"
+                            :checked = "this.newAccount.HasForeignCurrencyAccounting"
                         />
                         <div class="check-icon"></div>
                     </label>
-                    <span>Có hạch toán ngoại tệ
-                        
-                    </span>
+                    <span>Có hạch toán ngoại tệ</span>
                 </div>
             </div>
             <div class="account-track-detail">
@@ -104,9 +124,25 @@
                     :index="index"
                     @select="handleSelected"
                     @onCheckInput="handleChecked"
-                    :checked="item.identity"
+                    :checked="this.newAccount[`IsTrack${item.identity}`]"
+                    :selected="this.newAccount[`${item.identity}`]"
                     ></MTrackDetail>
+                    
+
                 </div>
+
+                <label
+                    for="accounting"
+                    class="modal__header-left-wrapper account-checkbox"
+                    tabindex="0"
+                >
+                    <input
+                        type="checkbox"
+                        id="accounting"
+                        :checked = "this.newAccount.Object"
+                    />
+                    <div class="check-icon"></div>
+                </label>
             </div>
             <div class="modal-footer account-form__footer">
                 <div class="modal-footer__wrapper" style="padding-right: 46px">
@@ -116,7 +152,7 @@
                         tabindex="0"
                         text="Cất"
                         style="height: 28px;"
-                        @click="handleSubmit"
+                        @click="btnSaveOnClick(false)"
                     >
                     </MButton>
                     <MButton 
@@ -124,7 +160,9 @@
                     text="Cất và Thêm" 
                     tabindex="0" 
                     style="height: 28px;"
-                    ref="refSaveBtn">
+                    ref="refSaveBtn"
+                    @Click="btnSaveOnClick(true)"
+                    >
                     </MButton>
                 </div>
                 <MButton
@@ -143,37 +181,61 @@
                 <div class="form-resize__icon"></div>
             </div>
         </div>
-        <div class="toast-account">
-            <!-- <m-toast
-                v-if="state.listToast.length"
-                v-for="(toast, index) in state.listToast"
-                :key="index"
-                :toastMessage="toast.toastMessage"
-                :statusMessage="toast.statusMessage"
-                :status="toast.status"
-            /> -->
-        </div>
+        
     </div>
+    <MDialogError
+    v-if="isShowDialogError"
+    :message="this.dialogMessage"
+    title="Cảnh báo"
+    @btnCloseDialog="hideDialogError"
+    ></MDialogError>
 </template>
 <script>
 import MInput from '@/components/bases/input/MInput.vue';
 import MButton from '@/components/bases/Button/MButton.vue';
-import MDropCombobox from '@/components/bases/combobox/MDropCombobox.vue';
+import MCombobox from '@/components/bases/combobox/MCombobox.vue';
 import MTrackDetail from "@/components/bases/Table/MTrackDetail.vue";
+import MDialogError   from '@/components/bases/Dialog/MDialogError.vue';
 import resource from '@/lib/resource';
-// import MCombobox from '@/components/bases/combobox/MCombobox.vue';
+import { HTTPAccounts } from '@/script/api';
 export default {
     name:"AccountDetail",
     components: {
         MInput,
-        MDropCombobox,
+        MCombobox,
         MTrackDetail,
         MButton,
-        // MCombobox,
+        MDialogError,
+    },
+    emits: ["CloseDetail"],
+    props: {
+        accounts: Object,
+        accountId: String,
+        isDuplicate: Boolean,
     },
     data(){
         return {
+            newAccount: {
+                
+            },
+            dialogMessage: "",
+            isShowDialogError: false,
+            titleForm: "",
             isShowTrackDetail:true,
+
+            //Các biến sử dụng cho validate
+            errorMessage: [],
+            borderAccountNumberError: false,
+            borderAccountNameError: false,
+            borderNatureError: false,
+            tooltipContentNumber: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NUMBER,
+            tooltipContentName: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NAME,
+            tooltipContentNature: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NATURE,
+            titleAdd: resource.Vi.Detail.titleAdd,
+            titleUpdate: resource.Vi.Detail.titleUpdate,
+            titleDuplicate: resource.Vi.Detail.titleDuplicate,
+            comboboxAccount:resource.COLUMNS_NAME_COMBOBOX_ACCOUNT,
+            comboboxNature: resource.COLUMNS_NAME_COMBOBOX_NATURE,
             ACCOUNT_TRACK : [
                 {
                     trackText: "Đối tượng",
@@ -246,22 +308,174 @@ export default {
                     identity: "Item",
                 },
             ],
+
+        }
+    },
+    created(){
+        //Khi mở form focus mặc định số tài khoản
+        this.$nextTick(function () {
+            this.$refs.AccountNumber.inputFocus();
+        });
+        //Check nếu tồn tại ID thì sẽ là form sửaưm
+        if(this.accountId || this.isDuplicate){
+            this.getAccountId(this.accountId);
         }
     },
     methods: {
+        handleSelected (event) {
+            try {
+                if (event.identity) {
+                    this.newAccount[`${event.identity}`] = event.option.optionId;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
         handleChecked (event) {
             try {
                 if (event.identity) {
-                    // account[`IsTrack${event.identity}`] = event.isChecked;
+                    this.newAccount[`IsTrack${event.identity}`] = event.isChecked;
                     console.log("ee");
                 }
             } catch (error) {
                 console.log(error);
             }
         },
+        /**
+         * Hàm phát ra sự kiện đóng form detail
+         * Author: Văn Anh (23/3/2023)
+         */
         onClose(){
             console.log("click");
             this.$emit("closeDetail");
+        },
+        /**
+         * Hàm ẩn dialog 
+         * Author: Văn Anh (23/3/2023)
+         */
+        hideDialogError(){
+            this.isShowDialogError = false;
+
+        },
+        //#region sự kiện sửa
+        async getAccountId(id){
+            try {
+                const response = await HTTPAccounts.get(`/${id}`);
+                this.newAccount = response.data;
+                console.log(response.data);
+                console.log(this.newAccount);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Hàm xử lý nhấn save 
+         * Author: Văn Anh (23/3/2023)
+         */
+        async handleSubmit(isSaveAndAdd, isAdd ,  toastMessage){
+            try {
+                const response = isAdd || this.isDuplicate
+                ? await HTTPAccounts.post("", this.newAccount)
+                : await HTTPAccounts.put(`/${this.newAccount.AccountId}`,this.newAccount);
+                console.log(response);
+                this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
+                this.$emit("onshowToast");
+                await this.$parent.listAccounts();
+                if (isSaveAndAdd) {
+                    this.newAccount ={};
+                }
+                else {
+                    this.$emit("closeDetail");
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Khi người dùng bấm nút cất hoặc cất và thêm mới
+         * Author: Văn Anh (23/3/2023)
+         */
+        async btnSaveOnClick(isSaveAndAdd) {
+            try {
+                //Hiển thị loading
+                var valid = this.validate();
+                //Validate dữ liệu
+                if (valid) {
+                this.isShowDialogWarning = false;
+                this.dialogMessage = this.errorMessage[0];
+                this.isShowDialogError = true;
+                } else {
+                this.isShowLoading = true;
+                if (this.isAdd) {
+                    this.titleForm = this.titleAdd;
+                    this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
+                }
+                else if (this.isDuplicate) {
+                    this.titleForm = this.titleDuplicate;
+                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
+                }
+                else {
+                    this.titleForm = this.titleUpdate;
+                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
+                }
+                this.isShowLoading = false;
+                this.isShowDialogWarning = false;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        //#endregion
+
+        //#region Validate  
+        /**
+         * Hàm validate các trường 
+         * Author: Văn Anh (23/3/2023)
+         */
+        validate(){
+            try {
+                this.errorMessage = [];
+                //Validate trường mã tài khoản
+                if (this.valueIsEmpty(this.newAccount.AccountNumber)){
+                    this.errorMessage.push(this.tooltipContentNumber);
+                    this.borderAccountNumberError = true;
+                }
+                //validate trường tên tài khoản
+                if (this.valueIsEmpty(this.newAccount.AccountName)){
+                    this.errorMessage.push(this.tooltipContentName);
+                    this.borderAccountNameError = true;
+                }
+
+                if(this.errorMessage.length > 0){
+                    return true
+                }
+                return false
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Hàm check value
+         * Author: Văn Anh (23/3/2023)
+         */
+        valueIsEmpty(value) {
+        try {
+            if (!value) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.log(error);
+        }
+        },
+        //#endregion
+    },
+    computed: {
+        isAdd: function(){
+            if(!this.accountId){
+                return true;
+            }
+            return false;
         }
     }
 }

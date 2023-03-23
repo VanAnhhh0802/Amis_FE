@@ -10,6 +10,10 @@ export const routes = [
             {
                 path: "account",
                 component: () => import("@/views/cash/account/AccountList.vue")
+            },
+            {
+                path: "category",
+                component: () => import("@/views/category/CategoryHome.vue")
             }
             
         ]

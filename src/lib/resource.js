@@ -220,7 +220,10 @@ export default {
       Explain : "Diễn giải",
       Accounting: "Hach toán",
       TotalAmount: "Tổng tiền",
-      Instruct: "Hướng dẫn"
+      Instruct: "Hướng dẫn",
+      TitleAdd: "Thêm tài khoản",
+      TitleUpdate: "Sửa tài khoản",
+      TitleDuplicate: "Nhân bản tài khoản",
     },
     Button: {
       AddRow: "Thêm dòng",
@@ -234,31 +237,31 @@ export default {
     Combobox: [
       {
         key: 1,
-        value: "Trả tiền nhà cung cấp(không theo hóa đơn)",
+        value: "1.Trả tiền nhà cung cấp(không theo hóa đơn)",
       },
       {
         key: 2,
-        value: "Tạm ứng cho nhân viên",
+        value: "2.Tạm ứng cho nhân viên",
       },
       {
         key: 3,
-        value: "Chi mua ngoài có hóa đơn",
+        value: "3.Chi mua ngoài có hóa đơn",
       },
       {
         key: 4,
-        value: "Trả lương nhân viên",
+        value: "4.Trả lương nhân viên",
       },
       {
         key: 5,
-        value: "Chuyển tiền cho chi nhánh khác",
+        value: "5.Chuyển tiền cho chi nhánh khác",
       },
       {
         key: 6,
-        value: "Gửi tiền vào tài khoản ngân hàng",
+        value: "6.Gửi tiền vào tài khoản ngân hàng",
       },
       {
         key: 7,
-        value: "Chi khác",
+        value: "7.Chi khác",
       },
     ],
     Tab: [
@@ -370,6 +373,18 @@ export default {
             isLast: true,
         },
     ],
+    ACCOUNT:{
+      DIALOG: {
+        TITLE_ERROR: "Xóa không thành công",
+        MESSAGE_ERROR: "Xóa không thành công. Không thể xóa danh mục cha nếu chưa xóa danh mục con.",
+        TITE_WARNING: "Cảnh báo",
+      },
+      TOOLTIP_ERROR:{
+        TILE_ACCOUNT_NUMBER: "Mã tài khoản không được để trống",
+        TILE_ACCOUNT_NAME: "Tên tài khoản không được để trống",
+        TILE_ACCOUNT_NATURE: "Tính chất không được để trống",
+      }
+    }
   },
   paging: [
     {
@@ -416,6 +431,71 @@ export default {
         optionId: 2,
         optionName: "Nhân viên",
     },
-],
+  ],
+  COLUMNS_NAME_COMBOBOX_ACCOUNT: [
+    {
+        columnName: "Số tài khoản",
+        width: "150px",
+        align: "left",
+        identityOption: "AccountNumber",
+        isWrap: false,
+    },
+    {
+        columnName: "Tên tài khoản",
+        width: "200px",
+        align: "left",
+        identityOption: "AccountName",
+        isWrap: true,
+    },
+  ],
+  COLUMNS_NAME_COMBOBOX_OBJECT: [
+    {
+        columnName: "Đối tượng",
+        width: "150px",
+        align: "left",
+        identityOption: "optionCode",
+        isWrap: false,
+    },
+    {
+        columnName: "Tên đối tượng",
+        width: "200px",
+        align: "left",
+        identityOption: "optionName",
+        isWrap: false,
+    },
+    {
+        columnName: "Địa chỉ",
+        width: "250px",
+        align: "left",
+        identityOption: "optionAddress",
+        isWrap: true,
+    },
+    {
+        columnName: "Số điện thoại",
+        width: "150px",
+        align: "left",
+        identityOption: "optionPhone",
+        isWrap: false,
+    },
+  ],
+  COLUMNS_NAME_COMBOBOX_NATURE: [
+    {
+      key: 1,
+      value: "Dư nợ"
+    },
+    {
+      key: 2,
+      value: "Dư có"
+    },
+    {
+      key: 3,
+      value: "Lưỡng tính"
+    },
+    {
+      key: 4,
+      value: "Không có số dư"
+    },
+    
+  ]
 };
 

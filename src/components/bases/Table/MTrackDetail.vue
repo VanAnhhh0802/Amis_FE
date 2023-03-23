@@ -7,17 +7,17 @@
                 tabindex="0"
                 @change="onChecked"
             >
-                <input type="checkbox"  :checked="isChecked" />
+                <input type="checkbox"  :checked="this.isChecked" />
                 <div class="check-icon"></div>
             </label>
-            <span class="track-text">{{ standard.trackText }}</span>
+            <span class="track-text">{{ this.standard.trackText }}</span>
         </div>
         <div
             v-if="standard.isComboBox"
             class="checkbox-wrapper"
             :style="{ width: '50%', marginRight: index % 2 === 0 ? '32px' : '0' }"
         >
-            <MDropCombobox
+            <MCombobox
                 width="100%"
                 :default="standard.default"
                 :options="standard.options"
@@ -28,11 +28,11 @@
     </div>
 </template>
 <script>
-import MDropCombobox from '../combobox/MDropCombobox.vue';
+import MCombobox from '../combobox/MCombobox.vue';
 export default {
     name: "MTrackDetail",
     components: {
-        MDropCombobox,
+        MCombobox,
     },
      
     props: {
@@ -57,15 +57,15 @@ export default {
     data(){
         return{
             isChecked: false,
-
         }
     },
     methods: {
         onChecked(){
             this.isChecked = !this.isChecked;
-            
-            this.$emit('onCheckInput', " identity: standard.identity, isChecked ")
-        }
+            this.$emit('onCheckInput', {identity: this.standard.identity, isChecked: this.isChecked })
+        },
+
+        
     }
 }
 </script>
@@ -75,4 +75,7 @@ export default {
         align-items: center;
         justify-content: space-between;
     }
+    th:last-child, td:last-child {
+    border-right: none;
+}
 </style>

@@ -1,3 +1,5 @@
+import MISAEnum  from "../lib/enum.js";
+
 const commonJs = {
     formatDate(date) {
         try {
@@ -24,6 +26,7 @@ const commonJs = {
             } else {
               day = "" + day;
             }
+            console.log(`${day}/${month}/${year}`);
             return `${day}/${month}/${year}`;
           } else {
             ("");
@@ -59,7 +62,35 @@ const commonJs = {
       catch(error) {
         return "";
       }
+    },
+    formatActiveAccount(active){
+      if (active == 1){
+        active = "Ngừng sử dụng"
+      }
+      else {
+        active = "Đang sử dụng"
+      }
+      return active;
+    },
+    formatTypeAccount(type){
+      if (MISAEnum.TypeAccount.DEBT === 1){
+        type = "Dư nợ"
+      }
+      else if (MISAEnum.TypeAccount.HERMAPHRODITE === 2){
+        type = "Lưỡng tính"
+      }
+      else if (MISAEnum.TypeAccount.SURPLUS === 3){
+        type = "Dư có"
+      }
+      else if(MISAEnum.TypeAccount.SURPLUS === 4) {
+        type = "Khống có số dư"
+      }
+      else {
+        type = ""
+      }
+      return type
     }
+
 }
 
 export default commonJs;

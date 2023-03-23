@@ -43,19 +43,18 @@
               placeholder="Tìm kiếm theo mã, tên nhân viên"
               
             ></MInput>
-            <MButton
-              class="icon btn--small btn__search"
-              v-on:keyup.enter="listEmployees()"
-              @click="this.listEmployees()"
-            ></MButton>
+            
           </div>
           <div class="tooltip">
             <div
               class="icon btn btn--small"
               id="btn__reload"
               @click="btnReload"
+            style="background-position: -1097px -83px;"
+
             ></div>
-            <div class="tooltip-text tooltip-reload">Lấy lại dữ liệu</div>
+            <div class="tooltip-text tooltip-reload"
+            >Lấy lại dữ liệu</div>
           </div>
           <div class="tooltip">
             <div class="icon export" style="background-position: -705px -258px;"
@@ -100,34 +99,34 @@
               v-for="(item, index) in employees"
               :key="index"
               @dblclick="rowOnDbClick(item), (updateFunction = true)"
-              :class="{employee__active: this.employeeSelected.includes(item.employeeId) }"
+              :class="{employee__active: this.employeeSelected.includes(item.EmployeeId) }"
             >
               <td class="width-table-checkbox list-checkbox body-checkbox" :class="{employee__active: this.employeeSelected.includes(item.employeeId)}">
                 <MCheckbox
-                :id ="item.employeeId" 
-                :checked ="this.employeeSelected.includes(item.employeeId)"
+                :id ="item.EmployeeId" 
+                :checked ="this.employeeSelected.includes(item.EmployeeId)"
                 @checkboxSelected="selectEmployeeCheck"
                 ></MCheckbox>
               </td>
               <td class="w-150 text-align-left employee-code">
-                {{ item.employeeCode || "" }}
+                {{ item.EmployeeCode || "" }}
               </td>
-              <td class="text-align-left">{{ item.fullName || "" }}</td>
+              <td class="text-align-left">{{ item.FullName || "" }}</td>
               <td class="text-align-left w-150">
-                {{ this.formatGender(item.gender) || "" }}
+                {{ this.formatGender(item.Gender) || "" }}
               </td>
               <td class="text-align-center w-150">
-                {{ this.formatDate(item.dateOfBirth) || ""}}
+                {{ this.formatDate(item.DateOfBirth) || ""}}
               </td>
-              <td class="text-align-left w-150">{{ item.positionName || ""}}</td>
+              <td class="text-align-left w-150">{{ item.PositionName || ""}}</td>
               <td class="text-align-left min-w-200">
-                {{ item.departmentName || ""}}
+                {{ item.DepartmentName || ""}}
               </td>
               <td class="text-align-left w-150">
-                {{ item.bankAccountNumber || ""}}
+                {{ item.BankAccountNumber || ""}}
               </td>
-              <td class="text-align-left w-150">{{ item.bankName || ""}}</td>
-              <td class="text-align-center w-100 tb-function" :class="{employee__active: this.employeeSelected.includes(item.employeeId)}">
+              <td class="text-align-left w-150">{{ item.BankName || ""}}</td>
+              <td class="text-align-center w-100 tb-function" :class="{employee__active: this.employeeSelected.includes(item.EmployeeId)}">
                 <div class="flex table__function" >
                   <button
                     class="btn-function-fix"
@@ -138,7 +137,7 @@
                   <button
                     class="btn-function__dropdown"
                     @click="
-                      showOnDropMenu($event, item.employeeId, item.employeeCode), (this.deleteMany = false)
+                      showOnDropMenu($event, item.EmployeeId, item.EmployeeCode), (this.deleteMany = false)
                     "
                   >
                     <div class="icon w-h-24 function-dropdown-icon"></div>
@@ -163,7 +162,10 @@
     <div class="content--right">
       <div class="flex pagination">
         <MDropCombobox
-        :pageNumberRecord="this.pagination"
+        :total="this.pagination"
+        styleData="top: -143px"
+        :default="this.pagination[1].value"
+        style="width:200px"
         @pageSize="setPageSize"
         ></MDropCombobox>
         <Paginate
@@ -875,7 +877,8 @@ export default {
             `https://localhost:7232/api/v1/Employees/filter?keyword=${this.textSearch}&pageSize=${this.filter.pageSize}&pageNumber=${this.filter.pageNumber}`
           )
           .then((response) => {
-            this.employees = response.data.data;
+            console.log(response);
+            this.employees = response.data.Data;
             this.totalRecord = response.data.totalRecord;
             this.totalPage = response.data.totalPage;
             this.isShowLoading = false;

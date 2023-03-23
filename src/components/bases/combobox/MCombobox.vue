@@ -24,22 +24,22 @@
         @blur="inputOutFocus"
         :ref ="nameRef"
       />
-      <button
-        class="combobox__button"
+      <div
+        class="combobox__button "
         @click="onShowHideData"
         @keydown="inputOnKeyDown"
+        v-click-outside-element="hideData"
       >
-      </button>
-      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;
-    left: 44px">
-        <div class="error-arrow error-bg" style="left: 50%;
-    top: -15%;"></div>
+      <div class=" btn-combobox-icon"></div>
+      </div>
+      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;left: 44px">
+        <div class="error-arrow error-bg" style="left: 50%;top: -15%;"></div>
         <div class="error-text">{{ tooltipContent }}</div>
       </div>
       
     </div>
-    <div class="combobox__data" v-show="isShowData">
-      <a
+    <div class="combobox__data" v-if="isShowData && !isTable">
+      <a 
         class="combobox-item"
         v-for="(entity, index) in entitySearch"
         :key="index"
@@ -47,15 +47,25 @@
         @click="itemOnSelect(entity, index)"
         :ref="`item_${index}`"
         :class="{ 'combobox-item--active': index == indexItemSelect }"
-        >{{ entity[propName] }}</a
-      >
+        >{{ entity[propName] }}
+      </a>
     </div>
-  </div>
+      <MTableCombobox
+      v-if="isTable && isShowData"
+      :columns="this.columns"
+      :options="this.entities"
+      @select="itemOnSelect($event.option, $event.index)"
+      ></MTableCombobox>
+</div>
 </template>
 <script>
 import axios from "axios";
+import MTableCombobox from "./MTableCombobox.vue";
 export default {
   name: "MCombobox",
+  components: {
+    MTableCombobox,
+  },
   data() {
     return {
       //Khai báo biến ngăn chặn tăng indexItemSelected
@@ -87,18 +97,27 @@ export default {
     tooltipError: Boolean,
     tooltipContent: String,
     list: Array,
+    columns: { 
+      type: Array
+    },
+    options: {
+      type: Array
+    },
+    isTable: Boolean,
   },
   emits: ["update:modelValue", "inputFocus", "comboboxOutFocus"],
-  created() {
+  updated() {
     
     if (this.api) {
       axios
         .get(this.api)
         .then((data) => {
-          this.entities = data.data.data;
+          this.entities = [...data.data]; 
+          console.log(this.entities);
+          this.entitySearch = data.data;
           
           //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
-          this.entitySearch = data.data.data;
+          // this.entitySearch = data.data;
           this.setItemSelected();
         })
         .catch((response) => {
@@ -106,7 +125,12 @@ export default {
         });
     }
     else {
-      this.entities = this.list;
+      this.entities =[...this.list];
+      console.log(this.entities);
+    }
+    if (this.options){
+      this.entitySearch = [...this.options]
+      console.log(this.entitySearch);
     }
   },
   watch: {
@@ -141,7 +165,10 @@ export default {
       },
       immediate: true,
     },
-
+    list: function () {
+      this.entities =[...this.list];
+      console.log("watch",this.entities);
+    }
   },
   computed: {
     /**
@@ -312,6 +339,12 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * Hàm click outside ẩn data
+     */
+    hideData(){
+      this.isShowData = false;
+    }
   },
 };
 </script>

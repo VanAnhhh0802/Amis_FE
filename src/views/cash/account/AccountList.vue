@@ -17,13 +17,16 @@
             style="min-width: 250px; box-sizing: border-box;"
             border="none"
             :borderSearch="true"
-            v-model.trim="this.textSearch"
+            v-model.trim="this.keyword"
             @inputFocus="inputSearchFocus"
             placeholder="Tìm kiếm theo số, tên tài khoản"
             ></MInput>
           </div>
           <div class=" list-toolbar-wrapper">
-              <div style="color: #0075C0; cursor: pointer; height: 100%;">Mở rộng</div>
+              <div 
+              style="color: #0075C0; cursor: pointer; height: 100%;"
+              @click="btnToggleAccount"
+              >{{ !this.isExpandList ? "Mở rộng" : "Thu gọn" }}</div>
               <div class="tooltip">
                   <div
                   class="icon w-h-24 btn btn--small"
@@ -39,11 +42,9 @@
                       :class="{ 'btn--primary': true }"
                       text="Thêm"
                       style=""
-                      @click="showHideDetail"
+                      @click="btnAddOnClick"
                   ></MButton>
-                  <!-- <div class="icon w-h-24 btn-dropdown-toolbar"
-                  style="background-position: -840px -353px;"
-                  ></div> -->
+                  
               </div>
           </div>
     </div>
@@ -54,29 +55,22 @@
             :column-auto-width="true"
             :word-wrap-enabled="true"
             :sorting="false"
-            :expanded-row-keys="!isExpandAll ? expandedRowKeys : newExpandedRowKeys"
+            :expanded-row-keys="!this.isExpandList ? expandedRowKeys : newExpandedRowKeys"
             key-expr="AccountId"
             parent-id-expr="ParentId"
-            no-data-text="Không có dữ liệu"
+            no-data-text=""
+            @cellDblClick="btnDbClick"
         >
-            <DxScrolling mode="standard" />
-            <DxPaging :enabled="false" :page-size="10" />
-            <DxPager
-                :show-page-size-selector="true"
-                :allowed-page-sizes="allowedPageSizes"
-                :show-info="true"
-            />
-            <DxColumn :width="130" :height="36" style="display: flex; align-items: center;" data-field="AccountNumber" caption="Số tài khoản" />
-            <DxColumn :width="250" :height="36" data-field="AccountName" caption="Tên tài khoản" />
-            <DxColumn :width="150" :height="36" data-field="Type" caption="Tính chất" />
-            <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
-            <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
-            <DxColumn :width="120" data-field="ÍsActive" caption="Trạng thái" />
-            <DxColumn :width="0" data-field="IsParent" caption="cha" style="display: none" />
-            <DxColumn :width="120" caption="Chức năng" cell-template="functionTemplate" />
-            <template #functionTemplate="{ data: options }">
-              <MFeatureDetail :data="options.data"></MFeatureDetail>
-            </template>
+          <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
+          <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
+          <DxColumn :width="100" data-field="Type" caption="Tính chất" />
+          <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
+          <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
+          <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" />
+          <DxColumn :width="150"  caption="Chức năng" cell-template="functionTemplate" />
+          <template #functionTemplate="{ data: options }">
+            <MFeatureDetail :data="options.data"></MFeatureDetail>
+          </template>
         </DxTreeList>
       </div>
     </div>
@@ -92,6 +86,11 @@
     <div class="content--right">
       <div class="flex pagination">
         <MDropCombobox
+        v-model:model-value="this.paSize"
+        :total="this.paging"
+        :default="this.paging[1].value"
+        style="min-width:200px"
+        styleData="top: -143px!important"
         ></MDropCombobox>
         <Paginate
           :page-count="this.totalPage"
@@ -110,21 +109,29 @@
   </div>
   <AccountDetail
     v-if="isShowDetail"
+    :accountId="accountIdSelected"
   @closeDetail="btnClose"
   ></AccountDetail>
   <MLoading
   v-if="isShowLoading"
   ></MLoading>
-
+  <MToast
+  v-if="false"
+  ></MToast>
 </template>
 <script>
+import Paginate from "vuejs-paginate-next";
 import MButton from '@/components/bases/Button/MButton.vue';
+import MToast from '@/components/bases/Toast/MToast.vue';
+
 import resource from '@/lib/resource';
 import MFeatureDetail from '@/components/bases/Table/MFeatureDetail.vue';
 import {HTTPAccounts} from "@/script/api"
-import { DxTreeList, DxColumn, DxPaging, DxPager, DxScrolling } from "devextreme-vue/tree-list";
+import { DxTreeList, DxColumn } from "devextreme-vue/tree-list";
 import AccountDetail from './AccountDetail.vue';
 import MLoading from '@/components/bases/Loading/MLoading.vue';
+import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue"
+import _ from "lodash";
 
 export default {
     name: "AccountList",
@@ -135,33 +142,49 @@ export default {
         MLoading,
         DxTreeList, 
         DxColumn, 
-        DxPaging, 
-        DxPager, 
-        DxScrolling
+        Paginate,
+        MDropCombobox,
+        MToast,
+
     },
     data(){
         return {
+          isExpandList: false,
+          expandedRowKeys: [],
+          newExpandedRowKeys: [],
           accounts: [],
+          accountIdSelected:null,
           childrenAccounts: [],
           totalPage:0,
           totalRecord: 0,
           isShowDetail: false,
           isShowLoading: false,
           pageSize: 20,
-          pageNumber: 1,
+          pageNumber: 1, 
           keyword: "",
-          allowedPageSizes : [10, 20, 30, 50, 100],
-          isExpandAll: false,
-          expandedRowKeys:[],
-          newExpandedRowKeys:[],
           columnTable:  resource.Vi.ColumsTableAccount,
+          paging: resource.paging
         }
     },
     created(){
+      this.listAccountChildrens();
       this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
-      console.log(this.accounts);
     },
+    watch: {
+      /**
+     * Hàm theo dõi keyword mà thay đổi gọi hàm search
+     */
+    keyword: function () { 
+      let number =1
+      this.searchAccount(number);
+    }
+    },
+
     methods: {
+      btnAddOnClick(){
+        this.accountIdSelected = null,
+        this.isShowDetail = true;
+      },
       /**
        * Hiển thi form detail
        * Author: Văn Anh (16/3/2023)
@@ -176,6 +199,41 @@ export default {
       btnClose(){
         this.isShowDetail = false;
       },
+      /**
+       * Hàm double click mở form detail
+       * @param {String} id 
+       * Author: Văn Anh (19/3/2023)
+       */
+      btnDbClick(e){
+        console.log(e.data);
+        this.handleClickEdit(e.data.AccountId)
+      },
+      /**
+       * Click mở form edit
+       * Author: Văn Anh (19/3/2023)
+       */
+      handleClickEdit(id){
+        this.isShowDetail = true;
+        this.accountIdSelected = id;
+        console.log(this.accountIdSelected );
+      },
+      /**
+       * Btn toggle thu gọn mở rộng list cây
+       * Author: Văn Anh (22/3/2023)
+       */
+      btnToggleAccount(){
+        try {
+          this.isExpandList = !this.isExpandList;
+          const newParentIdList = this.accounts.map((item) => {
+            if(item.AccountId){
+              return item.AccountId
+            }
+          });
+          this.newExpandedRowKeys = [...newParentIdList];
+        } catch (error) {
+          console.log(error);
+        }
+      },
       //#region GỌi api
       async listAccounts(filter, size, number){
         try {
@@ -183,7 +241,6 @@ export default {
           // me.isShowLoading = true;
           await HTTPAccounts.get(`/filter?keyword=${filter}&pageSize=${size}&pageNumber=${number}`)
           .then(function (response) {
-            console.log(response);
             me.accounts = response.data.Data;
             me.totalPage = response.data.totalPage;
             me.totalRecord = response.data.totalRecord;
@@ -200,8 +257,8 @@ export default {
 
             me.childrenAccounts.map((children) => {
               try {
-                if(accountIds.includes(children.AccountId)){
-                  this.accounts.push(children);
+                if(accountIds.includes(children.ParentId)){
+                  me.accounts.push(children);
                   accountIds = me.accounts.map((account) => account.AccountId);
                   countChildren++;
                 }
@@ -209,7 +266,6 @@ export default {
                 console.log(error);
               }
             })
-            console.log(me.accounts)
             me.totalRecord +=  countChildren;
             me.isShowLoading = false
           })
@@ -219,17 +275,33 @@ export default {
           console.log(error)
         }
       },
-
+      /**
+       * Hàm lấy ra tất cả tài khoản là con
+       * Author: Văn ANh(19/3/2023) 
+       */
       async listAccountChildrens(){
         try {
           const response = await HTTPAccounts.get("/AccountChildren")
-          this.childrenAccounts = response.data.Data
+          this.childrenAccounts = response.data
+          
         } catch (error) {
           console.log(error);
         }
+      },
+      /**
+     * Hàm xử lý tìm kiếm
+     * Author: Văn Anh (11/1/2023)
+     */
+     searchAccount : _.debounce(function (number) {
+      try {
+        this.listAccounts(this.keyword,this.pageSize, number);
+      } catch (error) {
+        console.log(error);
       }
-
+    }, 500),
       //#endregion
+
+
     }
 }
 </script>

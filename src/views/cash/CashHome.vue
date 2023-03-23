@@ -1,8 +1,11 @@
-<template lang="">
+<template>
    <div class="main-wrapper">
         <div class="flex main-header">
-            <router-link to="cash/" class="list-item list-item--active">Quy trình</router-link>
-            <router-link to="cash/payList" class="list-item">Chi tiền</router-link>
+            <router-link to="cash/" 
+            class="list-item ">Quy trình</router-link>
+            <router-link to="cash/payList"
+            active-class="list-item--active"
+            class="list-item">Chi tiền</router-link>
         </div>
         <router-view></router-view>
     </div>

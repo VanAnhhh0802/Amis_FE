@@ -72,10 +72,10 @@
                     id="cbxDepartment"
                     :label="this.textLabelDepartment "
                     :isRequired="true"
-                    propName="departmentName"
-                    propValue="departmentId"
+                    propName="DepartmentName"
+                    propValue="DepartmentId"
                     api="https://localhost:7232/api/v1/Departments/filter?pageSize=10&pageNumber=1"
-                    v-model.trim()="newEmployee.departmentId"
+                    v-model.trim()="newEmployee.DepartmentId"
                     :isShowError="false"
                     :tabIndex="3"
                     ref="DepartmentName"
@@ -166,7 +166,7 @@
                   tooltip="true"
                   tooltipMessage="Số chứng minh nhân dân"
                   ></MInput>
-                  <div style = "height: 62px">
+                  <div style = "height: 44px">
                   <label>Ngày cấp</label>
                   <br>
                   <MDatePicker
