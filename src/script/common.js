@@ -26,7 +26,6 @@ const commonJs = {
             } else {
               day = "" + day;
             }
-            console.log(`${day}/${month}/${year}`);
             return `${day}/${month}/${year}`;
           } else {
             ("");
@@ -64,17 +63,21 @@ const commonJs = {
       }
     },
     formatActiveAccount(active){
-      if (active == 1){
+      if (active == true){
+        active = "Đang sử dụng"
+      }
+      else if (active  == false){
         active = "Ngừng sử dụng"
       }
       else {
-        active = "Đang sử dụng"
+        active = ""
       }
       return active;
     },
     formatTypeAccount(type){
       if (MISAEnum.TypeAccount.DEBT === 1){
         type = "Dư nợ"
+
       }
       else if (MISAEnum.TypeAccount.HERMAPHRODITE === 2){
         type = "Lưỡng tính"

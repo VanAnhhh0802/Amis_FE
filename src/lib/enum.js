@@ -36,7 +36,8 @@ const MISAEnum = {
     InsertFailed: 1,
     UpdateFailed: 3,
     DeleteFailed:2,
-    InvalidInput: 8,
+    InvalidInput: 9,
+
   },
   HEIGHT: {
     HEIGHT_PAY_CONTENT: 647, // Chiều cao phần content trang phiếu chi

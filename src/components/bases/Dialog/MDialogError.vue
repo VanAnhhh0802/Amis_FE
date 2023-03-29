@@ -24,7 +24,6 @@
                 class="btn btn--primary dialog__btn--acept"
                 text="Đóng"
             @click="hideDialog"
-
             >
             </MButton>
         </div>
@@ -50,7 +49,24 @@ export default {
          */
         hideDialog(){
             this.$emit("btnCloseDialog")
+        },
+        /**
+         * author:Văn Anh(2/3/2023)
+         * Hàm onKeyDown xử lí khi nhấn phím tắt
+         */
+         onKeyDown(event) {
+            if (event.key === "Escape" || event.key === "Enter"){
+                this.$emit("btnCloseDialog")
+            }
         }
+    },
+    mounted() {
+        //Sự kiện bàn phím 
+        document.addEventListener("keydown",this.onKeyDown);
+    },
+    unmounted() {
+        //Sự kiện bàn phím
+        document.removeEventListener("keydown",this.onKeyDown);
     }
 }
 </script>

@@ -271,7 +271,7 @@
     /* margin: 0 -12px;  */
     /* padding: 12px 0 0 0; */
     position: relative;
-    z-index: 99;
+    z-index:10;
     overflow: hidden;
 }
 
@@ -308,18 +308,18 @@
     height: 26px;
   
   }
-  .combobox__button{
+  /* .combobox__button{
     border-radius: 2px;
     border: none;
     width: 30px;
   }
   .combobox__button:hover {
     background: #ECEEF1;
-   }
+   } */
    
-  .btn-combobox-icon {
+  /* .btn-combobox-icon {
     width: 30px;height: 100%;
     border: none;
     background:  
     url(http://localhost:8080/img/Sprites.64af8f61.2ff7618a.svg) no-repeat -551px -354px;
-  }
+  } */

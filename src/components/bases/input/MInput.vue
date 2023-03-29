@@ -52,7 +52,6 @@ export default {
     tooltipContent: String,
     error: Boolean,
     tooltipError:Boolean,
-    borderSearch: Boolean,
     tooltipMessage: String,
   },
 
@@ -67,9 +66,7 @@ export default {
     };
   },
   emits: ["update:model-Value", "inputFocus", "inputOutFocus"],
-  updated(){
-    this.isBorder = this.borderSearch;
-  },
+ 
   watch: {
     /**
      * Theo dõi sự thay đổi của biến modelValue
@@ -88,14 +85,7 @@ export default {
     error: function () {
         this.isError = this.error;
     },
-    borderSearch: function(){
-      if(this.borderSearch){
-        this.isBorder = this.borderSearch;
-      }
-      else {
-        this.isBorder = false
-      }
-    }
+    
   },
   methods: {
     

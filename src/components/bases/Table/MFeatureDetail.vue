@@ -3,13 +3,13 @@
         <div class="flex table__function" >
             <button
             class="btn-function-fix"
-            @click="rowOnDbClick(item), (updateFunction = true)"
+            @click="btnClickEdit(data.AccountId)"
             >
             Sửa
             </button>
             <button
             class="btn-function__dropdown"
-            @click="showOnDropMenu($event, data.AccountId, data.AccountNumber)"
+            @click="showOnDropMenu($event, data.AccountId, data.AccountNumber, data.IsActive)"
             v-click-outside-element="hideDropMenu" >
             <div class="icon w-h-24 function-dropdown-icon"></div>
             </button>
@@ -26,20 +26,21 @@
     >
       <ul class="dropdown-list">
         <li class="dropdown_list-item"
-        @click="btnReplicationOnDetail()"
+        @click="btnReplicationOnDetail(data.AccountId)"
         >Nhân bản</li>
-        <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete">
+        <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete(data.IsParent)">
           Xóa
         </li>
-        <div class="tooltip">
-            <li class="dropdown_list-item">Ngừng sử dụng</li>
-            <div class="tooltip-text tooltip-reload">Đang phát triển</div>
-          </div>
+        <li class="dropdown_list-item"
+        @click="handleAccountActive(data.AccountId, data.IsParent, isShowActive)"
+        >
+        {{isShowActive ? "Ngừng sử dụng" : "Sử dụng"}}
+        </li>
       </ul>
     </div>
     </teleport>
   <div  v-if="isShowDialog">
-      <MDialog v-if="!data.IsParent" @btnCloseDialog="closeDialog">
+      <MDialog v-if="!isShowDialogErr" @btnCloseDialog="closeDialog">
         <template v-slot:title>Cảnh báo</template>
         <template v-slot:message>
           <li class="flex dialog-mgs">
@@ -65,7 +66,7 @@
         </template>
       </MDialog>
       <MDialogError
-      v-if="data.IsParent"
+      v-if="isShowDialogErr"
       :title="this.titleError"
       :message="this.messageError"
       @btnCloseDialog="closeDialog"
@@ -84,15 +85,18 @@ import { HTTPAccounts } from '@/script/api';
 export default {
     name: "MFeatureDetail",
     components:{
-        MDialog,
-        MDialogError,
-        MLoading
+      MDialog,
+      MDialogError,
+      MLoading
     },
     props:{
-        data: Object,
+      data: Object,
     },
+    emits:["showFormEdit","reloadData","showDuplicate"],
     data(){
-        return{
+      return{
+          isShowActive:false,
+          
             //Khai báo biến liên quan đến loading
             isShowLoading: false,
             //Khai biến liên quan đến drop menu
@@ -110,17 +114,111 @@ export default {
             titleError: resource.Vi.ACCOUNT.DIALOG.TITLE_ERROR,
             messageError: resource.Vi.ACCOUNT.DIALOG.MESSAGE_ERROR,
             
-        }
+      }
     },
     created(){
+
     },
     methods: {
+      /**
+       * Xét trạng thái của active cho tài khoản
+       * @param {String} id - id của tài khoản
+       * @param {String} parentId  - nếu là con thì có id tài khoản của tài khoản cha
+       * @param {Boolean} active - trạng thái active tài khoản cha
+       * @param {Boolean} childrenActive - trạng thái tài khoản của tài khoản con
+       * Author: Văn Anh(26/3/2023)
+       */
+      async handleAccountActive(accountId, isParent, isActive, childrenActive){
+        try {
+          if(isActive){
+            isActive = 0;
+          }
+          else {
+            isActive = 1;
+          }
+          //Kiểm tra nếu là tài khoản cha
+          if (isParent) {
+            //Nếu không là con
+            if (!childrenActive) {
+              let accountIds = [accountId];
+                //Lấy ra tất cả các tài khoản con
+                const response = await HTTPAccounts.get("/AccountChildren");
+                //Tạo biến accountIds là mảng các id tài khoản con  
+                let childrens = [];
+                childrens = response.data
+
+                childrens.forEach((account) => {
+                  console.log(this.accountIds);
+                  if (accountIds.includes( account.ParentId) ) {
+                    accountIds.push(account.AccountId) ;
+                  }
+                });
+                //Gọi api sửa
+                 await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId, ...accountIds])
+                .then(res => {
+                  console.log(res);
+                  this.$emits("activeResponse");
+                })
+            } else {
+              await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId])
+              .then(res => {
+                console.log(res);
+                this.$emits("activeResponse");
+
+              })
+            }
+          } else {
+            await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId])
+            .then(res => {
+              console.log(res);
+              this.$emits("activeResponse");
+
+            })
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      
+      /**
+       * Kiểm tra trạng thái của các trường
+       * Author: Văn Anh (29/3/2023)
+       * @param {*} active 
+       */
+      checkActive(active){
+        if(active === "Đang sử dụng"){
+          this.isShowActive = true;
+        }
+        else if(active === "Ngừng sử dụng"){
+          this.isShowActive = false;
+        }
+      },
+      /**
+       * Hàm xử lý click nhân bản
+       * @param {Guid} id 
+       * Author: Văn Anh(25/3/2023)
+       */
+      btnReplicationOnDetail(id){
+        this.$emit("showDuplicate", id);
+        
+      },
+      /**
+       * hàm xử lú click btn sửa
+       * @param {Guid} id 
+       * Author: Văn Anh(25/3/2023)
+       */
+      btnClickEdit(id){
+        this.$emit("showFormEdit", id);
+      },
         /**
          * Hiển thị drop menu
          * Athor: Văn Anh(21/12/2022)
          */
-        showOnDropMenu(e, id, code) {
+        showOnDropMenu(e, id, code, active) {
         try {
+            //Check trạng thái của active
+            this.checkActive(active);
+            
             //Xét vị trí cho dropdown
             if (e.clientY > 560){
             this.isDropdown = false;
@@ -134,31 +232,35 @@ export default {
             this.isShowOnDropMenu = !this.isShowOnDropMenu;
             this.warningDeleteMessage = `Bạn có thực sự muốn xóa Tài khoản <${code}> không?`;
             this.deleteId = id;
-            console.log(this.deleteId);
+            
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
         },
         /**
          * Hàm click outside ẩn dropmenu
          */
         hideDropMenu(){
-            this.isShowOnDropMenu = false;
+          this.isShowOnDropMenu = false;
         },
         /**
          * Hiểm dialog cảnh báo xóa
          * Author: Văn Anh (19/3/2023)
          */
-        showOnDialogDelete(){
-                this.isShowDialog = true;
+        showOnDialogDelete(isParent){
+          if(isParent){
+            console.log(isParent);
+            this.isShowDialogErr = true;
+          }
+          this.isShowDialog = true;
         },
         /**
          * Hàm ẩn dialog 
          * Author: Văn Anh (19/3/2023)
          */
         closeDialog(){
-            this.isShowDialog = false;
-            this.isShowDialogErr = false;
+          this.isShowDialog = false;
+          this.isShowDialogErr = false;
         },
         //#region Các sự kiện liên quan đến xóa
         /**
@@ -171,8 +273,9 @@ export default {
             this.isShowLoading = true;
             const response =await HTTPAccounts.delete(`${id}`);
             console.log(response);
+            this.isShowDialog = false;
             this.isShowLoading = false;
-
+            this.$emit("reloadData");
           } catch (error) {
             console.log(error);
           }

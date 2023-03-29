@@ -10,3 +10,7 @@ export const HTTPDepartments = axios.create({
 export const HTTPAccounts  = axios.create({
   baseURL: "https://localhost:7232/api/v1/Accounts"
 })
+export const HTTPPayments = axios.create({
+  baseURL: "https://localhost:7232/api/v1/Payments"
+
+})

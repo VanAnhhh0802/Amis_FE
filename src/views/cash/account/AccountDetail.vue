@@ -9,7 +9,7 @@
                     <div class="icon w-h-24 tooltip form-icon--help">
                         <div class="tooltip-text">Giúp(F1)</div>
                     </div>
-                    <div class="modal__close-btn" @click="onClose">
+                    <div class="modal__close-btn" @click="confirmDialog">
                         <label
                             for="show-modal"
                             class="modal__close-btn-icon"
@@ -20,9 +20,11 @@
             <div class="account-main">
                 <div class="row">
                     <MInput
-                        v-model="newAccount.AccountNumber"
+                        v-model="this.newAccount.AccountNumber"
                         label="Số tài khoản"
+                        @keydown.shift.tab.prevent="onFocusBtnClose"
                         inputRequired="true"
+                        :tabIndex="1"
                         width="25%"
                         bottom="12px"
                         ref="AccountNumber"
@@ -36,9 +38,10 @@
                 </div>
                 <div class="row">
                     <MInput
-                    v-model="newAccount.AccountName"
+                    v-model="this.newAccount.AccountName"
                         label="Tên tài khoản"
                         inputRequired="true"
+                        :tabIndex ="2"
                         width="100%"
                         bottom="12px"
                         @inputOutFocus="this.borderAccountNameError = false"
@@ -48,10 +51,11 @@
                         :tooltipContent = "this.tooltipContentName"
                     />
                     <MInput
-                    v-model="newAccount.EnglishName"
+                    v-model="this.newAccount.EnglishName"
                         label="Tên tiếng Anh"
                         width="100%"
                         bottom="12px"
+                        :tabIndex ="3"
                         full-width
                         style="margin-left: 8px"
                     />
@@ -60,20 +64,37 @@
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <label for="">Tài khoản tổng hợp</label>
                         <MCombobox
-                        api="https://localhost:7232/api/v1/Accounts"
+                        v-model="this.newAccount.ParentId"
+                        api="https://localhost:7232/api/v1/Accounts/All"
                         propName="AccountNumber"
+                        propValue="AccountId"
+                        defaultIndex="0"
+                        :tabIndex="4"
                         :columns = "this.comboboxAccount"
                         isTable="true"
+                        @changeGrade="newAccount.Grade = $event ? $event + 1 : newAccount.Grade "
+                        @parentAccountNumber="this.parentNumber = $event"
+                        @removeParentId="removeParentId"
                         ></MCombobox>
                     </div>
                     <div class="checkbox-wrapper" style="width: 25%">
                         <label for="">Tính chất
                             <span class="input--required">*</span>
                         </label>
-
                         <MCombobox
                             :list="this.comboboxNature"
-                            isTable = "false"
+                            v-model="this.newAccount.Type"
+                            propValue="optionId"
+                            propName="optionName"
+                            :defaultName="this.comboboxNature[0].optionName"
+                            :defaultIndex="this.comboboxNature[0].optionId"
+                            :tabIndex="5"
+                            ref="AccountType"
+                            nameRef="AccountType"
+                            @comboboxOutFocus="this.borderNatureError = false"
+                            :inputErrorCombobox = "this.borderNatureError"
+                            :tooltipError = "this.borderNatureError"
+                            :tooltipContent = "this.tooltipContentNature"
                         ></MCombobox>
                     </div>
                 </div>
@@ -81,6 +102,8 @@
                     <div class="textarea-wrapper">
                         <label class="textfield__label modal-label"> Diễn giải</label>
                         <textarea
+                            tabindex="6"
+                            v-model="this.newAccount.Description"
                             class="account-form__textarea"
                         ></textarea>
                     </div>
@@ -89,12 +112,14 @@
                     <label
                         for="accounting"
                         class="modal__header-left-wrapper account-checkbox"
-                        tabindex="0"
+                        tabindex="7"
+                        @keydown.enter="this.newAccount.HasForeignCurrencyAccounting = !this.newAccount.HasForeignCurrencyAccounting"
+
                     >
                         <input
                             type="checkbox"
                             id="accounting"
-                            :checked = "this.newAccount.HasForeignCurrencyAccounting"
+                            v-model = "this.newAccount.HasForeignCurrencyAccounting"
                         />
                         <div class="check-icon"></div>
                     </label>
@@ -116,51 +141,309 @@
                     </div>
                     Theo dõi chi tiết theo
                 </div>
-                <div class="track-detail" :style="{ height: !isShowTrackDetail ? '0' : '175px' }">
-                    <MTrackDetail
-                    v-for = "(item, index)  in ACCOUNT_TRACK"
-                    :key="index"
-                    :standard="item"
-                    :index="index"
-                    @select="handleSelected"
-                    @onCheckInput="handleChecked"
-                    :checked="this.newAccount[`IsTrack${item.identity}`]"
-                    :selected="this.newAccount[`${item.identity}`]"
-                    ></MTrackDetail>
-                    
+                <div class="track-detail" v-if="isShowTrackDetail" :style="{ height: !isShowTrackDetail ? '0' : '175px' }">
+                    <div class=" account-track__left-row" style="width: 50%;">
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="8"
+                                    @keydown.enter="this.newAccount.IsTrackObject = !this.newAccount.IsTrackObject"
+                                >
+                                    <input 
+                                    type="checkbox" 
+                                    v-model="this.newAccount.IsTrackObject" 
+                                    />
+                                    <div class="check-icon"></div>
+                                </label>
+                                
+                                <span class="track-text">Đối tượng</span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                                
+                            >
+                                <MCombobox
+                                v-model="this.newAccount.Object"
+                                propName="optionName"
+                                propValue="optionId"
+                                :tabIndex="this.newAccount.IsTrackObject ? 9 : 0"
+                                :defaultName = "this.comboboxObject[1].optionName"
+                                :defaultIndex="this.comboboxObject[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackObject"
+                                :list="this.comboboxObject"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="10"
+                                    @keydown.enter="this.newAccount.IsTrackJob = !this.newAccount.IsTrackJob"
 
+                                >
+                                    <input type="checkbox"  v-model="this.newAccount.IsTrackJob" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Đối tượng THCP</span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                :tabIndex="this.newAccount.IsTrackJob ? 11 : 0"
+                                v-model="this.newAccount.Job"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackJob"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="12"
+                                    @keydown.enter="this.newAccount.IsTrackOrder = !this.newAccount.IsTrackOrder"
+
+                                >
+                                    <input type="checkbox"  v-model="this.newAccount.IsTrackOrder" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Đơn đặt hàng </span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                :tabIndex="this.newAccount.IsTrackOrder ? 13 : 0"
+                                v-model="this.newAccount.Order"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackOrder"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="14"
+                                    @keydown.enter="this.newAccount.IsTrackPurchaseContract = !this.newAccount.IsTrackPurchaseContract"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackPurchaseContract" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Hợp đồng mua </span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.PurchaseContract"
+                                :tabIndex="this.newAccount.IsTrackPurchaseContract ? 15 : 0"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackPurchaseContract"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="16"
+                                    @keydown.enter="this.newAccount.IsTrackOrganizationUnit = !this.newAccount.IsTrackOrganizationUnit"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackOrganizationUnit" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Đơn vị </span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.OrganizationUnit"
+                                :tabIndex="this.newAccount.IsTrackOrganizationUnit ? 17 : 0"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackOrganizationUnit"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account-track__right-row" style="width: 50%;">
+                        <div class="flew account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="18"
+                                    @keydown.enter="this.newAccount.IsTrackBankAccount = !this.newAccount.IsTrackBankAccount"
+
+                                >
+                                    <input type="checkbox"  v-model="this.newAccount.IsTrackBankAccount" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Tài khoản ngân hàng </span>
+                            </div>
+                            
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="19"
+                                    @keydown.enter="this.newAccount.IsTrackProjectWork = !this.newAccount.IsTrackProjectWork"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackProjectWork" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Công trình</span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.ProjectWork"
+                                :tabIndex="this.newAccount.IsTrackProjectWork ? 20 : 0"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackProjectWork"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="21"
+                                    @keydown.enter="this.newAccount.IsTrackSaleContract = !this.newAccount.IsTrackSaleContract"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackSaleContract" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Hợp đồng bán </span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.SaleContract"
+                                :tabIndex="this.newAccount.IsTrackSaleContract ? 22 : 0"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackSaleContract"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="23"
+                                    @keydown.enter="this.newAccount.IsTrackExpenseItem = !this.newAccount.IsTrackExpenseItem"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackExpenseItem" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Khoản mục CP</span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.ExpenseItem"
+                                :tabIndex="this.newAccount.IsTrackExpenseItem ? 24 : 0"
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackExpenseItem"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex account-track-item" style="justify-content: space-between">
+                            <div class="row-left" >
+                                <label
+                                    class="modal__header-left-wrapper account-checkbox"
+                                    tabindex="25"
+                                    ref="IsTrackItem"
+                                    @keydown.enter="this.newAccount.IsTrackItem = !this.newAccount.IsTrackItem"
+
+                                >
+                                    <input type="checkbox" v-model="this.newAccount.IsTrackItem" />
+                                    <div class="check-icon"></div>
+                                </label>
+                                <span class="track-text">Mã thống kê</span>
+                            </div>
+                            <div
+                                class="checkbox-wrapper"
+                            >
+                                <MCombobox
+                                propName="optionName"
+                                propValue="optionId"
+                                v-model="this.newAccount.Item"
+                                :tabIndex="this.newAccount.IsTrackExpenseItem ? 26 : 0"
+
+                                :defaultName = "this.comboboxTrackType[1].optionName"
+                                :defaultIndex="this.comboboxTrackType[1].optionId"
+                                :isDisabled = "!this.newAccount.IsTrackItem"
+                                :list="this.comboboxTrackType"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <label
-                    for="accounting"
-                    class="modal__header-left-wrapper account-checkbox"
-                    tabindex="0"
-                >
-                    <input
-                        type="checkbox"
-                        id="accounting"
-                        :checked = "this.newAccount.Object"
-                    />
-                    <div class="check-icon"></div>
-                </label>
             </div>
             <div class="modal-footer account-form__footer">
                 <div class="modal-footer__wrapper" style="padding-right: 46px">
                     <MButton
                         type="submit"
                         class="btn btn--secondary modal-btn__secondary btn-save"
-                        tabindex="0"
+                        tabindex="27"
                         text="Cất"
+                        ref="refSave"
+                        refName="refSave"
                         style="height: 28px;"
                         @click="btnSaveOnClick(false)"
+                        @keydown.shift.tab.prevent="this.$refs[IsTrackItem]"
+
                     >
                     </MButton>
                     <MButton 
                     class="btn btn--primary btn-save-add" 
                     text="Cất và Thêm" 
-                    tabindex="0" 
+                    tabindex="28" 
                     style="height: 28px;"
-                    ref="refSaveBtn"
+                    ref="refSaveAddBtn"
+                    @keydown.shift.tab.prevent="onFocusBtnSave"
+                    refName="refSaveAddBtn"
                     @Click="btnSaveOnClick(true)"
                     >
                     </MButton>
@@ -168,11 +451,14 @@
                 <MButton
                     for="show-modal"
                     class="btn btn--secondary modal-btn-cancel"
-                    tabindex="0"
+                    tabindex="29"
                     ref="refCancelBtn"
+                    refName="refCancelBtn"
                     @click="onClose"
                     style="height: 28px;"
                     text="Hủy"
+                    @keydown.shift.tab.prevent="onFocusBtnAdd"
+                    @keydown.tab.prevent="tabOrder()"
                     ></MButton
                 >
             </div>
@@ -189,25 +475,67 @@
     title="Cảnh báo"
     @btnCloseDialog="hideDialogError"
     ></MDialogError>
+    <MDialog v-if="isShowDialogWarning" 
+    @btnCloseDialog="closeDialogWarning"
+    @btnYes="btnSaveOnClick(false)"
+    >
+    <template v-slot:title>Cảnh báo</template>
+    <template v-slot:message
+      >
+      <li class="flex dialog-mgs">
+        <div
+          class="icon w-h-36 btn-dialog--close dialog__confirm-icon"
+        ></div>
+        Dữ liệu bị thay đổi. Bạn có muỗn cất không
+      </li>
+      </template
+    >
+    <template v-slot:footer>
+      <div class="flex w-full" style="justify-content: space-between">
+        <MButton
+          class="btn--secondary dialog__btn--acept"
+          @click="this.isShowDialogWarning = false"
+          text="Hủy"
+        >
+        </MButton>
+        <div class="flex col-gap">
+          <MButton
+            class="btn--secondary dialog__btn--acept"
+            @click="onClose"
+            text="Không"
+          >
+          </MButton>
+          <MButton
+            class="btn--primary dialog__btn--acept"
+            @click="btnWarningClickYes"
+            text="Có"
+          >
+          </MButton>
+        </div>
+      </div>
+    </template>
+    </MDialog>
 </template>
 <script>
 import MInput from '@/components/bases/input/MInput.vue';
 import MButton from '@/components/bases/Button/MButton.vue';
 import MCombobox from '@/components/bases/combobox/MCombobox.vue';
-import MTrackDetail from "@/components/bases/Table/MTrackDetail.vue";
+import MDialog from '@/components/bases/Dialog/MDialog.vue';
 import MDialogError   from '@/components/bases/Dialog/MDialogError.vue';
 import resource from '@/lib/resource';
 import { HTTPAccounts } from '@/script/api';
+import MISAEnum from '@/lib/enum';
+
 export default {
     name:"AccountDetail",
     components: {
         MInput,
         MCombobox,
-        MTrackDetail,
+        MDialog,
         MButton,
         MDialogError,
     },
-    emits: ["CloseDetail"],
+emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
     props: {
         accounts: Object,
         accountId: String,
@@ -215,11 +543,46 @@ export default {
     },
     data(){
         return {
+            parentNumber: "",
             newAccount: {
-                
+                AccountNumber: "",
+                AccountName: "",
+                Grade: 1,
+                ParentId: resource.Vi.GUID_EMPTY,
+                EnglishName: "",
+                Type: 1,
+                Description: "",
+                HasForeignCurrencyAccounting: false,
+                IsActive: true,
+                IsParent: false,
+                IsTrackObject: false,
+                IsTrackJob: false,
+                IsTrackOrder: false,
+                IsTrackPurchaseContract: false,
+                IsTrackOrganizationUnit: false,
+                IsTrackProjectWork: false,
+                IsTrackBankAccount: false,
+                IsTrackSaleContract: false,
+                IsTrackExpenseItem: false,
+                IsTrackItem: false,
+                Object: 1,
+                Job: 1,
+                Order: 1,
+                PurchaseContract: 1,
+                OrganizationUnit: 1,
+                BankAccount: 0,
+                ProjectWork: 1,
+                SaleContract: 1,
+                ExpenseItem: 1,
+                Item: 1,
+                CreatedBy: "Hồ Văn Anh",
+                CreatedDate: new Date(),
+                ModifiedBy: "",
+                ModifiedDate: new Date(),
             },
             dialogMessage: "",
             isShowDialogError: false,
+            isShowDialogWarning: false,
             titleForm: "",
             isShowTrackDetail:true,
 
@@ -231,83 +594,13 @@ export default {
             tooltipContentNumber: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NUMBER,
             tooltipContentName: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NAME,
             tooltipContentNature: resource.Vi.ACCOUNT.TOOLTIP_ERROR.TILE_ACCOUNT_NATURE,
-            titleAdd: resource.Vi.Detail.titleAdd,
-            titleUpdate: resource.Vi.Detail.titleUpdate,
-            titleDuplicate: resource.Vi.Detail.titleDuplicate,
+            titleAdd: resource.Vi.Detail.TitleAdd,
+            titleUpdate: resource.Vi.Detail.TitleUpdate,
+            titleDuplicate: resource.Vi.Detail.TitleDuplicate,
             comboboxAccount:resource.COLUMNS_NAME_COMBOBOX_ACCOUNT,
             comboboxNature: resource.COLUMNS_NAME_COMBOBOX_NATURE,
-            ACCOUNT_TRACK : [
-                {
-                    trackText: "Đối tượng",
-                    isComboBox: true,
-                    options: resource.OBJECT_TYPE,
-                    default: resource.OBJECT_TYPE[1].optionId,
-                    identity: "Object",
-                },
-                {
-                    trackText: "Tài khoản ngân hàng",
-                    isComboBox: false,
-                    options: resource.TRACK_TYPE,
-                    default: resource.TRACK_TYPE[1].optionId,
-                    identity: "BankAccount",
-                },
-                {
-                    trackText: "Đối tượng THCP",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "Job",
-                },
-                {
-                    trackText: "Công trình",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "ProjectWork",
-                },
-                {
-                    trackText: "Đơn đặt hàng",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "Order",
-                },
-                {
-                    trackText: "Hợp đồng bán",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "PurchaseContract",
-                },
-                {
-                    trackText: "Hợp đồng mua",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "SaleContract",
-                },
-                {
-                    trackText: "Khoản mục CP",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "ExpenseItem",
-                },
-                {
-                    trackText: "Đơn vị",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "OrganizationUnit",
-                },
-                {
-                    trackText: "Mã thống kê",
-                    isComboBox: true,
-                    options:resource.TRACK_TYPE,
-                    default:resource.TRACK_TYPE[1].optionId,
-                    identity: "Item",
-                },
-            ],
+            comboboxTrackType:resource.TRACK_TYPE,
+            comboboxObject:resource.OBJECT_TYPE,
 
         }
     },
@@ -316,37 +609,91 @@ export default {
         this.$nextTick(function () {
             this.$refs.AccountNumber.inputFocus();
         });
+        
+        //Thay đổi title form 
+        this.handleTitleForm()
         //Check nếu tồn tại ID thì sẽ là form sửaưm
         if(this.accountId || this.isDuplicate){
             this.getAccountId(this.accountId);
         }
     },
+    computed: {
+        /**
+         * Kiểm tra xem form cái là form thêm mới hay không
+         */
+        isAdd: function(){
+            if(!this.accountId){
+                return true;
+            }
+            return false;
+        },
+        
+    },
     methods: {
-        handleSelected (event) {
+
+        /**
+         * Hàm đóng dialog warning
+         * Author: Văn ANh(28/3/2023)
+         */
+        closeDialogWarning(){
+            this.isShowDialogWarning = false;
+            //Khi mở form focus mặc định số tài khoản
+            this.$nextTick(function () {
+                this.$refs.AccountNumber.inputFocus();
+            });
+        },
+        /*
+        * Hãm xử lý focus vao button Cất và thêm
+        Author: Văn Anh (3/3/2023)
+        */
+        onFocusBtnClose(){
             try {
-                if (event.identity) {
-                    this.newAccount[`${event.identity}`] = event.option.optionId;
-                }
+                this.$refs.refCancelBtn.buttonFocus();
             } catch (error) {
                 console.log(error);
             }
         },
-        handleChecked (event) {
+        onFocusBtnAdd(){
             try {
-                if (event.identity) {
-                    this.newAccount[`IsTrack${event.identity}`] = event.isChecked;
-                    console.log("ee");
-                }
+                this.$refs.refSaveAddBtn.buttonFocus();
             } catch (error) {
                 console.log(error);
             }
+        },
+        enter(){
+            console.log("ener");
+        },
+        onFocusBtnSave(){
+            try {
+                this.$refs.refSave.buttonFocus();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Hàm xử lý khi người dùng tab đến button hủy tab lần nữa quay lại ô input đầu tiên
+         * Author: Văn Anh(26/12/2022)
+         */
+        tabOrder() {
+            try {
+                this.$refs.AccountNumber.inputFocus();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Hiển thị dialoa cảnh báo
+         */
+        confirmDialog(){
+            this.isShowDialogWarning = true;
         },
         /**
          * Hàm phát ra sự kiện đóng form detail
          * Author: Văn Anh (23/3/2023)
          */
         onClose(){
-            console.log("click");
+            this.isShowDialogWarning = false;
+            this.isShowDialogError = false;
             this.$emit("closeDetail");
         },
         /**
@@ -354,19 +701,32 @@ export default {
          * Author: Văn Anh (23/3/2023)
          */
         hideDialogError(){
+            console.log("click");
             this.isShowDialogError = false;
-
+            this.inputErrorFocus();
         },
+        
         //#region sự kiện sửa
         async getAccountId(id){
             try {
                 const response = await HTTPAccounts.get(`/${id}`);
+                
                 this.newAccount = response.data;
+                this.newAccount.AccountId = id;
                 console.log(response.data);
-                console.log(this.newAccount);
+                console.log("newAccount",this.newAccount);
             } catch (error) {
                 console.log(error);
             }
+        },
+        /**
+         * Nếu không phải tài khoản tổng hợp thì reset lại các trường
+         * Author: Văn Anh(25/3/2023)
+         */
+        removeParentId(){
+            this.newAccount.ParentId = resource.Vi.GUID_EMPTY,
+            this.parentNumber = "",
+            this.newAccount.Grade = 1
         },
         /**
          * Hàm xử lý nhấn save 
@@ -374,14 +734,88 @@ export default {
          */
         async handleSubmit(isSaveAndAdd, isAdd ,  toastMessage){
             try {
+                // this.setGrandAccount();
+                console.log("account: " + this.newAccount);
                 const response = isAdd || this.isDuplicate
-                ? await HTTPAccounts.post("", this.newAccount)
-                : await HTTPAccounts.put(`/${this.newAccount.AccountId}`,this.newAccount);
-                console.log(response);
-                this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
-                this.$emit("onshowToast");
-                await this.$parent.listAccounts();
+                ? await HTTPAccounts.post("",{
+                AccountNumber: this.newAccount.AccountNumber,
+                AccountName:this.newAccount.AccountName,
+                Grade: this.newAccount.Grade,
+                IsParent: false,
+                Description: this.newAccount.Description,
+                EnglishName:this.newAccount.EnglishName,
+                ParentId:this.newAccount.ParentId ? this.newAccount.ParentId : resource.Vi.GUID_EMPTY,
+                HasForeignCurrencyAccounting: this.newAccount.HasForeignCurrencyAccounting,
+                IsTrackObject: this.newAccount.IsTrackObject,
+                IsTrackJob: this.newAccount.IsTrackJob,
+                IsTrackOrder: this.newAccount.IsTrackOrder,
+                IsTrackPurchaseContract: this.newAccount.IsTrackPurchaseContract,
+                IsTrackOrganizationUnit: this.newAccount.IsTrackOrganizationUnit,
+                IsTrackBankAccount: this.newAccount.IsTrackBankAccount,
+                IsTrackProjectWork: this.newAccount.IsTrackProjectWork,
+                IsTrackSaleContract: this.newAccount.IsTrackSaleContract,
+                IsTrackExpenseItem: this.newAccount.IsTrackExpenseItem,
+                IsTrackItem: this.newAccount.IsTrackItem,
+                IsActive: this.newAccount.IsActive,
+                Type: this.newAccount.Type,
+                Object: this.newAccount.Object,
+                Job: this.newAccount.Job,
+                Order: this.newAccount.Order,
+                PurchaseContract: this.newAccount.PurchaseContract,
+                OrganizationUnit: this.newAccount.OrganizationUnit,
+                BankAccount: this.newAccount.BankAccount,
+                ProjectWork: this.newAccount.ProjectWork,
+                SaleContract: this.newAccount.SaleContract,
+                ExpenseItem: this.newAccount.ExpenseItem,
+                Item: this.newAccount.Item,
+                CreatedBy: "Hồ Văn Anh",
+                CreatedDate: new Date(),
+                ModifiedBy: "",
+                ModifiedDate: new Date(),
+                })
+                : await HTTPAccounts.put(`/${this.newAccount.AccountId}`,{
+                AccountId: this.newAccount.AccountId,
+                AccountNumber: this.newAccount.AccountNumber,
+                AccountName:this.newAccount.AccountName,
+                Grade: this.newAccount.Grade,
+                IsParent: false,
+                Description: this.newAccount.Description,
+                EnglishName:this.newAccount.EnglishName,
+                ParentId:this.newAccount.ParentId ? this.newAccount.ParentId : resource.Vi.GUID_EMPTY,
+                HasForeignCurrencyAccounting: this.newAccount.HasForeignCurrencyAccounting,
+                IsTrackObject: this.newAccount.IsTrackObject,
+                IsTrackJob: this.newAccount.IsTrackJob,
+                IsTrackOrder: this.newAccount.IsTrackOrder,
+                IsTrackPurchaseContract: this.newAccount.IsTrackPurchaseContract,
+                IsTrackOrganizationUnit: this.newAccount.IsTrackOrganizationUnit,
+                IsTrackBankAccount: this.newAccount.IsTrackBankAccount,
+                IsTrackProjectWork: this.newAccount.IsTrackProjectWork,
+                IsTrackSaleContract: this.newAccount.IsTrackSaleContract,
+                IsTrackExpenseItem: this.newAccount.IsTrackExpenseItem,
+                IsTrackItem: this.newAccount.IsTrackItem,
+                IsActive: this.newAccount.IsActive,
+                Type: this.newAccount.Type,
+                Object: this.newAccount.Object,
+                Job: this.newAccount.Job,
+                Order: this.newAccount.Order,
+                PurchaseContract: this.newAccount.PurchaseContract,
+                OrganizationUnit: this.newAccount.OrganizationUnit,
+                BankAccount: this.newAccount.BankAccount,
+                ProjectWork: this.newAccount.ProjectWork,
+                SaleContract: this.newAccount.SaleContract,
+                ExpenseItem: this.newAccount.ExpenseItem,
+                Item: this.newAccount.Item,
+                CreatedBy: "Hồ Văn Anh",
+                CreatedDate: new Date(),
+                ModifiedBy: "",
+                ModifiedDate: new Date(),});
+                if (response){
+                    this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
+                    this.$emit("onshowToast");
+                    this.$emit("reloadData");
+                }
                 if (isSaveAndAdd) {
+                    this.isAdd = true;
                     this.newAccount ={};
                 }
                 else {
@@ -389,6 +823,7 @@ export default {
                 }
             } catch (error) {
                 console.log(error);
+                this.handleException(error)
             }
         },
         /**
@@ -396,33 +831,71 @@ export default {
          * Author: Văn Anh (23/3/2023)
          */
         async btnSaveOnClick(isSaveAndAdd) {
+            console.log(this.newAccount);
             try {
                 //Hiển thị loading
                 var valid = this.validate();
-                //Validate dữ liệu
+                //Validate dữ li
                 if (valid) {
                 this.isShowDialogWarning = false;
                 this.dialogMessage = this.errorMessage[0];
                 this.isShowDialogError = true;
                 } else {
                 this.isShowLoading = true;
-                if (this.isAdd) {
-                    this.titleForm = this.titleAdd;
-                    this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
-                }
-                else if (this.isDuplicate) {
-                    this.titleForm = this.titleDuplicate;
-                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
-                }
-                else {
-                    this.titleForm = this.titleUpdate;
+                if(this.newAccount.AccountId){
                     this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
                 }
-                this.isShowLoading = false;
-                this.isShowDialogWarning = false;
+                else {
+                    if (this.isAdd) {
+                        this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
+                    }
+                    else if (this.isDuplicate) {
+                        this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
+                    
+                    }
                 }
+                this.isShowLoading = false;
+            }
             } catch (error) {
                 console.log(error);
+
+            }
+        },
+        /**
+         * Hàm trả về mã lỗi
+         * Author: Văn Anh(24/3/2023)
+         */
+        handleException(error) {
+            console.log(resource.STATUSCODE.BadRequest, error.response.status);
+            if (error.response.status === resource.STATUSCODE.BadRequest) {
+                switch (error.response.data.ErrorCode) {
+                case MISAEnum.ERRORCODE.DuplicateCode:
+                    this.isShowLoading = false;
+                    //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
+                    this.dialogMessage = error.response.data.UserMsg;
+                    this.isShowDialogError = true;
+                    this.$refs.AccountNumber.inputFocus();
+                    break;
+                // eslint-disable-next-line
+                case MISAEnum.ERRORCODE.InvalidInput:
+                    this.dialogMessage = error.response.data.UserMsg;
+                    this.isShowDialogError = true;
+                    break;
+                    default:
+                    break;
+                }
+            } 
+            else if (error.response.status == resource.STATUSCODE.ServerError) {
+                this.dialogMessage = error.response.data.UserMsg;
+                this.isShowDialog = true;
+            }
+            else {
+                for(const property in resource.STATUSCODES) {
+                    if(error.response.status == property.Code) {
+                    this.dialogMessage = property.Message;
+                    this.isShowDialog = true;
+                    }
+                }
             }
         },
         //#endregion
@@ -435,17 +908,56 @@ export default {
         validate(){
             try {
                 this.errorMessage = [];
+
                 //Validate trường mã tài khoản
                 if (this.valueIsEmpty(this.newAccount.AccountNumber)){
                     this.errorMessage.push(this.tooltipContentNumber);
                     this.borderAccountNumberError = true;
                 }
+                else if (this.newAccount.AccountNumber.length < resource.Vi.ACCOUNT.ERROR_MESSAGE.MIN_NUMBER){
+                    //Kiểm tra số tài khoản nhập vào bé hơn 3 ký tự
+                    this.errorMessage.push(resource.Vi.ACCOUNT.TOOLTIP_ERROR.TITLE_ACCOUNT_NAMBER_MINLENGTH);
+                }
+                else if(this.parentNumber){
+                    console.log("this.parentNumber",this.parentNumber);
+                    console.log("this.parentNumber",this.newAccount.AccountNumber);
+                    
+                    //Kiểm tra nếu có tài khoản cha thì số tài khoản bắt đầu từ tài khoản cha
+                    let regex = new RegExp(`^${this.parentNumber}*`)
+                    if(!regex.test(this.newAccount.AccountNumber)){
+                        this.errorMessage.push(resource.Vi.ACCOUNT.TOOLTIP_ERROR.TITLE_ACCOUNT_NUMBER_PARENT);
+                    }
+                }
+                else if(this.outLengthValid(this.newAccount.AccountNumber, resource.Vi.ACCOUNT.ERROR_MESSAGE.OUTLENGTH_NUMBER)){
+                    this.errorMessage.push(resource.Vi.ACCOUNT.TOOLTIP_ERROR.TITLE_ACCOUNT_NUMBER_OUTLENGTH);
+                }
+                else {
+                    this.borderAccountNumberError = false;
+                }
+
+
                 //validate trường tên tài khoản
                 if (this.valueIsEmpty(this.newAccount.AccountName)){
                     this.errorMessage.push(this.tooltipContentName);
                     this.borderAccountNameError = true;
                 }
+                else if (this.outLengthValid(this.newAccount.AccountName, resource.Vi.ACCOUNT.ERROR_MESSAGE.OUTLENGTH_NAME)){
+                    this.errorMessage.push(resource.Vi.ACCOUNT.TOOLTIP_ERROR.TITLE_ACCOUNT_NAME_OUTLENGTH);
+                }
+                else {
+                    this.borderAccountNameError = false;
+                }
 
+
+                //validate trường tính chất
+                if(this.valueIsEmpty(this.newAccount.Type)){
+                    this.errorMessage.push(this.tooltipContentNature);
+                    this.borderNatureError = true;
+                }
+                else {
+                    this.borderNatureError = false;
+                }
+                //Nếu có lỗi thì return về true
                 if(this.errorMessage.length > 0){
                     return true
                 }
@@ -459,24 +971,112 @@ export default {
          * Author: Văn Anh (23/3/2023)
          */
         valueIsEmpty(value) {
+            try {
+                if (!value) {
+                    return true;
+                }
+                return false;
+            } 
+            catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Hàm focus khi có lỗi xảy ra
+         */
+        inputErrorFocus() {
+            try {
+                if (this.borderAccountNumberError){
+                    this.$nextTick(function () {
+                        this.$refs.AccountNumber.inputFocus();
+                    });
+                }
+                if (this.borderAccountNameError){
+                    this.$nextTick(function () {
+                        this.$refs.AccountName.inputFocus();
+                    });
+                }
+                if (this.borderNatureError){
+                    this.$nextTick(function () {
+                        this.$refs.AccountType.comboboxFocus();
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        //Hàm dùng chung xử lý lỗi nhập vượt quá độ dài
+        outLengthValid (value, number){
         try {
-            if (!value) {
-                return true;
+            if (value.length > number){
+            return true;
             }
             return false;
-        } catch (error) {
+        } 
+        catch (error) {
             console.log(error);
         }
         },
         //#endregion
-    },
-    computed: {
-        isAdd: function(){
-            if(!this.accountId){
-                return true;
+
+        /**
+         * author:Văn Anh(2/3/2023)
+         * Hàm onKeyDown xử lí khi nhấn phím tắt
+         */
+        onKeyDown(event) {
+            var me = this;
+            if(!this.isShowDialogError && !this.isShowDialogWarning){
+                if(event.ctrlKey  &&  event.key === "s") {
+                event.preventDefault();
+                me.btnSaveOnClick(false);
+                }
+                else if (event.ctrlKey && event.key === "S") {
+                    event.preventDefault();
+                    me.btnSaveOnClick(true) 
+                }
+                else if (!this.isShowDialogError &&event.key === "Escape"){
+                    event.preventDefault();
+                    me.confirmDialog();
+                }
+                
             }
-            return false;
+        },
+        /**
+         * Xét title form cho detail
+         */
+        handleTitleForm(){
+            if(this.isAdd){
+                this.titleForm = this.titleAdd;
+                console.log(this.titleForm);
+            }
+            else if(this.isDuplicate){
+                this.titleForm = this.titleDuplicate;
+            }
+            else {
+                this.titleForm = this.titleUpdate;
+            }
         }
+    },
+    
+    watch: {
+        newAccount:  {
+            handler(newValue){
+                console.log("account thay doi " + newValue);
+            },
+            deep:true
+        },
+
+        onKeyDown: function(newValue){
+            console.log(newValue);
+        }
+    },
+    mounted() {
+        //Sự kiện bàn phím 
+        document.addEventListener("keydown",this.onKeyDown);
+    },
+    unmounted() {
+        //Sự kiện bàn phím
+        document.removeEventListener("keydown",this.onKeyDown);
     }
 }
 </script>
@@ -526,5 +1126,21 @@ export default {
 }
 .form-icon--help {
   background-position: -89px -144px;
+}
+.account-track-item + .account-track-item{
+    margin-top: 8px;
+}
+.account-track-item{
+    position: relative;
+}
+.account-track-item-disabled{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #eff0f2;
+    cursor: default;
+}
+label:focus{
+    outline: 1px solid #a0f5e1;
 }
 </style>

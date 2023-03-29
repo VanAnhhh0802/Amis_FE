@@ -16,7 +16,9 @@ export default {
      */
     buttonFocus(){
       try {
-        this.$refs[this.refName].focus();
+        this.$nextTick(function () {
+          this.$refs[this.refName].focus();
+        });
       }
       catch (error) {
         console.log(error);

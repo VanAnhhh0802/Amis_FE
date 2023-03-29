@@ -376,7 +376,7 @@ import MInput from "@/components/bases/input/MInput.vue";
 import MCombobox from "@/components/bases/combobox/MCombobox.vue";
 import MLoading from "@/components/bases/Loading/MLoading";
 import MDatePicker from "@/components/bases/DatePicker/MDatePicker.vue";
-import { HTTPEmployees } from "@/script/api.js"; 
+import { HTTPAccounts, HTTPEmployees } from "@/script/api.js"; 
 import MISAEnum from "@/lib/enum.js"
 
 export default {
@@ -647,8 +647,8 @@ export default {
     async handleOnSave(isSaveAndAdd, isAdd ,  toastMessage){
       try {
          const response = isAdd || this.isDuplicate
-          ? await HTTPEmployees.post("", this.newEmployee)
-          : await HTTPEmployees.put(`/${this.newEmployee.employeeId}`,this.newEmployee);
+          ? await HTTPAccounts.post("", this.newEmployee)
+          : await HTTPAccounts.put(`/${this.newEmployee.employeeId}`,this.newEmployee);
           console.log(response);
           this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
           this.$emit("onshowToast");

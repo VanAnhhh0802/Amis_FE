@@ -39,6 +39,7 @@
                             <label for="">Mã đối tượng  </label>
                             <MCombobox
                             style="width: 363px"
+                            api="https://localhost:7232/api/v1/Employees/filter?pageSize=20&pageNumber=1"
                             ></MCombobox>
                         </div>
                         <MInput label="Tên đối tượng" style="width: 500px" bottom="8px" />

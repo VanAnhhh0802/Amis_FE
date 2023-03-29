@@ -9,7 +9,6 @@
             </slot>
           </div>
           <div
-            
             @click="btnClose"
           >
           <div class="icon w-h-24 dialog__btn--acept dialog__header-icon"></div>
@@ -34,6 +33,7 @@ export default {
     return {};
   },
   props: ["textTitle", "message"],
+  emits: ["btnYes"],
   methods: {
     /**
      * button đóng
@@ -47,16 +47,28 @@ export default {
       }
     },
     /**
-     * Click vào đồng ý
-     * Author: Văn Anh (9/1/2023)
+     * author:Văn Anh(2/3/2023)
+     * Hàm onKeyDown xử lí khi nhấn phím tắt
      */
-    // btnDelete() {
-    //   try {
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+      onKeyDown(event) {
+        console.log(event);
+        if (event.key === "Escape"){
+            this.$emit("btnCloseDialog")
+        }
+        else if (event.key === "Enter"){
+          this.$emit("btnYes");
+        }
+        
+    }
   },
+  mounted() {
+      //Sự kiện bàn phím 
+      document.addEventListener("keydown",this.onKeyDown);
+  },
+  unmounted() {
+      //Sự kiện bàn phím
+      document.removeEventListener("keydown",this.onKeyDown);
+  }
 };
 </script>
 <style scoped>

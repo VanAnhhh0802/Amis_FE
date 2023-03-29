@@ -135,7 +135,7 @@
     overflow: auto;
   }
   table {
-    width: 120%;
+    width: 100%;
     border-collapse: collapse;
     overflow-x: auto;
   }
@@ -339,7 +339,7 @@
 }
 
 .account-track__title:hover {
-  color: var(--primary-color);
+  color: var(--main-color);
   cursor: pointer;
 }
 
@@ -374,7 +374,6 @@
 }
 
 .track-detail {
-  overflow: hidden;
   transition: all ease-in 0.25s;
 }
 
@@ -1072,7 +1071,13 @@ th:last-child, td:last-child {
   border-right: none;
   border-bottom: none;
 }
-
+ .dx-header-row{
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
 .dx-treelist .dx-header-row > td{
   background-color: #e5e8ec;
 }
@@ -1085,9 +1090,9 @@ background-color: #f5f5f5;
 .content__footer{
   height: 42px;
 }
-.content__list{
-  height: calc(100% - 60px);
-}
+/* .content__list-table{
+  height: calc(100% - 88px);
+} */
 .dropdown__data {
   top:-143px!important
 }
@@ -1101,18 +1106,21 @@ background-color: #f5f5f5;
   height: 17px;
 
 }
-.combobox__button{
+/* .combobox__button{
   border-radius: 2px;
   border: none;
   width: 30px;
 }
 .combobox__button:hover {
   background: #ECEEF1;
- }
+ } */
  
-.btn-combobox-icon {
+/* .btn-combobox-icon {
   width: 30px;height: 100%;
   border: none;
   background:  
   url(http://localhost:8080/img/Sprites.64af8f61.2ff7618a.svg) no-repeat -551px -354px;
+} */
+.dx-freespace-row {
+  display: none;
 }

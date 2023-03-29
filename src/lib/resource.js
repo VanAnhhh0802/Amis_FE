@@ -205,6 +205,7 @@ export default {
     }
   },
   Vi: {
+    GUID_EMPTY: "00000000-0000-0000-0000-000000000000",
     Detail: {
       TitleDetail: "Chi phiếu PC0003",
       Code: "Mã nhà cung cấp",
@@ -379,10 +380,19 @@ export default {
         MESSAGE_ERROR: "Xóa không thành công. Không thể xóa danh mục cha nếu chưa xóa danh mục con.",
         TITE_WARNING: "Cảnh báo",
       },
+      ERROR_MESSAGE:{
+        OUTLENGTH_NUMBER: 20,
+        OUTLENGTH_NAME: 255,
+        MIN_NUMBER: 3,
+      },
       TOOLTIP_ERROR:{
         TILE_ACCOUNT_NUMBER: "Mã tài khoản không được để trống",
         TILE_ACCOUNT_NAME: "Tên tài khoản không được để trống",
         TILE_ACCOUNT_NATURE: "Tính chất không được để trống",
+        TITLE_ACCOUNT_NUMBER_PARENT: "Số tài khoản không hợp lệ. Số tài khoản chi tiết phải bắt đầu bằng số của Tài khoản tổng hợp",
+        TITLE_ACCOUNT_NUMBER_OUTLENGTH: "Số tài khoản không được nhập lớn hơn 20 ký tự",
+        TITLE_ACCOUNT_NAMBER_MINLENGTH: "Số tài khoản phải có độ dài >=3 ký tự",
+        TITLE_ACCOUNT_NAME_OUTLENGTH: "Tên tài khoản không được nhập lớn hơn 255 ký tự",
       }
     }
   },
@@ -480,20 +490,20 @@ export default {
   ],
   COLUMNS_NAME_COMBOBOX_NATURE: [
     {
-      key: 1,
-      value: "Dư nợ"
+      optionId: 1,
+      optionName: "Dư nợ"
     },
     {
-      key: 2,
-      value: "Dư có"
+      optionId: 2,
+      optionName: "Dư có"
     },
     {
-      key: 3,
-      value: "Lưỡng tính"
+      optionId: 3,
+      optionName: "Lưỡng tính"
     },
     {
-      key: 4,
-      value: "Không có số dư"
+      optionId: 4,
+      optionName: "Không có số dư"
     },
     
   ]

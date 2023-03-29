@@ -83,6 +83,7 @@ export default {
             indexItemSelect: 1,
             // Khai báo biến giá trị cho func
             listRecords: [],
+
             active: false,
         }
     },

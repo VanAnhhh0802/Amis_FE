@@ -6,19 +6,20 @@
         Hệ thống tài khoản
       </div>
     </div>
-    <div class="content__list" >
+    <div class="content__list "  style="height: calc(100% - 88px)">
         <div class="flex list__header" style="justify-content: space-between;">
           <div
             style="width: 260px"
             class="flex input__wrapper list__toolbar"
           >
             <MInput
+            :class="{ 'border-focus': this.inputSearchFocused }"
             class="icon btn--search"
             style="min-width: 250px; box-sizing: border-box;"
             border="none"
-            :borderSearch="true"
             v-model.trim="this.keyword"
             @inputFocus="inputSearchFocus"
+            @inputOutFocus="this.inputSearchFocused = false"
             placeholder="Tìm kiếm theo số, tên tài khoản"
             ></MInput>
           </div>
@@ -31,7 +32,7 @@
                   <div
                   class="icon w-h-24 btn btn--small"
                   id="btn__reload"
-                  @click="btnReload"
+                  @click="reloadData"
                   style="background-position: -1097px -83px;"
                   ></div>
                   <div class="tooltip-text tooltip-reload">Lấy lại dữ liệu</div>
@@ -54,13 +55,14 @@
             :data-source="accounts"
             :column-auto-width="true"
             :word-wrap-enabled="true"
-            :sorting="false"
             :expanded-row-keys="!this.isExpandList ? expandedRowKeys : newExpandedRowKeys"
             key-expr="AccountId"
             parent-id-expr="ParentId"
             no-data-text=""
             @cellDblClick="btnDbClick"
+            :sorting="false"
         >
+        <DxScrolling mode="standard" />
           <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
           <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
           <DxColumn :width="100" data-field="Type" caption="Tính chất" />
@@ -69,7 +71,12 @@
           <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" />
           <DxColumn :width="150"  caption="Chức năng" cell-template="functionTemplate" />
           <template #functionTemplate="{ data: options }">
-            <MFeatureDetail :data="options.data"></MFeatureDetail>
+            <MFeatureDetail :data="options.data"
+            @reloadData="reloadData"
+            @showFormEdit="handleClickEdit($event)"
+            @showDuplicate="handleClickDuplicate($event)"
+            
+            ></MFeatureDetail>
           </template>
         </DxTreeList>
       </div>
@@ -86,11 +93,12 @@
     <div class="content--right">
       <div class="flex pagination">
         <MDropCombobox
-        v-model:model-value="this.paSize"
+        v-model="this.pageSize"
         :total="this.paging"
         :default="this.paging[1].value"
         style="min-width:200px"
         styleData="top: -143px!important"
+        @pageSize="setPageSize"
         ></MDropCombobox>
         <Paginate
           :page-count="this.totalPage"
@@ -105,33 +113,43 @@
       </div>
     </div>
   </div>
-    
   </div>
   <AccountDetail
     v-if="isShowDetail"
-    :accountId="accountIdSelected"
-  @closeDetail="btnClose"
+    :accountId="this.accountIdSelected"
+    @closeDetail="btnClose"
+    @reloadData="reloadData"
+    :isDuplicate="this.isDuplicate" 
+    @onshowToast="onshowToast"
+    @changeToastMsg="changeToastMsg"   
   ></AccountDetail>
   <MLoading
   v-if="isShowLoading"
   ></MLoading>
   <MToast
-  v-if="false"
+  v-if="isShowToast "
+    @closeToast="closeToast"
+    @onHideToast="onHideToast"
+    :toastType="toastContent"
+    :toastTitle="toastTitle"
+    :isSuccessToast="isSuccessToast"
+    :isErrorToast="isErrorToast"
   ></MToast>
 </template>
 <script>
 import Paginate from "vuejs-paginate-next";
 import MButton from '@/components/bases/Button/MButton.vue';
 import MToast from '@/components/bases/Toast/MToast.vue';
-
 import resource from '@/lib/resource';
+
 import MFeatureDetail from '@/components/bases/Table/MFeatureDetail.vue';
 import {HTTPAccounts} from "@/script/api"
-import { DxTreeList, DxColumn } from "devextreme-vue/tree-list";
+import { DxTreeList, DxColumn,DxScrolling } from "devextreme-vue/tree-list";
 import AccountDetail from './AccountDetail.vue';
 import MLoading from '@/components/bases/Loading/MLoading.vue';
 import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue"
 import _ from "lodash";
+import commonJs from '@/script/common';
 
 export default {
     name: "AccountList",
@@ -141,6 +159,7 @@ export default {
         AccountDetail,
         MLoading,
         DxTreeList, 
+        DxScrolling,
         DxColumn, 
         Paginate,
         MDropCombobox,
@@ -149,6 +168,9 @@ export default {
     },
     data(){
         return {
+          isDuplicate: false,
+          inputSearchFocused:false,
+          isShowToast: false,
           isExpandList: false,
           expandedRowKeys: [],
           newExpandedRowKeys: [],
@@ -169,8 +191,24 @@ export default {
     created(){
       this.listAccountChildrens();
       this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
+      
     },
+    updated(){
+      //Set các biển dùng cho nhân bản và sửa về mặc định
+      this.accountIdSelected = "";
+      this.isDuplicate = false
+    },
+    mounted() {
+      document.addEventListener("keydown",this.onKeyDown);
+    },
+    unmounted() {
+      // document.removeEventListener("keydown",this.onKeyDown);
+    },
+    
     watch: {
+      onKeyDown: function(newValue){
+            console.log(newValue);
+        },
       /**
      * Hàm theo dõi keyword mà thay đổi gọi hàm search
      */
@@ -181,10 +219,119 @@ export default {
     },
 
     methods: {
+      /**
+       * Hàm bắt sự kiện phím tắt
+       * @param {*} event 
+       * Author: Văn Anh(28/3/2023)
+       */
+    onKeyDown(event){
+      var me = this;
+      if (event.ctrlKey && event.key == "1") {
+        event.preventDefault();
+        me.isShowDetail = true;
+      }
+    },
+    /**
+   *Hàm khi người dùng focus thì show border xanh
+    *Author: Văn Anh (11/1/2023)
+    */
+    inputSearchFocus() {
+      try {
+        
+        this.inputSearchFocused = true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Hàm show toast message
+     */
+    onshowToast(){
+      this.isShowToast = true;
+    },
+      /**
+     * author:Văn anh(3/1/2023)
+     * Hàm onHideToast ẩn  Toast thông báo
+     */
+    onHideToast() {
+      this.isShowToast = false;
+    },
+    /**
+     * Set giá content cho toast message
+     * @param {Text} text - Gàn message cho toast to
+     * @param {*} error 
+     * @param {*} success 
+     * @param {*} title 
+     * Author: Văn Anh(25/3/2023)
+     */
+    changeToastMsg(text, error, success, title) {
+      this.toastContent = text;
+      this.isErrorToast = error;
+      this.isSuccessToast = success;
+      this.toastTitle = title;
+    },
+      /**
+     * Hàm đóng toast 
+     * Author: Văn anh(18/12/2022)
+     */
+     closeToast(){
+      try {
+        this.isShowOnToast = false
+      } catch (error) {
+        console.log(error);
+      }
+    },
+      /**
+       * Hàm gọi lại dũ liệu
+       */
+      reloadData(){
+        this.isLoading = true;
+        this.listAccountChildrens();
+        this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
+        this.isLoading = false;
+      },
+      /**
+       * Hàm set lại giá trị cho page size
+       * Author: Văn ANh (24/3/2023)
+       */
+      async setPageSize(size){
+        try {
+          this.pageSize = size;
+          this.pageNumber = 1;
+          await this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      /**
+       * Hàm xử lý click chuyển trâng
+       * Author: Văn Anh (24/2/2023)
+       */
+      async clickCallback(pageNum){
+        try {
+          this.pageNumber = pageNum;
+          await this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
+          // this.testCheckAll();
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      /**
+       * Hàm xử lý click btn thêm account
+       */
       btnAddOnClick(){
         this.accountIdSelected = null,
         this.isShowDetail = true;
       },
+      /**
+       * Hàm xử lý nhân bản tài khoản
+       */
+      handleClickDuplicate(id){
+        this.isDuplicate = true;
+        this.isShowDetail = true;
+        this.accountIdSelected = id;
+      },
+
       /**
        * Hiển thi form detail
        * Author: Văn Anh (16/3/2023)
@@ -213,9 +360,9 @@ export default {
        * Author: Văn Anh (19/3/2023)
        */
       handleClickEdit(id){
+        this.isDuplicate = false
         this.isShowDetail = true;
         this.accountIdSelected = id;
-        console.log(this.accountIdSelected );
       },
       /**
        * Btn toggle thu gọn mở rộng list cây
@@ -236,12 +383,20 @@ export default {
       },
       //#region GỌi api
       async listAccounts(filter, size, number){
+        
         try {
+
           let me = this;
-          // me.isShowLoading = true;
+          me.isShowLoading = true;
           await HTTPAccounts.get(`/filter?keyword=${filter}&pageSize=${size}&pageNumber=${number}`)
           .then(function (response) {
             me.accounts = response.data.Data;
+            //Xử lý dữ liệu trả về
+            me.accounts.forEach(account =>{
+              account.IsActive = commonJs.formatActiveAccount(account.IsActive);
+              account.Type = commonJs.formatTypeAccount(account.Type);
+            });
+            console.log(me.accounts);
             me.totalPage = response.data.totalPage;
             me.totalRecord = response.data.totalRecord;
           })
@@ -251,7 +406,6 @@ export default {
 
             //Lấy ra những id là tài khoản cha
             let accountIds = me.accounts.map((account) => account.AccountId);
-
             //Lấy ra số tài khoản con tương ứng với tài khoản cha
             let countChildren = 0;
 
@@ -283,7 +437,10 @@ export default {
         try {
           const response = await HTTPAccounts.get("/AccountChildren")
           this.childrenAccounts = response.data
-          
+          this.childrenAccounts.forEach(children =>{
+            children.IsActive = commonJs.formatActiveAccount(children.IsActive);
+            children.Type = commonJs.formatTypeAccount(children.Type);
+            });
         } catch (error) {
           console.log(error);
         }

@@ -4,6 +4,7 @@
   type="checkbox" 
   name="" 
   :id="id" 
+  :tabindex="tabIndex" 
   class="m-input-checkbox" 
   :checked="checked" 
   @change="selectedCheckBox" 
@@ -20,7 +21,7 @@ export default {
   props: {
     id : String,
     checked : Boolean,
-    
+    tabIndex:String,
     disabled : {
       type : Boolean,
       default : false
