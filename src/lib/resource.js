@@ -386,13 +386,21 @@ export default {
         MIN_NUMBER: 3,
       },
       TOOLTIP_ERROR:{
-        TILE_ACCOUNT_NUMBER: "Mã tài khoản không được để trống",
+        TILE_ACCOUNT_NUMBER: "Số tài khoản không được để trống",
         TILE_ACCOUNT_NAME: "Tên tài khoản không được để trống",
         TILE_ACCOUNT_NATURE: "Tính chất không được để trống",
         TITLE_ACCOUNT_NUMBER_PARENT: "Số tài khoản không hợp lệ. Số tài khoản chi tiết phải bắt đầu bằng số của Tài khoản tổng hợp",
         TITLE_ACCOUNT_NUMBER_OUTLENGTH: "Số tài khoản không được nhập lớn hơn 20 ký tự",
         TITLE_ACCOUNT_NAMBER_MINLENGTH: "Số tài khoản phải có độ dài >=3 ký tự",
         TITLE_ACCOUNT_NAME_OUTLENGTH: "Tên tài khoản không được nhập lớn hơn 255 ký tự",
+      }, 
+    },
+    PEYMENT: {
+      TOOLTIP_ERROR_PAYMENT: {
+        TILE_PAYMENT_NUMBER: "Số phiếu chi không được để trống",
+      },
+      DEFAULT:{
+        reason: "Chi tiền"
       }
     }
   },
@@ -463,28 +471,58 @@ export default {
         columnName: "Đối tượng",
         width: "150px",
         align: "left",
-        identityOption: "optionCode",
+        identityOption: "ObjectCode",
         isWrap: false,
     },
     {
         columnName: "Tên đối tượng",
         width: "200px",
         align: "left",
-        identityOption: "optionName",
+        identityOption: "ObjectName",
         isWrap: false,
     },
     {
         columnName: "Địa chỉ",
         width: "250px",
         align: "left",
-        identityOption: "optionAddress",
+        identityOption: "Address",
         isWrap: true,
     },
     {
         columnName: "Số điện thoại",
         width: "150px",
         align: "left",
-        identityOption: "optionPhone",
+        identityOption: "PhoneNumber",
+        isWrap: false,
+    },
+  ],
+  COLUMNS_NAME_COMBOBOX_EMPLOYEE: [
+    {
+        columnName: "Mã nhân viên",
+        width: "150px",
+        align: "left",
+        identityOption: "EmployeeCode",
+        isWrap: false,
+    },
+    {
+        columnName: "Tên nhân viên",
+        width: "200px",
+        align: "left",
+        identityOption: "FullName",
+        isWrap: false,
+    },
+    {
+        columnName: "Đơn vị",
+        width: "250px",
+        align: "left",
+        identityOption: "DepartmentName",
+        isWrap: true,
+    },
+    {
+        columnName: "ĐT di động",
+        width: "150px",
+        align: "left",
+        identityOption: "PhoneNumber",
         isWrap: false,
     },
   ],

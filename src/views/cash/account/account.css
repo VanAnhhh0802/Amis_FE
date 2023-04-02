@@ -1103,7 +1103,7 @@ background-color: #f5f5f5;
 }
 .combobox__input{
   border: none;
-  height: 17px;
+  height: 100%;
 
 }
 /* .combobox__button{

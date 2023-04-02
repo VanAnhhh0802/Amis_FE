@@ -24,3 +24,7 @@
 .tooltip-text-identity {
   width: 150px;
 }
+.tooltip-track-job{
+  min-width: 150px;
+  top: 20px;
+}

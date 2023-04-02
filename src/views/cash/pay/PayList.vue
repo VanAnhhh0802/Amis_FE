@@ -53,12 +53,12 @@
                         <div class="tooltip-text tooltip-reload">Xuất khẩu</div>
                     </div>
                     <div class="flex toolbar-right-wrapper">
-                        <router-link to="/pay/pay-detail"
+                        <m-button to="/pay/pay-detail-add" 
                         class="btn"
                             :class="{ 'btn--primary': true }"
                             text="Chi tiền"
                             style="order: 0; border-radius: 40px;box-sizing: border-box ; height: 28px; text-decoration: none;"
-                        ></router-link>
+                        ></m-button>
                     </div>
                     </div>
                 </div>
@@ -188,6 +188,7 @@ import MISAEnum from '@/lib/enum';
 
 import { HTTPPayments } from '@/script/api';
 import _ from "lodash";
+import MButton from '@/components/bases/Button/MButton.vue';
 
 export default {
     name: "PayList",
@@ -197,7 +198,8 @@ export default {
     MDialog,
     MLoading,
     MTable,
-    MDropCombobox
+    MDropCombobox,
+        MButton
     },
     created(){
         this.listPayments(this.keyword, this.pageSize, this.pageNumber);
@@ -248,6 +250,7 @@ export default {
         top: `calc(${this.dropdownPositionY}px + 10px)`,
         left: `calc(${this.dropdownPositionX}px - 55px)`,
       };
+    
     },
     /**
      * Hàm tính toán vị trí ở cuối dropdown

@@ -13,8 +13,8 @@
         text-input
         :ref="dateName"
         auto-apply
+        start-date="now"
         close-on-scroll
-
         show-now-button
         format="dd/MM/yyyy"
         :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
@@ -88,6 +88,10 @@ export default {
     tooltipError: Boolean,
     tooltipContent: String,
     style:String,
+
+  },
+  created(){
+    // this.$emit("update:modelValue", new Date.now(), this.name);
   },
   methods: {
     /**
@@ -106,7 +110,6 @@ export default {
     blurInputValue(event){
       if(this.isValidDate(event)){
         const newDate = new Date(event.target.value.split('/').reverse().join('-'));
-        console.log("newDate", newDate);
         this.$emit('update:modelValue',newDate, this.name);
         this.$emit("blurInput");
        }else{

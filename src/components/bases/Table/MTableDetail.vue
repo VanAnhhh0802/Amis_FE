@@ -12,14 +12,68 @@
                 </tr>
             </thead>
             <tbody>
-                <MRowDetail 
-                v-for="(entity, index) in entities"
-                :key="index"
-                :entity="entity"
-                :hasColumnDelete="hasColumnDelete"
-                />
+                <tr
+                    class="employee-infor"
+                    v-for="(entity, index) in entities"
+                    :key="index"
+                    :entity="entity"
+                >
+                    <td class="width-table-checkbox" style="text-align: center" >{{ index || "" }}</td>
+                    <td class=" text-align-left"> {{ entity.Description || "" }}</td>
+                    <td class="text-align-left">
+                        <MCombobox
+                        :columns = "this.comboboxAccount"
+                        api="https://localhost:7232/api/v1/Accounts/All"
+                        isTable="true"
+                        tabIndex="11"
+
+                        propValue="AccountId"
+                        propName="AccountNumber"
+                        ></MCombobox> 
+                    </td>
+                    <td class="text-align-left">
+                        <MCombobox
+                        :columns = "this.comboboxAccount"
+                        api="https://localhost:7232/api/v1/Accounts/All"
+                        isTable="true"
+                        tabIndex="12"
+
+                        propValue="AccountId"
+                        propName="AccountNumber"
+                        ></MCombobox>    
+                    </td>
+                    <td class="text-align-right ">
+                        <MInputMoney
+                        tabIndex="13"
+                        
+                        v-model="entity.Amount"
+                        ></MInputMoney>
+                    </td>
+                    <td class="text-align-left ">
+                        <MCombobox
+                            v-model="entity.ObjectCode"
+                            style="width: 363px"
+                            tabIndex="14"
+                            isTable="true"
+                            propName="ObjectCode"
+                            propValue="ObjectId"
+                            api="https://localhost:7232/api/v1/Objects/GetAll"
+                            :columns = "this.comboboxObject"
+                            ref="PaymentObject"
+                            nameRef="PaymentObject"
+                        ></MCombobox>
+                    </td>
+                    <td class="text-align-left " style=" min-width: 300px" >{{ entity.ObjectName || ""}}</td>
+                    <td
+                        v-if="hasColumnDelete"  
+                        class="tbl-col tbl-col-delete tbl-col__last sticky"
+                        style="width: 34px; min-width: 34px"
+                    >
+                        <div class="delete-icon"></div>
+                    </td>
+                </tr>
             </tbody>
-            <tfoot style="position: sticky;bottom: 0;z-index: 99;">
+            <tfoot style="position: sticky;bottom: 0;z-index: 1;">
             <tr style="border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5;">
                 <th class="text-align-center no-border" ></th>            
                 <th class="text-align-center w-200 no-border" style="text-transform: inherit">Tổng</th>
@@ -37,12 +91,14 @@
 <script>
 import MISAEnum from '@/lib/enum';
 import resource from '@/lib/resource';
-import MRowDetail from './MRowDetail.vue';
 import CommonJs from '@/script/common';
+import MCombobox from '../combobox/MCombobox.vue';
+import MInputMoney from '../input/MInputMoney.vue';
 export default {
     name: "MTableDetail",
     components: {
-        MRowDetail,
+        MCombobox,
+        MInputMoney
     },
     props: {
         entities: { 
@@ -62,6 +118,8 @@ export default {
         return {
             heightDetail: MISAEnum.HEIGHT.HEIGHT_PAY_MASTER,
             //resource
+            comboboxObject: resource. COLUMNS_NAME_COMBOBOX_OBJECT,
+            comboboxAccount:resource.COLUMNS_NAME_COMBOBOX_ACCOUNT,
             textAccountingDate: resource.Vi.ColumsTablePay.AccountingDate,
             textVouchersDate: resource.Vi.ColumsTablePay.VouchersDate,
             textNumberOfVouchers: resource.Vi.ColumsTablePay.NumberOfVouchers,
@@ -88,6 +146,6 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style scoped>
+    @import url(./table.css);
 </style>

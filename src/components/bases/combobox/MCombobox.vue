@@ -144,7 +144,8 @@ export default {
     "dataCombobox", 
     "changeGrade", 
     "parentAccountNumber",
-     "removeParentId"
+     "removeParentId",
+     "onChangeObject"
   ],
   created() {
     if (this.api) {
@@ -264,7 +265,6 @@ export default {
             if (!this.isShowData) {
               this.isShowData = true;
             }
-            console.log(this.indexItemSelect);
             //eslint-disable-next-line no-case-declarations
             let maxLength = this.entitySearch.length;
             
@@ -336,9 +336,8 @@ export default {
         this.entitySearch = this.entities;
         //Gán item đang đc chọn cho entity
         this.itemSelected = entity;
-        console.log("asd",this.itemSelected?.Grade);
         this.$emit("changeGrande", this.itemSelected?.Grade);
-
+        this.$emit("changeObject", this.itemSelected);
         //set index của item được chọn
         this.indexItemSelect = me.findIdexSelected;
         this.textSelected = entity[this.propName];

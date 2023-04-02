@@ -40,6 +40,10 @@ export const routes = [
             {
                 path: "pay-detail",
                 component: () => import("@/views/cash/pay/PayDetail.vue"),
+            },
+            {
+                path: "pay-detail-add",
+                component: () => import("@/views/cash/pay/PayDetail.vue")
             }
         ]
     }

@@ -10,7 +10,8 @@
             <button
             class="btn-function__dropdown"
             @click="showOnDropMenu($event, data.AccountId, data.AccountNumber, data.IsActive)"
-            v-click-outside-element="hideDropMenu" >
+            v-click-outside-element="hideDropMenu" 
+            >
             <div class="icon w-h-24 function-dropdown-icon"></div>
             </button>
         </div>

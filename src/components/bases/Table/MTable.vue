@@ -59,13 +59,13 @@
                     <div class="flex table__function" >
                         <button
                         class="btn-function-fix"
-                        @click="rowOnDbClick(item)"
+                        @click="btnWatchClick(item.PaymentId)"
                         >
                         Xem
                         </button>
                         <button
                         class="btn-function__dropdown"
-                        @click="this.showOnDropMenu($event, item.PaymentId, item.PaymentNumber)"
+                        @click="showOnDropMenu($event, item.PaymentId, item.PaymentNumber)"
                         >
                         <div class="icon w-h-24 function-dropdown-icon"></div>
                         </button>
@@ -101,7 +101,7 @@
     <teleport to="body" >
     <div
       class="dropdown-menu"
-      v-if="isShowOnDropMenu"
+      v-if="isShowOnDropMenu" 
       :style="[isDropdown ? dropdownPosition : dropdownPositionReverse]"
     >
       <ul class="dropdown-list">
@@ -175,6 +175,7 @@ export default {
             type: Array, 
         },
     },
+    emits: ["deleteResponse","showToolbar","listId"],
     created(){
          this.entities.forEach((item) => {
             this.totalMoney += item.TotalAmount;
@@ -213,6 +214,17 @@ export default {
     methods: {
         //#region Hàm liên quan đến xử lý sự kiện
         
+        /**
+         * Hàm click btn xem chứng từ 
+         * Authot: Văn Anh(29/3/2023)
+         */
+        btnWatchClick(id){
+            console.log(id);
+            this.$router.push({
+                path: "/pay/pay-detail",
+                query: {id : id}
+            })
+        },
         /**
          * Check  nhân viên
          * Author: Văn Anh (12/10/2023)
@@ -326,7 +338,7 @@ export default {
          * Hàm click outside ẩn dropmenu
          */
          hideDropMenu(){
-            this.isShowOnDropMenu = !this.isShowOnDropMenu;
+            this.isShowOnDropMenu = !this.isShowOnDropMenu;  
         },
         /**
          * Hiển thị drop menu
@@ -345,13 +357,16 @@ export default {
             this.dropdownPositionY = e.clientY;
             //Hiển thị drop menu
             this.isShowOnDropMenu = !this.isShowOnDropMenu;
-            console.log(this.dropdownPositionX,this.dropdownPositionY,  this.isShowOnDropMenu);
 
             this.warningDeleteMessage = `Bạn có thực sự muốn xóa Chứng từ <${code}> không?`;
             this.deleteId = id;
         } catch (error) {
             console.log(error);
         }
+        },
+        showOnDialogDelete(){
+            this.isShowOnDropMenu = false;
+            this.isShowDialog = true;
         },
         //#endregion
 

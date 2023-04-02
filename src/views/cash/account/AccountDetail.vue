@@ -186,7 +186,10 @@
                                     <input type="checkbox"  v-model="this.newAccount.IsTrackJob" />
                                     <div class="check-icon"></div>
                                 </label>
-                                <span class="track-text">Đối tượng THCP</span>
+                                <div class="tooltip">
+                                    <span class="track-text">Đối tượng THCP</span>
+                                    <div class="tooltip-text tooltip-track-job">Đối tượng tập hợp chi phí</div>
+                                </div>
                             </div>
                             <div
                                 class="checkbox-wrapper"
@@ -701,7 +704,6 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
          * Author: Văn Anh (23/3/2023)
          */
         hideDialogError(){
-            console.log("click");
             this.isShowDialogError = false;
             this.inputErrorFocus();
         },
@@ -1142,5 +1144,9 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
 }
 label:focus{
     outline: 1px solid #a0f5e1;
+}
+.tooltip-track-job{
+  min-width: 150px;
+  top: 20px;
 }
 </style>
