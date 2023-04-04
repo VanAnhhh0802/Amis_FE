@@ -7,7 +7,7 @@
             :height="heightMaster"
             @resize:move="handleChangeHeight($event)"
         >
-            <div class="content__list" style="height: 385px;box-sizing: border-box;">
+            <div class="content__list" style="height: calc(100% - 45px);box-sizing: border-box;">
                 <div class="flex list__header" style="justify-content: space-between;">
                     <div class="flex toolbar__left">
                         <div class="icon-new w-h-24 toolbar__left-icon" style="margin-left: 15px;"></div> 
@@ -53,12 +53,12 @@
                         <div class="tooltip-text tooltip-reload">Xuất khẩu</div>
                     </div>
                     <div class="flex toolbar-right-wrapper">
-                        <m-button to="/pay/pay-detail-add" 
+                        <router-link to="/pay/pay-detail" 
                         class="btn"
                             :class="{ 'btn--primary': true }"
                             text="Chi tiền"
                             style="order: 0; border-radius: 40px;box-sizing: border-box ; height: 28px; text-decoration: none;"
-                        ></m-button>
+                        ></router-link>
                     </div>
                     </div>
                 </div>
@@ -103,13 +103,13 @@
             </div>
         
         </vue-resizable>
-        <div class="detail-payment" :style="{ height: heightDetail + 'px' }">
+        <!-- <div class="detail-payment" :style="{ height: heightDetail + 'px' }">
             <div class="content__list" style="height: 100%;box-sizing: border-box;" >
                 <div class="flex list__header" style="justify-content: space-between; margin-bottom: 0; background-color:#eceef1;">
                     <div class="toolbar__detail">Chi tiết</div>
                 </div>
                 <MTableDetail
-                    :entities = "this.payments"
+                    :entities = "payments"
                 ></MTableDetail>
                 <div class="content__footer">
                     <div class="content--left">
@@ -145,7 +145,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
     <MLoading
     v-if="isShowLoading"
@@ -179,7 +179,6 @@
 <script>
 import MTable from '@/components/bases/Table/MTable.vue';
 import MLoading from '@/components/bases/Loading/MLoading.vue';
-import MTableDetail from '@/components/bases/Table/MTableDetail.vue';
 import paginate from 'vuejs-paginate-next';
 import resource from '@/lib/resource';
 import MDialog from '@/components/bases/Dialog/MDialog.vue';
@@ -194,7 +193,6 @@ export default {
     name: "PayList",
     components: {
     paginate,
-    MTableDetail,
     MDialog,
     MLoading,
     MTable,
@@ -268,7 +266,6 @@ export default {
          */
         keyword: function () { 
             let number =1
-            console.log("keyword",this.keyword);
             this.searchPayment(number);
         }
     },
@@ -300,7 +297,6 @@ export default {
          * Author: Văn Anh(28/3/2023)
          */
         reloadData(){
-            console.log("filter",this.keyword, this.pageSize);
             this.listPayments(this.keyword,this.pageSize,1);
         },
     /**
@@ -385,14 +381,21 @@ export default {
     async listPayments(filter, size, number){
         try {
             this.isShowLoading = true;
-            const response = await HTTPPayments.get(`/filter?keyword=${filter}&pageSize=${size}&pageNumber=${number}`)
-            this.payments= response.data.Data;
-            this.totalPage = response.data.totalPage;
-            console.log("entities", this.payments);
-            this.totalRecord = response.data.totalRecord;
-            if(response){
-                this.isShowLoading = false
-            }
+            await HTTPPayments.get(`/filter?keyword=${filter}&pageSize=${size}&pageNumber=${number}`)
+            .then(response => {
+                this.payments= response.data.Data;
+                this.totalPage = response.data.totalPage;
+                console.log("payment", response.data.Data);
+                console.log("payment", this.payments);
+                this.totalRecord = response.data.totalRecord;
+                if(response){
+                    this.isShowLoading = false
+                }
+            })
+            .catch(error => {
+
+                console.log(error);
+            })
         } catch (error) {
             this.isShowLoading = false;
             console.log(error);

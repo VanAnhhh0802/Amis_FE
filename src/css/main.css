@@ -167,4 +167,7 @@
   height: 100px;
   background: url(../assets/img/bg_report_nodata.76e50bd8.svg) no-repeat;
 }
+.disabled-action{
+  background-color: #eceef1!important;
+}
 /*  */

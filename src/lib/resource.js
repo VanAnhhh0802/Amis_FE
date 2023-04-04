@@ -1,3 +1,5 @@
+import MISAEnum from "./enum";
+
 /**
  * Hàm dùng toàn chương trình
  * Author: Văn Anh (26/12/2022)
@@ -52,10 +54,10 @@ export default {
   },
   FORM_MESSAGE: {
     SUCCESS: {
-      ADD: "Thêm mới nhân viên thành công!",
-      EDIT: "Sửa nhân viên thành công!",
-      DELETE: "Xóa nhân viên thành công!",
-      DUPLICATE: "Nhân bản nhân viên thành công!"
+      ADD: "Thêm mới tài khoản thành công!",
+      EDIT: "Sửa tài khoản thành công!",
+      DELETE: "Xóa tài khoản thành công!",
+      DUPLICATE: "Nhân bản tài khoản thành công!"
     }
   },
   //Thông báo nhập thiếu
@@ -379,6 +381,9 @@ export default {
         TITLE_ERROR: "Xóa không thành công",
         MESSAGE_ERROR: "Xóa không thành công. Không thể xóa danh mục cha nếu chưa xóa danh mục con.",
         TITE_WARNING: "Cảnh báo",
+        TITLE_ACCOUNT_PARENT_ACTIVE: 'Bạn có muốn thiết lập trạng thái "Sử dụng" cho tất cả <Tài khoản> con không?',
+        TITLE_ACCOUNT_CHILDREN_ACTIVE: 'Tài khoản cha đang ở trạng thái "Ngừng sử dụng". Bạn không thể thiết lập trạng thái "Sử dụng" cho Tài 	khoản con.',
+        
       },
       ERROR_MESSAGE:{
         OUTLENGTH_NUMBER: 20,
@@ -398,9 +403,15 @@ export default {
     PEYMENT: {
       TOOLTIP_ERROR_PAYMENT: {
         TILE_PAYMENT_NUMBER: "Số phiếu chi không được để trống",
+        TITLE_PAYMENT_NUMBER_OUTLENGTH: "Số phiếu chi không được lớn hơn 20 ký tự",
+        TITLE_ERROR_DATE: "Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ. Xin vui lòng kiểm tra lại.",
+        DETAIL: {
+          DEBIT_ACCOUNT_ERROR: "Tài khoản nợ không được để trống",
+          CREBIT_ACCOUNT_ERROR: "Tài khoản có không được để trống"
+        }
       },
       DEFAULT:{
-        reason: "Chi tiền"
+        reason: "Chi tiền cho"
       }
     }
   },
@@ -544,6 +555,18 @@ export default {
       optionName: "Không có số dư"
     },
     
+  ],
+  BUTTON_SAVE_DROPDOWN:[
+    {
+      name: "Cất và Thêm",
+      tooltipText: "Ctrl + Shift + S",
+      action: MISAEnum.STATUS_PAYMENT_SAVE.SAVE_ADD
+    },
+    {
+      name: "Cất và Đóng",
+      tooltipText: "Ctrl + Q",
+      action: MISAEnum.STATUS_PAYMENT_SAVE.SAVE_CLOSE
+    }
   ]
 };
 

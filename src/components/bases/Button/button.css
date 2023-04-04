@@ -67,3 +67,13 @@
   height: 28px; 
   text-decoration: none;
 }
+.background-disable {
+  border: 1px solid #b1b2b3;
+    background: 0 0;
+    color: #afafaf;
+    cursor: default;
+}
+.background-disable:hover {    
+  background: 0 0;
+
+}

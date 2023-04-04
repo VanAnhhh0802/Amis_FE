@@ -26,7 +26,7 @@
                         api="https://localhost:7232/api/v1/Accounts/All"
                         isTable="true"
                         tabIndex="11"
-
+                        :isDisabledInput="isDisabled"
                         propValue="AccountId"
                         propName="AccountNumber"
                         ></MCombobox> 
@@ -37,7 +37,7 @@
                         api="https://localhost:7232/api/v1/Accounts/All"
                         isTable="true"
                         tabIndex="12"
-
+                        :isDisabledInput="isDisabled"
                         propValue="AccountId"
                         propName="AccountNumber"
                         ></MCombobox>    
@@ -45,7 +45,7 @@
                     <td class="text-align-right ">
                         <MInputMoney
                         tabIndex="13"
-                        
+                        :isDisabled="isDisabled"
                         v-model="entity.Amount"
                         ></MInputMoney>
                     </td>
@@ -61,6 +61,9 @@
                             :columns = "this.comboboxObject"
                             ref="PaymentObject"
                             nameRef="PaymentObject"
+                            :isDisabledInput="isDisabled"
+                            @changeObject="getObject"
+
                         ></MCombobox>
                     </td>
                     <td class="text-align-left " style=" min-width: 300px" >{{ entity.ObjectName || ""}}</td>
@@ -108,11 +111,13 @@ export default {
             type: Array
         },
         hasColumnDelete:Boolean,
+        isDisabled: Boolean,
     },
     watch: {
-        entities: function(){
-            console.log("entities: " + this.entities);
-        }
+        entities: function(newValue){
+            console.log("entities: " + newValue);
+        },
+        deep: true,
     }  ,
     data(){
         return {
@@ -135,7 +140,19 @@ export default {
         }
     },
     methods: {
-        /**
+    getObject(){
+        try {
+                this.e.ObjectId = event.ObjectId;
+                this.newPayment.ObjectCode = event.ObjectCode;
+                this.newPayment.ObjectName = event.ObjectName;
+                this.newPayment.Receiver = event.ObjectName;
+                this.newPayment.Address = event.Address;
+                this.newPayment.Reason = "Lý do chi " + event.ObjectName;
+            } catch (error) {
+                console.log(error);
+            }
+    },
+    /**
      * Hàm định dạng tiền tệ
      * @param {String} money
      * Author: Văn Anh (15/3/2023) 

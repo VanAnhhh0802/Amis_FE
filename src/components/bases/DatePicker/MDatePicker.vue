@@ -36,6 +36,7 @@
               :tabindex="tabIndex"
               @blur="blurInputValue"
               @input="onInputValue"
+              :disabled="isDisabled"
             />
             <p class="text-error">{{ errorMsg}}</p>
             <p class="date-picker__icon">
@@ -88,7 +89,7 @@ export default {
     tooltipError: Boolean,
     tooltipContent: String,
     style:String,
-
+    isDisabled: Boolean,
   },
   created(){
     // this.$emit("update:modelValue", new Date.now(), this.name);

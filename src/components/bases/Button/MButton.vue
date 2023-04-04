@@ -1,5 +1,11 @@
 <template lang="">
-  <button class="btn" :tabindex="tabIndex" :ref="refName" >{{ text }}</button>
+  <button 
+  class="btn" 
+  :class ="{'background-disable': disable}"
+  :tabindex="tabIndex" 
+  :ref="refName" 
+  :disabled="disable"
+  >{{ text }}</button>
 </template>
 <script>
 export default {
@@ -8,6 +14,7 @@ export default {
     text: String,
     tabIndex: Number,
     refName: String,
+    disable: Boolean,
   },
   methods:{
     /**\

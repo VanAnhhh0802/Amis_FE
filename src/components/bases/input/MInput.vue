@@ -24,6 +24,8 @@
         :placeholder="placeholder"
         @input="input"
         :ref="nameRef"
+        :disabled="isDisabled"
+        :maxlength="maxLength"
       />
       <div class="error-info error-bg" v-if="tooltipError" style="top: 33px;left: -32px">
         <div class="error-arrow error-bg" style="left: 50%;
@@ -53,6 +55,8 @@ export default {
     error: Boolean,
     tooltipError:Boolean,
     tooltipMessage: String,
+    isDisabled: Boolean,
+    maxLength:String,
   },
 
   data() {

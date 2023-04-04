@@ -4,9 +4,9 @@
  */
 const MISAEnum = {
   Mode: {
-    Add: 1,
-    Edit: 2,
-    Delete: 3,
+    Add: 0, // Trạng thái thêm
+    Edit: 1, // Trạng thái sửa
+    Duplicate:2, //Trạng thái nhân bản
   },
   StatusCode: {
     OK: 200, //Trả về thành công ở những phương thứ như GET, POST , PUT , DELETE
@@ -49,6 +49,13 @@ const MISAEnum = {
     HERMAPHRODITE: 2, //Lưỡng tính
     SURPLUS: 3, //Dư có
     NOBALANCE: 4, //Khống có số dư
+  },
+  STATUS_PAYMENT_SAVE:{
+    SAVE_ADD: 0, // Cất và Thêm
+    SAVE_CLOSE: 1, //Cất và đống
+  },
+  MAX_LENGTH_PAYMENT:{
+    NUMBER: 20,
   }
 
 };

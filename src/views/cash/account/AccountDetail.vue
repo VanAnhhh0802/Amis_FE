@@ -63,7 +63,7 @@
                 <div class="row">
                     <div class="checkbox-wrapper" style="width: 25%; margin-right: 8px">
                         <label for="">Tài khoản tổng hợp</label>
-                        <MCombobox
+                        <MComboboxV2
                         v-model="this.newAccount.ParentId"
                         api="https://localhost:7232/api/v1/Accounts/All"
                         propName="AccountNumber"
@@ -72,10 +72,10 @@
                         :tabIndex="4"
                         :columns = "this.comboboxAccount"
                         isTable="true"
-                        @changeGrade="newAccount.Grade = $event ? $event + 1 : newAccount.Grade "
+                        @changeGrade="newAccount.Grade = $event ? $event + 1 : newAccount.Grade; "
                         @parentAccountNumber="this.parentNumber = $event"
                         @removeParentId="removeParentId"
-                        ></MCombobox>
+                        ></MComboboxV2>
                     </div>
                     <div class="checkbox-wrapper" style="width: 25%">
                         <label for="">Tính chất
@@ -523,6 +523,7 @@
 import MInput from '@/components/bases/input/MInput.vue';
 import MButton from '@/components/bases/Button/MButton.vue';
 import MCombobox from '@/components/bases/combobox/MCombobox.vue';
+import MComboboxV2 from '@/components/bases/combobox/MComboboxV2.vue';
 import MDialog from '@/components/bases/Dialog/MDialog.vue';
 import MDialogError   from '@/components/bases/Dialog/MDialogError.vue';
 import resource from '@/lib/resource';
@@ -534,6 +535,7 @@ export default {
     components: {
         MInput,
         MCombobox,
+        MComboboxV2,
         MDialog,
         MButton,
         MDialogError,
@@ -547,6 +549,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
     data(){
         return {
             parentNumber: "",
+            DuplicateAccount:false,
             newAccount: {
                 AccountNumber: "",
                 AccountName: "",
@@ -583,6 +586,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 ModifiedBy: "",
                 ModifiedDate: new Date(),
             },
+            accountChanged: false,
             dialogMessage: "",
             isShowDialogError: false,
             isShowDialogWarning: false,
@@ -612,11 +616,11 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
         this.$nextTick(function () {
             this.$refs.AccountNumber.inputFocus();
         });
-        
+        this.DuplicateAccount = this.isDuplicate;
         //Thay đổi title form 
         this.handleTitleForm()
         //Check nếu tồn tại ID thì sẽ là form sửaưm
-        if(this.accountId || this.isDuplicate){
+        if(this.accountId || this.DuplicateAccount){
             this.getAccountId(this.accountId);
         }
     },
@@ -688,7 +692,14 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
          * Hiển thị dialoa cảnh báo
          */
         confirmDialog(){
-            this.isShowDialogWarning = true;
+            if (this.accountChanged){
+                console.log(this.accountChanged);
+                this.isShowDialogWarning = true;
+            }
+            else {
+            this.$emit("closeDetail");
+
+            }
         },
         /**
          * Hàm phát ra sự kiện đóng form detail
@@ -715,8 +726,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 
                 this.newAccount = response.data;
                 this.newAccount.AccountId = id;
-                console.log(response.data);
-                console.log("newAccount",this.newAccount);
+               
             } catch (error) {
                 console.log(error);
             }
@@ -731,14 +741,23 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
             this.newAccount.Grade = 1
         },
         /**
+         * Nếu là tài khoản tổng hợp thì cộng bậc của tài khoản cha lên + 1
+         * Author: Văn Anh(25/3/2023)
+         */
+        SetGradeAccount(event){
+            this.newAccount.Grade = event ? event + 1 : this.newAccount.Grade;
+            console.log("grade: " + this.newAccount.Grade);
+        },
+        /**
          * Hàm xử lý nhấn save 
          * Author: Văn Anh (23/3/2023)
          */
         async handleSubmit(isSaveAndAdd, isAdd ,  toastMessage){
             try {
-                // this.setGrandAccount();
-                console.log("account: " + this.newAccount);
-                const response = isAdd || this.isDuplicate
+                if (this.DuplicateAccount){
+                    this.newAccount.AccountId = null;
+                }
+                const response = isAdd || this.DuplicateAccount
                 ? await HTTPAccounts.post("",{
                 AccountNumber: this.newAccount.AccountNumber,
                 AccountName:this.newAccount.AccountName,
@@ -758,7 +777,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 IsTrackSaleContract: this.newAccount.IsTrackSaleContract,
                 IsTrackExpenseItem: this.newAccount.IsTrackExpenseItem,
                 IsTrackItem: this.newAccount.IsTrackItem,
-                IsActive: this.newAccount.IsActive,
+                IsActive: isAdd ? this.newAccount.IsActive :  this.newAccount.IsActive = true,
                 Type: this.newAccount.Type,
                 Object: this.newAccount.Object,
                 Job: this.newAccount.Job,
@@ -811,6 +830,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 CreatedDate: new Date(),
                 ModifiedBy: "",
                 ModifiedDate: new Date(),});
+
                 if (response){
                     this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
                     this.$emit("onshowToast");
@@ -844,17 +864,11 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 this.isShowDialogError = true;
                 } else {
                 this.isShowLoading = true;
-                if(this.newAccount.AccountId){
-                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
+                if(this.isAdd || this.DuplicateAccount){
+                    this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
                 }
                 else {
-                    if (this.isAdd) {
-                        this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
-                    }
-                    else if (this.isDuplicate) {
-                        this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
-                    
-                    }
+                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
                 }
                 this.isShowLoading = false;
             }
@@ -1051,7 +1065,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 this.titleForm = this.titleAdd;
                 console.log(this.titleForm);
             }
-            else if(this.isDuplicate){
+            else if(this.DuplicateAccount){
                 this.titleForm = this.titleDuplicate;
             }
             else {
@@ -1062,15 +1076,19 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
     
     watch: {
         newAccount:  {
-            handler(newValue){
-                console.log("account thay doi " + newValue);
+            handler(newValue, oldValue) {
+
+                if (oldValue){
+                    this.accountChanged = false;
+                }
+               if (newValue) {
+                    this.accountChanged = true;
+                }
             },
             deep:true
         },
-
-        onKeyDown: function(newValue){
-            console.log(newValue);
-        }
+        
+        
     },
     mounted() {
         //Sự kiện bàn phím 

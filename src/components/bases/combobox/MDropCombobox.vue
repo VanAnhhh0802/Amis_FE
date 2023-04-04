@@ -1,22 +1,23 @@
 <template>
-    <div class="dropdown" :class="{'dropdown--active': this.active}">
+    <div class="dropdown" :class="{'dropdown--active': this.active, 'disabled-action': disabledInput }">
         <div class="flex w-full">
             <input 
             v-model="textSelectTed" 
-            disabled
             :id="id" 
+            disabled
             class="dropdown__input" 
-            :class="{'drop-combobox-input': name}"
+            :class="{'drop-combobox-input': name, 'disabled-action': disabledInput}"
             :style="style"
             @blur="!this.active"
             type="text"
+            
             >
             <div class="dropdown__button iconBtndropdown" @click="onShowHideData"
             v-click-outside-element="hideData"
             
             ></div>
         </div>
-        <div v-show="isShowData" :style="styleData" class="dropdown__data" :class="{'drop-combobox-data': name}">
+        <div v-show="isShowData && !disabledInput" :style="styleData" class="dropdown__data" :class="{'drop-combobox-data': name}">
             <div class="dropdown-item"
             v-for="(item,index) in listRecords" 
             :key="index"
@@ -39,6 +40,7 @@ export default {
         default: String,
         style: String,
         styleData: String,
+        disabledInput: Boolean,
     },
     updated(){
         // Nhận giá trị tổng bản ghi
@@ -63,10 +65,13 @@ export default {
          * CreatedBy: 
          */
         itemOnSelect(item,index){
-            this.textSelectTed = item.value;
-            this.isShowData = false;
-            this.indexItemSelect = index;
-            this.$emit('pageSize', item.key);
+
+            if(!this.disabledInput){
+                this.textSelectTed = item.value;
+                this.isShowData = false;
+                this.indexItemSelect = index;
+                this.$emit('pageSize', item.key);
+            }
         },
     },
     data(){
@@ -112,4 +117,5 @@ export default {
 
 <style scoped>
     @import url(./combobox.css);
+    
 </style>

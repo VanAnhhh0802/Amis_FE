@@ -999,8 +999,9 @@ table {
   font-family: FontAwesome;
 }
 .dx-row:has(.dx-treelist-readonly .dx-treelist-checkbox-size input[value="true"]) {
-  font-weight: 700;
+  font-weight: 700!important;
 }
+
 .dx-widget.dx-state-readonly.dx-checkbox {
   position: absolute;
   visibility: hidden;

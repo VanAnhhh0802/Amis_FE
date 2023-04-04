@@ -24,19 +24,22 @@
         @focus="inputFocus"
         @blur="inputOutFocus"
         :ref ="nameRef"
+        :disabled ="isDisabledInput"
+        :maxlength="maxLength"
       />
       <div
         class="combobox__button "
         @click="onShowHideData"
         @keydown="inputOnKeyDown"
         v-click-outside-element="hideData"
+        :class="{'disabled-action': isDisabledInput}"
       >
       <div class=" btn-combobox-icon"
-      :style="{transform: isShowData ? 'rotate(180deg)' : 'rotate(0deg)', }" 
+      :style="{transform: isShowData && !isDisabledInput ? 'rotate(180deg)' : 'rotate(0deg)', }" 
       
       ></div>
       </div>
-      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;left: 44px">
+      <div class="error-info error-bg" v-if="tooltipError" style="top: 36px;left: -23px;">
         <div class="error-arrow error-bg" style="left: 50%;top: -15%;"></div>
         <div class="error-text">{{ tooltipContent }}</div>
       </div>
@@ -55,7 +58,7 @@
       </a>
     </div>
     <!-- TABLE -->
-    <div class="wrapper-table" v-if="isTable && isShowData">     
+    <div class="wrapper-table" v-if="isTable && isShowData && !isDisabledInput">     
       <table class="table table-cbo">
           <tbody class="tbd" ref="refList">
               <tr class="table-row">
@@ -136,6 +139,8 @@ export default {
       type: Array
     },
     isTable: Boolean,
+    maxLength: String,
+    isDisabledInput:Boolean,
   },
   emits: [
     "update:modelValue", 
@@ -180,31 +185,36 @@ export default {
   },
   watch: {
     modelValue: {
-      handler: function (newValue) {
-        if (!newValue && !this.defaultName) {
-          this.textSelected = "";
+      handler: function () {
+        // if (!newValue && !this.defaultName) {
+        //   this.textSelected = "";
+        // }
+        if (this.modelValue || this.modelValue === 0) {
+        this.setItemSelected();
         }
-      },immediate: true,
+      },
+      // immediate: true,
     },
+    
     /**
      * Hàm theo dõi border combobox khi bị lỗi
      * Author: Văn Anh(25/3/2023)
      */
     inputErrorCombobox: function () {
       this.isError = this.inputErrorCombobox
-      console.log("error",this.isError);
     },
     /**
      * Hàm theo dõi text combobox sau khi đc chọn
      */
-    textSelected: {
-      handler: function (newValue) {
-        if (!newValue) {
-          this.$emit("update:modelValue", "");
-        }
-      },
-      immediate: true,
-    },
+    // textSelected: {
+    //   handler: function (newValue) {
+    //     if (!newValue) {
+    //       this.$emit("update:modelValue", "");
+    //     }
+    //   this.$emit("update:modelValue", newValue);
+    //   },
+    //   immediate: true,
+    // },
   },
   computed: {
     /**
@@ -216,7 +226,6 @@ export default {
       let findIdex = this.entitySearch.findIndex(
         (item) => item[me.propValue] == me.itemSelected[me.propValue]
       );
-      console.log("findIdex",findIdex);
       return findIdex;
     },
   },
@@ -359,14 +368,16 @@ export default {
         let entitySelected = this.entities.find(
           (item) =>  {
             item[me.propValue] == me.modelValue
-            console.log(me.modelValue);
           }
         );
 
         //Truyền bậc của tài khoản cha 
         if(this.isTable){
-          this.$emit("changeGrade", entitySelected.Grade)
-          this.$emit("parentAccountNumber", entitySelected.AccountNumber)
+          if(entitySelected.Grade){
+            this.$emit("changeGrade", entitySelected.Grade)
+            this.$emit("parentAccountNumber", entitySelected.AccountNumber)
+
+          }
         }
 
         //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input

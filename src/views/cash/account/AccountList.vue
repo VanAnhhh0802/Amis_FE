@@ -62,20 +62,27 @@
             @cellDblClick="btnDbClick"
             :sorting="false"
         >
-        <DxScrolling mode="standard" />
+          <DxScrolling mode="standard" />
+          <DxPaging :enabled="false" :page-size="10" />expandedRowKeys
+          <DxPager
+            :show-page-size-selector="true"
+            :allowed-page-sizes="allowedPageSizes"
+            :show-info="true"
+          />
           <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
           <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
           <DxColumn :width="100" data-field="Type" caption="Tính chất" />
           <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
           <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
-          <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" />
+          <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" style="display: none"/>
+          <DxColumn :width="100" data-field="IsParent" caption="cha" style="display: none"/>
           <DxColumn :width="150"  caption="Chức năng" cell-template="functionTemplate" />
           <template #functionTemplate="{ data: options }">
             <MFeatureDetail :data="options.data"
             @reloadData="reloadData"
             @showFormEdit="handleClickEdit($event)"
             @showDuplicate="handleClickDuplicate($event)"
-            
+            @activeResponse="reloadData()"
             ></MFeatureDetail>
           </template>
         </DxTreeList>
@@ -284,7 +291,8 @@ export default {
       /**
        * Hàm gọi lại dũ liệu
        */
-      reloadData(){
+      reloadData(event){
+        console.log(event);
         this.isLoading = true;
         this.listAccountChildrens();
         this.listAccounts(this.keyword, this.pageSize, this.pageNumber);
@@ -468,5 +476,9 @@ export default {
   padding-right: 36px; 
   background-position: -765px -355px;
   }
-  
+
+  .dx-treelist .dx-column-lines > td:nth-child(7),
+  .dx-treelist .dx-row > td:nth-child(7){
+    display: none;
+  }
 </style>

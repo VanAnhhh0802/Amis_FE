@@ -5,7 +5,7 @@
                 <div class="m-icon">
                     <div class="payment-header__icon"></div>
                 </div>
-                <div class="payment-title">{{ this.newPayment.PaymentNumber }}</div>
+                <div class="payment-title">Phiếu chi {{ this.newPayment.PaymentNumber }}</div>
                 <div class="checkbox-wrapper">
                     <MDropCombobox
                     :total="listPayDetail"
@@ -13,6 +13,7 @@
                     styleData="top: 30px!important"
                     name="true"
                     @pageSize="this.newPayment.ReasonType"
+                    :disabledInput="this.isDisabled"
                     ></MDropCombobox>
                 </div>
             </div>
@@ -28,7 +29,7 @@
                     <div class="help-icon"></div>
                 </div>
                 <div class="m-icon m-icon__second">
-                    <router-link to="/cash/procedure" class="close-icon"></router-link>
+                    <div @click="closeForm"  class="close-icon"></div>
                 </div>
             </div>
         </div>
@@ -39,6 +40,7 @@
                         <div style="min-width: 363px;">
                             <label for="">Mã đối tượng  </label>
                             <MCombobox
+                            v-model="newPayment.ObjectICode"
                             style="width: 363px"
                             tabIndex="1"
                             isTable="true"
@@ -47,8 +49,10 @@
                             api="https://localhost:7232/api/v1/Objects/GetAll"
                             @changeObject="getObject"
                             :columns = "this.comboboxObject"
-                            ref="PaymentObject"
-                            nameRef="PaymentObject"
+                            ref="PaymentObjectDetail"
+                            nameRef="PaymentObjectDetail"
+                            :isDisabledInput="this.isDisabled"
+                            maxLength="20"
                             ></MCombobox>
                         </div>
                         <MInput 
@@ -56,27 +60,37 @@
                         style="width: 500px" 
                         tabIndex="2"
                         v-model="newPayment.ObjectName"
+                        :isDisabled="this.isDisabled"
+                        maxLength="100"
+
                         />
                     </div>
                     <div class="row col-gap-12">
                         <MInput 
                         label="Người nhận" 
                         tabIndex="3"
-                        v-model="newPayment.ObjectName"
+                        v-model="newPayment.Receiver"
                         style="width: 363px;"
+                        :isDisabled="this.isDisabled"
                         
+                        maxLength="100"
                         />
                         <MInput 
                         label="Địa chỉ" 
                         tabIndex="4"
                         style="width: 500px"  
                         v-model="newPayment.Address"
+                        :isDisabled="this.isDisabled"
+                        maxLength="255"
+
                         />
                     </div>
                     <div class="row">
                         <MInput 
                         label="Lý do chi"  
                         tabIndex="5"
+                        :isDisabled="this.isDisabled"
+                        maxLength="255"
 
                         style="width: 100%" 
                         v-model="newPayment.Reason" 
@@ -93,11 +107,15 @@
                             api="https://localhost:7232/api/v1/Employees/GetAll"
                             @changeObject="getEmployee"
                             :columns = "this.comboboxEmployee"
+                            :isDisabledInput="this.isDisabled"
+                            maxLength="255"
                             ></MCombobox>
                         <MInput 
                         label="Kèm theo" 
                         style="width: 150px; text-align: right" 
                         tabIndex="7"
+                        :isDisabled="this.isDisabled"
+                        maxLength="255"
 
                         />
                         <div class="row-text" style="margin-top: 17px;">chứng từ gốc</div>
@@ -115,6 +133,12 @@
                         :tabIndex="8"
                         dateName="'PaymentDatePicker'"
                         ref="PaymentDate"
+                        :isDisabled="this.isDisabled"
+                        maxLength="255"
+                        :isErrorInput = "this.borderErrorPaymentDate"
+                        :tooltipError = "this.borderErrorPaymentDate"
+                        @blurInput = "this.borderErrorPaymentDate = false"
+                        :tooltipContent = "this.tooltipContentDate"
                         />
                     </div>
                     <div style="margin: 16px 0; width: 166px">
@@ -123,7 +147,10 @@
                             v-model="newPayment.PostedDate"
                             :tabIndex="9"
                             style="width: 166px;" 
+                            name="PostedDate"
                             dateName="VoucherDay"
+                            :isDisabled="this.isDisabled"
+                            maxLength="255"
                         />
                     </div>
                     <MInput 
@@ -133,20 +160,139 @@
                     v-model="newPayment.PaymentNumber"
                     ref="PaymentNumber"
                     nameRef="PaymentNumber"
+                    :error = "this.borderErrorNumber"
+                    :tooltipError = "this.borderErrorNumber"
+                    :tooltipContent = "this.tooltipContentNumber"
+                    @inputOutFocus="this.borderErrorNumber = false"
+                    :isDisabled="this.isDisabled"
+                    maxLength="20"
+
                     />
                 </div>
                 <div class="container-right">
                     Tổng tiền
-                    <div class="payment-total">0</div>
+                    <div class="payment-total">{{ this.formatMoney(this.newPayment.TotalAmount) }}</div>
                 </div>
             </div>
             <div class="payment-detail">
                 <label class="payment-detail-title">Hạch toán</label>
-                <MTableDetail
-                    :entities="this.newPaymentDetails"
-                    :columnsTh="this.listThDetail"
-                    hasColumnDelete="true"
-                />
+    <!-- Detail -->
+                <div class="list__table" style="height: 100% ;box-sizing: border-box;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th
+                                v-for="(column, index) in listThDetail"
+                                :key="index"
+                                >
+                                {{column.columnName}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                class="employee-infor"
+                                v-for="(detail, index) in newPaymentDetails"
+                                :key="index"
+                                :class="{'disable': isDisabled}"
+                            >
+                                <td class="text-align-center" style="text-align: center; width: 35px;" >{{ index + 1}}</td>
+                                <td class=" text-align-left">
+                                    <MInput 
+                                    v-model="newPaymentDetails[index].Description"
+                                    tabIndex="13"
+                                    :isDisabled="isDisabled"
+                                    style="min-width: 250px; width: 250px;"
+                                    />
+                                </td>
+                                <td class="text-align-left" 
+                                style="min-width: 155px;width: 155px;"
+                                
+                                >
+                                    <MCombobox
+                                    :columns = "this.comboboxAccount"
+                                    api="https://localhost:7232/api/v1/Accounts/All"
+                                    isTable="true"
+                                    tabIndex="11"
+                                    :isDisabledInput="isDisabled"
+                                    propValue="AccountId"
+                                    propName="AccountNumber"
+                                    v-model="this.newPaymentDetails[index].DebitAccount"
+                                    style="min-width: 155px;width: 155px;"
+                                    @comboboxOutFocus="this.borderErrorDebitAccount = false"
+                                    :inputErrorCombobox = "this.borderErrorDebitAccount"
+                                    :tooltipError = "this.borderErrorDebitAccount"
+                                    :tooltipContent = "this.tooltipContentDebitAccount"
+                                    ></MCombobox> 
+                                </td>
+                                <td class="text-align-left"
+                                style="min-width: 165px;width: 165px;"
+                                
+                                >
+                                    <MCombobox
+                                    style="min-width: 165px;width: 165px;"
+                                    :columns = "this.comboboxAccount"
+                                    api="https://localhost:7232/api/v1/Accounts/All"
+                                    isTable="true"
+                                    tabIndex="12"
+                                    :isDisabledInput="isDisabled"
+                                    propValue="AccountId"
+                                    propName="AccountNumber"
+                                    v-model="this.newPaymentDetails[index].CreditAccount"
+                                    @comboboxOutFocus="this.borderErrorCreditAccount = false"
+                                    :inputErrorCombobox = "this.borderErrorCreditAccount"
+                                    :tooltipError = "this.borderErrorCreditAccount"
+                                    :tooltipContent = "this.tooltipContentCreditAccount"
+                                    ></MCombobox>    
+                                </td>
+                                <td class="text-align-right ">
+                                    <MInputMoney
+                                    style="min-width: 176px;width: 176px;"
+                                    tabIndex="13"
+                                    :isDisabled="isDisabled"
+                                    v-model="this.newPaymentDetails[index].Amount"
+                                    ></MInputMoney>
+                                </td>
+                                <td class="text-align-left ">
+                                    <MCombobox
+                                    style="width: 363px; min-width: 175px;width: 175px;"
+                                        v-model="this.newPaymentDetails[index].ObjectId"
+                                        tabIndex="14"
+                                        isTable="true"
+                                        propName="ObjectCode"
+                                        propValue="ObjectId"
+                                        api="https://localhost:7232/api/v1/Objects/GetAll"
+                                        :columns = "this.comboboxObject"
+                                        ref="PaymentObject"
+                                        nameRef="PaymentObject"
+                                        :isDisabledInput="isDisabled"
+                                        @changeObject="getObjectDetail(index, $event)"
+                                    ></MCombobox>
+                                </td>
+                                <td class="text-align-left " style="min-width: 280px;width: 280px;" >{{ newPaymentDetails[index].ObjectName || ""}}</td>
+                                <td
+                                    class="tbl-col tbl-col-delete"
+                                    style="width: 34px; min-width: 34px"
+                                >
+                                    <div class="delete-icon"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot style="position: sticky;bottom: 0;z-index: 1;">
+                        <tr style="border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5;">
+                            <th class="text-align-center no-border" ></th>            
+                            <th class="text-align-center w-200 no-border" style="text-transform: inherit">Tổng</th>
+                            <th class="text-align-left w-150 no-border" ></th>
+                            <th class="text-align-left no-border" style="min-width: 200px;">{{this.newPaymentDetails.Amount}}</th>
+                            <th class="text-align-right w-150 no-border">{{ this.formatMoney(this.newPayment.TotalAmount) }}</th>
+                            <th class="text-align-left w-150 no-border"></th>
+                            <th class="text-align-left no-border" style="min-width: 200px; background-color:#f5f5f5"></th>
+                            <th class="text-align-left no-border" style="min-width: 34px; background-color:#f5f5f5"></th>
+                        </tr>
+                    </tfoot>
+                    </table>
+                </div>
+
                 <div class="payment-action">
                     <MButton 
                     text="Thêm dòng" 
@@ -154,6 +300,7 @@
                     style="font-weight: 600; height: 24px; margin-right: 8px;border-color:#8d9096 ; "
                     tabIndex="15"
                     @click="addRowDetail"
+                    :disable="this.isDisabled"
                     ></MButton>
                     <MButton 
                     text="Xóa hết dòng" 
@@ -161,21 +308,24 @@
                      style="font-weight: 600; height: 24px;border-color:#8d9096 ;"
                     tabIndex="16"
                      @click="deleteRowDetail"
+                     :disable="this.isDisabled"
                      ></MButton>
                 </div>
             </div>
         </div>
         <div class="import-footer">
-            <router-link to="/cash/procedure"
+            <MButton 
               class="btn btn--secondary"
               tabIndex="19"
-              
+              @click="closeForm"
               text="Hủy"
               style="height: 28px;background-color: #38393d; color: #fff; text-decoration: none;box-sizing: border-box; "
             >
-            </router-link>
+            </MButton>
             <div class="flex col-gap-12 form__footer-right">
-                <div class="tooltip">
+                <div class="tooltip"
+                v-if="!this.isDisabled"
+                >
                     <MButton
                         id="btn--save"
                         tabIndex="17"
@@ -187,45 +337,27 @@
                     />
                     <div class="tooltip-text tooltip-text-payment">Ctrl + S</div>
                 </div>
-                <div class="tooltip">
+                <div class="tooltip"
+                    v-if="this.isDisabled"
+                >
                     <MButton
                         id="btn--edit"
                         tabIndex="17"
                         class="btn btn--secondary"
-                        text="Sửa nhanh"
+                        text="Sửa"
                         style="height: 28px; background-color: #38393d; color: #fff"
-                        @click="btnSaveOnClick(false)"
+                        @click="btnEditOnClick"
                     />
                     <div class="tooltip-text tooltip-text-payment">Ctrl + E</div>
                 </div>
 
-                <div class="footer-right-btn">
-                    <div class="tooltip">
-                        <MButton
-                            class="btn btn--primary btn-save-add btnClass"
-                            text="Cất và Thêm"
-                            tabIndex="18"
-                            style="height: 28px; border-top-right-radius: 0; border-bottom-right-radius: 0;"
-                            @click="btnSaveOnClick(true)"
-                            
-                        />
-                        <div class="tooltip-text tooltip-save tooltip-text-payment">
-                            Ctrl + Shift + S
-                        </div>
-                    </div>
-                    <div class="btn-dropdown"
-                        @click="this.isShowDropDownBtn = !this.isShowDropDownBtn"
-
-                    >
-                        <div class="icon btn-dropdown-icon"></div>
-                        <div class="btn-dropdown-list"
-                            v-if="isShowDropDownBtn"
-                        >
-                            <div class="btn-dropdown-item">Cất và Đóng</div>
-                            <div class="btn-dropdown-item">Cất và Thêm</div>
-                        </div>
-                    </div>
-                </div>
+                <MComboButton 
+                :entities="this.comboButton"
+                :textDefault="this.comboButton[this.indexCoboButtonLocal]?.name"
+                :defaultTooltip="this.comboButton[this.indexCoboButtonLocal]?.tooltipText"
+                @clickBtn="clickBtn"
+                />
+                
             </div>
         </div> 
     </div>
@@ -240,37 +372,65 @@
     :message="this.dialogMessage"
     @btnCloseDialog="hideDialogError"
     />
+    <!-- Dialog Warning -->
+    <MDialogWarning
+    v-if="isShowDialogWarning"
+    :message="this.dialogMessage"
+    @btnCloseDialog="hideDialogWarning"
+    @btnClickYes="SavPayment"
+    ></MDialogWarning>
 </template>
 <script>
 import resource from "@/lib/resource";
 import MDialogError from "@/components/bases/Dialog/MDialogError.vue";
+import MDialogWarning from "@/components/bases/Dialog/MDialogWarning.vue";
 import MInput from "@/components/bases/input/MInput.vue";
-import MTableDetail from "@/components/bases/Table/MTableDetail.vue";
+import MInputMoney from "@/components/bases/input/MInputMoney.vue"
 import MDropCombobox from "@/components/bases/combobox/MDropCombobox.vue";
 import MCombobox from "@/components/bases/combobox/MCombobox.vue";
+import MComboButton from "@/components/bases/Button/MComboButton.vue";
 import MDatePicker from "@/components/bases/DatePicker/MDatePicker.vue";
 import MLoading from "@/components/bases/Loading/MLoading.vue";
 import MButton from "@/components/bases/Button/MButton.vue";
-import { HTTPPayments } from '@/script/api';
+import { HTTPPayments, HTTPPaymentsDetails } from '@/script/api';
+import CommonJs from "@/script/common";
+import MISAEnum from '@/lib/enum';
 
 export default {
     name : "PayDetail",
     components: {
     MInput,
     MDropCombobox,
+    MInputMoney,
     MCombobox,
-    MTableDetail,
+    MComboButton,
     MDatePicker,
     MButton,
     MLoading,
     MDialogError,
+    MDialogWarning,
     },
     data(){
       return {
+        isDisabled:false,
+        newPaymentId: null,
+        //Validate PAYMENT
+        tooltipContentDate: null,
+        tooltipContentNumber: null,
+        tooltipContentDebitAccount:null,
+        tooltipContentCreditAccount:null,
+        borderErrorPaymentDate: false,
+        borderErrorNumber:false,
+        borderErrorDebitAccount:false,
+        borderErrorCreditAccount: false,
+        //
+        isEdit: false,
+        textBtnSave: null,
         isShowDropDownBtn: false,
         dialogMessage: null,
         isShowLoading: false,
         idPayment: null,
+        isShowDialogWarning:false,
         isShowDialogError:false,
         //Khởi tạo các thông tin cho đôi tượng patment
         newPayment: {
@@ -285,24 +445,25 @@ export default {
             Reason: "",
             Attachment: 0,
             ReasonType: 0,
-            PaymentDate: "",
-            PostedDate: "",
+            PaymentDate: new Date(),
+            PostedDate: new Date(),
             TotalAmount:0,
             CreatedDate: new Date(),
             CreatedBy: "Hồ Văn Anh ",
             ModifiedDate: new Date(),
             ModifiedBy:"",
         },
-        
         newPaymentDetails: [
             {
-                Description: resource.Vi.PEYMENT.DEFAULT.reason,
+                Description: resource.Vi.PEYMENT.DEFAULT.reason ,
             }
         ],
         errorMessage: [],
         //#region 
         //Text resources
-
+        indexCoboButtonLocal: localStorage.actionSelect,
+        comboboxAccount:resource.COLUMNS_NAME_COMBOBOX_ACCOUNT,
+        comboButton:resource.BUTTON_SAVE_DROPDOWN,
         comboboxEmployee: resource.COLUMNS_NAME_COMBOBOX_EMPLOYEE,
         comboboxObject: resource. COLUMNS_NAME_COMBOBOX_OBJECT,
         listPayDetail: resource.Vi.Combobox,
@@ -312,40 +473,58 @@ export default {
       }
     },
     created(){
-         this.idPayment = this.$router.addRoute;
-        //  this.$router.query.id;
-         
+        this.idPayment = this.$route.query.id;
         if (this.idPayment){
-            console.log("asd");
-        }
-        else {
             this.getPayment(this.idPayment)
         }
-
-
+        else {
+            this.getNewNumber();
+        }
+        console.log("comboButton", this.comboButton[this.indexCoboButtonLocal]);
         this.$nextTick(function () {
             this.$refs.PaymentObject.inputFocus();
         });
     },
     computed: {
         isAdd: function(){
-            if (this.idPayment ){
+            if (!this.idPayment && !this.newPayment.PaymentId){
                 return true;
             }
             return false;
         }
     },
     watch:{
-        
+        newPaymentDetails: function(newValue, oldValue){
+            console.log("total", newValue, oldValue);
+            this.newPayment.TotalAmount = this.newPaymentDetails.reduce((result, current) => {
+                return result += current.Amount;
+
+            }, 0);
+        },
+        deep: true,
     },
     methods: {
+        clickBtn(event){
+            if(!event){
+                this.btnSaveOnClick(true, false);
+            }
+            else {
+                this.btnSaveOnClick(true, true);
+            }
+        },
         /**
          * Hàm ẩn dialog 
          * Author: Văn Anh (23/3/2023)
          */
          hideDialogError(){
             this.isShowDialogError = false;
-            this.inputErrorFocus();
+        },
+          /**
+         * Hàm ẩn dialog 
+         * Author: Văn Anh (23/3/2023)
+         */
+        hideDialogWarning(){
+            this.isShowDialogWarning = false;
         },
         /**
          * Xóa hết các dòng ở bảng detail
@@ -353,9 +532,7 @@ export default {
          */
         deleteRowDetail(){
             this.newPaymentDetails = [
-                {
-                    Description: resource.Vi.PEYMENT.DEFAULT.reason,
-                }
+                
             ]
         },
         /**
@@ -363,8 +540,18 @@ export default {
          * Văn Anh (4/2/2023)
          */
         addRowDetail(){
-            let numberRowDetail = this.newPaymentDetails.length - 1;
-            this.newPaymentDetails = [...this.newPaymentDetails, this.newPaymentDetails[numberRowDetail]]
+            let numberRowDetail = this.newPaymentDetails.length;
+            //copy mảng detail 
+            let newLine = Object.assign({}, this.newPaymentDetails[numberRowDetail - 1]);
+            this.newPaymentDetails = [...this.newPaymentDetails, newLine];
+        },
+        /**
+         * Gán giá trị cho đối tượng dettail
+         * Author: Văn Anh (4/3/2023)
+         */
+        getObjectDetail(index, event){
+            this.newPaymentDetails[index].ObjectCode = event.ObjectCode;
+            this.newPaymentDetails[index].ObjectName = event.ObjectName;
         },
         /**
          * Người dùng chọn đối tượng nhận viên ở combobox và gán lại dữ liệu cho đối tượng payment
@@ -392,12 +579,30 @@ export default {
                 this.newPayment.Receiver = event.ObjectName;
                 this.newPayment.Address = event.Address;
                 this.newPayment.Reason = "Lý do chi " + event.ObjectName;
+
+                this.newPaymentDetails.forEach((item) => {
+                    item.Description =  "Chi tiền cho " +  event.ObjectName;
+                });
             } catch (error) {
                 console.log(error);
             }
         },
-
+        /**
+         * Xử lý click nút sửa bỏ disable các trường nhập liệu => Thực hiện gọi sửa nhân viên
+         * Author: Văn Anh (4/3/2023)
+         */
+        btnEditOnClick(){
+            this.isDisabled = false;
+        },  
         //#region Sự kiện liên quan đến API
+        async getNewNumber(){
+            try {
+                const res = await HTTPPayments.get("/newPaymentNumber");
+                this.newPayment.PaymentNumber = res.data;
+            } catch (error) {
+                console.log(error);
+            }
+        },
         /**
          * Lấy đổi tượng object theo id
          * @param {String} id 
@@ -405,40 +610,48 @@ export default {
         async getPayment(id){
             try {
                 const response = await HTTPPayments.get(`/${id}`);
+                console.log(response);
                 this.newPayment = response.data;
             } catch (error) {
                 console.log(error);
             }
         },
-
+        /**
+         * Xử lý khi số chứng từ bị trùng => Người dùng chọn có sẽ lấy số chứng từ mới và thực hiện cất
+         * Author: Văn Anh (4/4/2023)
+         */
+        SavPayment(event){
+            try {
+                if(event){
+                    console.log(event);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        },
         /**
          * Khi người dùng bấm nút cất hoặc cất và thêm mới
          * Author: Văn Anh (23/3/2023)
          */
-         async btnSaveOnClick(isSaveAndAdd) {
+         async btnSaveOnClick(isSaveAndAdd, isActionBtnClose) {
             try {
                 //Hiển thị loading
                 var valid = this.validateData();
-                //Validate dữ li
+                //Validate dữ liệu
                 if (valid) {
                 this.isShowDialogWarning = false;
                 this.dialogMessage = this.errorMessage[0];
                 this.isShowDialogError = true;
                 } 
                 else {
-                this.isShowLoading = true;
-                if(this.newPayment.PaymentId){
-                    this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.EDIT)
-                }
-                else {
-                    if (this.isAdd) {
-                        this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD);
+                    this.isShowLoading = true;
+                    //Thêm hoặc nhân bản chi phiếu
+                    if(this.isAdd){
+                        this.handleSubmitAdd( isSaveAndAdd,resource.FORM_MODE.ADD, isActionBtnClose );
                     }
-                    else if (this.isDuplicate) {
-                        this.handleSubmit(isSaveAndAdd, false, resource.FORM_MODE.DUPLICATE)
-                    
+                    else {
+                        this.handleSubmitEdit(isSaveAndAdd,resource.FORM_MODE.EDIT)
                     }
-                }
                 this.isShowLoading = false;
             }
             } catch (error) {
@@ -451,10 +664,10 @@ export default {
          * Hàm gọi API Thêm hoặc sủa chi phiếu
          * Author: Văn Anh (4/1/2023)
          */
-         async handleSubmit(isSaveAndAdd, isAdd ,  toastMessage){
+         async handleSubmitAdd(isSaveAndAdd ){
             try {
-                const response = isAdd 
-                ? await HTTPPayments.post("",{
+                 this.isShowLoading = true;
+                await HTTPPayments.post("",{
                     PaymentNumber: this.newPayment.PaymentNumber,
                     EmployeeId: this.newPayment.EmployeeId,
                     EmployeeName:this.newPayment.EmployeeName,
@@ -474,35 +687,99 @@ export default {
                     ModifiedDate: new Date(),
                     ModifiedBy:"",
                 })
-                : await HTTPPayments.put(`/${this.newPayment.PaymentId}`,{
-                    PaymentNumber: this.newPayment.PaymentNumber,
-                    EmployeeName:this.newPayment.EmployeeName,
-                    ObjectCode: this.newPayment.ObjectCode,
-                    ObjectName: this.newPayment.ObjectName,
-                    Receiver: this.newPayment.Receiver,
-                    Address: this.newPayment.Address,
-                    Reason: this.newPayment.Reason,
-                    Attachment: this.newPayment.Attachment,
-                    ReasonType: this.newPayment.ReasonType,
-                    PaymentDate: this.newPayment.PaymentDate,
-                    PostedDate: this.newPayment.PostedDate,
-                    TotalAmount:this.newPayment.TotalAmount,
-                });
-                if (response){
-                    this.$emit("changeToastMsg",toastMessage,false,true, resource.NOTIFICATION_TITLE.SUCCESS);
-                    this.$emit("onshowToast");
-                    this.$emit("reloadData");
-                }
-                if (isSaveAndAdd) {
-                    this.isAdd = true;
-                    this.newAccount ={};
-                }
-                else {
-                    this.$emit("closeDetail");
-                }
+                .then((response) =>{
+                    this.isShowLoading = false;
+                    //Gán paymentId cho đối tượng detai;
+                    this.newPaymentDetails = this.newPaymentDetails.map((item) => {
+                        return {
+                            ...item,
+                            PaymentId :  response.data,
+                        };
+                    });
+
+                    this.handleAddPaymentDetail();     
+                    this.GetPaymentDetailById();
+                    if(!isSaveAndAdd){
+                        this.newPayment.PaymentId = response.data;
+                        this.isDisabled = true;
+                    }
+                    else if (this.indexCoboButtonLocal == "0"){
+                        this.resetForm();
+                    }
+                    else {
+                        this.closeForm();
+                    }
+                })
+                .catch(error => {
+                    this.handleException(error)
+                })
+                
             } catch (error) {
+                this.isShowLoading = false;
                 console.log(error);
                 this.handleException(error)
+            }
+        },
+        /**
+         * Handle Sủa phiếu chi
+         * Author: Văn Anh (4/3/2023)
+         */
+        async handleSubmitEdit(isEdit, toastMessage){
+            try {
+                const response = await HTTPPayments.put(`/${this.newPayment.PaymentId}`,[
+                    {
+                        PaymentNumber: this.newPayment.PaymentNumber,
+                        EmployeeName:this.newPayment.EmployeeName,
+                        ObjectCode: this.newPayment.ObjectCode,
+                        ObjectName: this.newPayment.ObjectName,
+                        Receiver: this.newPayment.Receiver,
+                        Address: this.newPayment.Address,
+                        Reason: this.newPayment.Reason,
+                        Attachment: this.newPayment.Attachment,
+                        ReasonType: this.newPayment.ReasonType,
+                        PaymentDate: this.newPayment.PaymentDate,
+                        PostedDate: this.newPayment.PostedDate,
+                        TotalAmount:this.newPayment.TotalAmount,
+                    }
+                ]);
+                if(response){
+                console.log(toastMessage);
+                    
+                    this.newPaymentDetails.PaymentId = response.data;
+                    this.newPayment.PaymentId = response.data;
+                    this.isDisabled = true;
+                }
+            } catch (error) {
+            console.log(error);
+            }
+        },
+        /**
+         * Api Thêm payment details 
+         * Author: Văn Anh (4/3/2023)
+         */
+        async handleAddPaymentDetail(){
+            try {
+                const response = await HTTPPaymentsDetails.post("/InsertMany", this.newPaymentDetails)
+                this.newPaymentDetails = response.data;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Lấy detail theo id 
+         * Author: văn Anh (4/4/2023)
+         */
+        async GetPaymentDetailById(){
+            try {
+                const response = await HTTPPaymentsDetails.get("/Id", this.newPaymentDetails, {
+                    headers: {
+                        "access-control-allow-origin": "https://localhost:7232 ",
+                        "content-type": "application/json; charset=utf-8"
+                    }
+                });
+                this.newPaymentDetails = response.data;
+            } catch (error) {
+                console.log(error);
             }
         },
         //#endregion
@@ -511,13 +788,39 @@ export default {
         validateData(){
             try {
                 this.errorMessage = [];
+                //Số phiếu chi
                 if (!this.newPayment.PaymentNumber){
                     this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.TILE_PAYMENT_NUMBER)
-                    this.$nextTick(function () {
-                        this.$refs.PaymentNumber.inputFocus();
-                    });
+                    this.borderErrorNumber = true;
+                    this.tooltipContentNumber = resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.TILE_PAYMENT_NUMBER
                 }
+                else if(this.newPayment.PaymentNumber > MISAEnum.MAX_LENGTH_PAYMENT.NUMBER){
+                    this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.TITLE_PAYMENT_NUMBER_OUTLENGTH)
+                    this.borderErrorNumber = true;
+                    this.tooltipContentNumber = resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.TITLE_PAYMENT_NUMBER_OUTLENGTH
+                }
+                else {
+                    this.borderErrorNumber = false;
+                }
+
+                //Ngày chi phiếu
+                if (this.newPayment.PaymentDate && this.newPayment.PostedDate){
+                    let paymentDate = new Date(this.newPayment.PaymentDate);
+                    let postedDate = new Date(this.newPayment.PaymentDate);
+                    console.log("date", paymentDate.getTime(), postedDate.getTime());
+                    if (paymentDate.getTime() < postedDate.getTime()){
+                        this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.ITTLE_ERROR_DATE);
+                        this.borderErrorPaymentDate = true;
+                        this.tooltipContentDate= resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.ITTLE_ERROR_DATE
+                    }
+                }
+
+                //Detail
+                this.validateDetail();
+
+
                 if (this.errorMessage.length > 0) {
+
                     return true;
                 }
                 return false;
@@ -525,7 +828,70 @@ export default {
                 console.log(error);
             }
         },
+        /**
+         * Hàm validate cho đối tượng detail
+         * Author: Văn Anh (4/3/2023)
+         */
+        validateDetail(){
+            for(let i = 0; i < this.newPaymentDetails.length; i++) {
+                if(!this.newPaymentDetails[i].DebitAccount){
+                    this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.DETAIL.DEBIT_ACCOUNT_ERROR);
+                    this.borderErrorDebitAccount = true;
+                    this.tooltipContentDebitAccount= resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.DETAIL.DEBIT_ACCOUNT_ERROR
+                }
+                else{
+                    this.borderErrorDebitAccount = false;
 
+                }
+
+                if(!this.newPaymentDetails[i].CreditAccount){
+                    this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.DETAIL.CREBIT_ACCOUNT_ERROR);
+                    this.borderErrorCreditAccount = true;
+                    this.tooltipContentCreditAccount= resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.DETAIL.CREBIT_ACCOUNT_ERROR
+                }
+                else {
+                    this.borderErrorCreditAccount = false;
+
+                }
+            }
+        },
+        /**
+     * Hàm xử lý lỗi trả về
+     * @param {Mã lỗi} error 
+     * Author: Văn ANh(3/2/2023)
+     */
+    handleException(error) {
+      console.log(error);
+      if (error.response.status == resource.STATUSCODE.BadRequest) {
+        switch (error.response.data.ErrorCode) {
+          case MISAEnum.ERRORCODE.DuplicateCode:
+            this.isShowLoading = false;
+            //Trả về lỗi 400 thì hiển thị thông báo mã đã bị trùng
+            this.dialogMessage = error.response.data.UserMsg;
+            this.isShowDialogError = true;
+            this.$refs.PaymentNumber.inputFocus();
+            break;
+          // eslint-disable-next-line
+          case MISAEnum.ERRORCODE.InvalidInput:
+            this.dialogMessage = error.response.data.userMsg;
+            break;
+          default:
+            break;
+        }
+      } 
+      else if (error.response.status == resource.STATUSCODE.ServerError) {
+        this.dialogMessage = error.response.data.userMsg;
+        this.isShowDialog = true;
+      }
+      else {
+        for(const property in resource.STATUSCODES) {
+          if(error.response.status == property.Code) {
+            this.dialogMessage = property.Message;
+            this.isShowDialog = true;
+          }
+        }
+      }
+    },
         //#endregion
 
         //#region Sự kiện liên quan đến phím tắt
@@ -550,7 +916,32 @@ export default {
                 
             }
         },
+        /**
+         * Hàm định dạng tiền tệ
+         * @param {String} money
+         * Author: Văn Anh (15/3/2023) 
+         */
+        formatMoney(money){
+            return CommonJs.formatMoney(money);
+        },
+        /**
+         * Xử lý khi click đóng form trước về trang trước
+         * Author: Văn Anh (4/3/2023)
+         */
+        closeForm(){
+            this.$router.go(-1);
+        },
+        resetForm(){
+            this.newPayment = {
+            
+            };
+            this.newPaymentDetails = [
+                {
 
+                    Description: resource.Vi.PEYMENT.DEFAULT.reason,
+                },
+            ]
+        }
         //#endregion
     },
     mounted() {
@@ -565,6 +956,7 @@ export default {
 </script>
 <style scoped>
 @import url(./pay.css);
+@import url(../../../components/bases/Table/table.css);
 .payment-btn-save {
     margin: 0 8px;
     color: #fff;
@@ -613,5 +1005,27 @@ export default {
 }
 .tooltip-text-payment{
     top: -29px;
+}
+.disable::after{
+    position: absolute;
+    content:"";
+    width: 100%;
+    height: 100%;
+    background-color: #e5f3ff;
+}
+tr:hover, tr:hover > td:last-child{
+    background-color: #e5f3ff!important;
+}
+table{
+    width: 100%;
+}
+th:last-child {
+    background-color: #f5f5f5!important;
+}
+td:last-child{
+    background-color: #fff;
+}
+.combobox__button {
+    background-color: #fff;
 }
 </style>

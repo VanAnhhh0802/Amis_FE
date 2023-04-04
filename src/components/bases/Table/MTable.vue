@@ -49,9 +49,9 @@
                     <td class="text-align-left w-150">{{ item.PaymentNumber|| "" }}</td>
                     <td class="text-align-left w-150">{{ item.Reason || ""}}</td>
                     <td class="text-align-right w-150">{{ this.formatMoney(item.TotalAmount) || ""}}</td>
-                    <td class="text-align-left min-w-200">{{ item.ObjectCode || ""}}</td>
-                    <td class="text-align-left min-w-200">{{ item.ObjectName || ""}}</td>
-                    <td class="text-align-left min-w-200">{{ item.Address || ""}}</td>
+                    <td class="text-align-left min-w-200">{{ item.ObjectCode}}</td>
+                    <td class="text-align-left min-w-200">{{ item.ObjectName}}</td>
+                    <td class="text-align-left min-w-200">{{ item.Address }}</td>
                     <td class="text-align-center w-100 tb-function"
                     :class="{employee__active: this.paymentSelected.includes(item.PaymentId) }"
                     
@@ -105,8 +105,8 @@
       :style="[isDropdown ? dropdownPosition : dropdownPositionReverse]"
     >
       <ul class="dropdown-list">
-        <li class="dropdown_list-item">Xem</li>
         <li class="dropdown_list-item">Sửa</li>
+        <li class="dropdown_list-item">Nhân bản</li>
         <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete">
           Xóa
         </li>
@@ -155,6 +155,7 @@ export default {
     },
     watch: {
         entities: function(newValue) {
+            console.log("entities entit", newValue);
             if(this.entities.length == 0){
                 this.isNoData = true;
             }
@@ -168,18 +169,18 @@ export default {
         item : function() {
             console.log("item table",this.item);    
         }
-    },  
+    }, 
+    
     props:{
         isCheckbox: Boolean,
-        entities: { 
-            type: Array, 
-        },
+        entities: Array,
     },
     emits: ["deleteResponse","showToolbar","listId"],
     created(){
-         this.entities.forEach((item) => {
-            this.totalMoney += item.TotalAmount;
-        });
+        console.log("entities entit", this.entities);   
+    //      this.entities.forEach((item) => {
+    //         this.totalMoney += item.TotalAmount;
+    //     });
     },
      
     data(){
@@ -219,7 +220,6 @@ export default {
          * Authot: Văn Anh(29/3/2023)
          */
         btnWatchClick(id){
-            console.log(id);
             this.$router.push({
                 path: "/pay/pay-detail",
                 query: {id : id}

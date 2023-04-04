@@ -12,5 +12,8 @@ export const HTTPAccounts  = axios.create({
 })
 export const HTTPPayments = axios.create({
   baseURL: "https://localhost:7232/api/v1/Payments"
-
 })
+export const HTTPPaymentsDetails = axios.create({
+  baseURL: "https://localhost:7232/api/v1/PaymentDetails"
+})
+

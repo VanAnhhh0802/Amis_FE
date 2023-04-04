@@ -9,7 +9,7 @@
             </button>
             <button
             class="btn-function__dropdown"
-            @click="showOnDropMenu($event, data.AccountId, data.AccountNumber, data.IsActive)"
+            @click="showOnDropMenu($event, data.AccountId, data.AccountNumber, data.IsActive, data.ParentId, data.AccountId, data.IsParent)"
             v-click-outside-element="hideDropMenu" 
             >
             <div class="icon w-h-24 function-dropdown-icon"></div>
@@ -33,7 +33,7 @@
           Xóa
         </li>
         <li class="dropdown_list-item"
-        @click="handleAccountActive(data.AccountId, data.IsParent, isShowActive)"
+        @click="isShowActive ?  handleAccountActive(data.AccountId, data.IsParent, isShowActive) : data.IsParent ? confirmActive() : handleAccountActive(data.AccountId, data.IsParent, isShowActive, data.ParentId)"
         >
         {{isShowActive ? "Ngừng sử dụng" : "Sử dụng"}}
         </li>
@@ -67,12 +67,18 @@
         </template>
       </MDialog>
       <MDialogError
-      v-if="isShowDialogErr"
+      v-if="isShowDialogErr = true"
       :title="this.titleError"
       :message="this.messageError"
       @btnCloseDialog="closeDialog"
       ></MDialogError>
-  </div>
+    </div>
+    <MDialogWarning 
+    v-if="isShowDialogWarning"
+    :message="this.dialogMessage"
+    @closeDialog="closeDialogWarning()"
+    @btnClickYes="btnDialogWarningClickYes"
+  />
   <MLoading
   v-if="isShowLoading"
   ></MLoading>
@@ -83,11 +89,13 @@ import MDialog from '../Dialog/MDialog.vue';
 import MDialogError from '../Dialog/MDialogError.vue';
 import MLoading from "../../bases/Loading/MLoading.vue";
 import { HTTPAccounts } from '@/script/api';
+import MDialogWarning from '../Dialog/MDialogWarning.vue';
 export default {
     name: "MFeatureDetail",
     components:{
       MDialog,
       MDialogError,
+      MDialogWarning,
       MLoading
     },
     props:{
@@ -96,8 +104,12 @@ export default {
     emits:["showFormEdit","reloadData","showDuplicate"],
     data(){
       return{
+          accountId:  null,
+          isParent: false,
+          parentIdChildren: null,
+          dialogMessage:null,
           isShowActive:false,
-          
+          isShowDialogWarning: false,
             //Khai báo biến liên quan đến loading
             isShowLoading: false,
             //Khai biến liên quan đến drop menu
@@ -118,9 +130,19 @@ export default {
       }
     },
     created(){
-
     },
     methods: {
+      btnDialogWarningClickYes(){
+        this.isShowDialogWarning = false;
+        this.handleAccountActive(this.accountId, this.isParent, this.isShowActive);
+      },
+      closeDialogWarning(){
+        this.isShowDialogWarning= false
+      },
+      confirmActive(){
+        this.dialogMessage = resource.Vi.ACCOUNT.DIALOG.TITLE_ACCOUNT_PARENT_ACTIVE;
+        this.isShowDialogWarning = true;
+      },
       /**
        * Xét trạng thái của active cho tài khoản
        * @param {String} id - id của tài khoản
@@ -131,12 +153,6 @@ export default {
        */
       async handleAccountActive(accountId, isParent, isActive, childrenActive){
         try {
-          if(isActive){
-            isActive = 0;
-          }
-          else {
-            isActive = 1;
-          }
           //Kiểm tra nếu là tài khoản cha
           if (isParent) {
             //Nếu không là con
@@ -149,32 +165,56 @@ export default {
                 childrens = response.data
 
                 childrens.forEach((account) => {
-                  console.log(this.accountIds);
                   if (accountIds.includes( account.ParentId) ) {
                     accountIds.push(account.AccountId) ;
                   }
                 });
                 //Gọi api sửa
-                 await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId, ...accountIds])
+                 await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId, ...accountIds])
                 .then(res => {
                   console.log(res);
-                  this.$emits("activeResponse");
+                  // this.$emits("activeResponse");
+              this.$parent.reloadData();
                 })
-            } else {
-              await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId])
+            } 
+            else {
+              await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
               .then(res => {
                 console.log(res);
-                this.$emits("activeResponse");
-
+                // this.$emits("activeResponse");
+              this.$parent.reloadData();
               })
             }
-          } else {
-            await HTTPAccounts.put(`UpdateActive?${isActive}`,[accountId])
-            .then(res => {
-              console.log(res);
-              this.$emits("activeResponse");
-
-            })
+          } 
+          else {
+            if(this.parentIdChildren && this.parentIdChildren != 0){
+              //Check trạng thái tài khoản cha
+              const response = await HTTPAccounts.get(`/${this.parentIdChildren}`);
+              if(response){
+                var parentActive = response.data.IsActive;
+                //Nếu tài tài khoản cha Đang là Ngừng sử dụng thì show lỗi
+                if (!parentActive){
+                  this.isShowDialog = true;
+                  this.dialogMessage = resource.Vi.ACCOUNT.DIALOG.TITLE_ACCOUNT_CHILDREN_ACTIVE;
+                  this.isShowDialogWarning = true;
+                }
+                else{
+                  await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
+                  .then(res => {
+                    console.log(res);
+                      this.$emits("activeResponse");
+                  })
+                }
+              }
+            }
+            else{
+              //Ngươc lại thực hiện sửa
+              await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
+              .then(res => {
+                console.log(res);
+                  this.$emits("activeResponse");
+              })
+            }
           }
         } catch (error) {
           console.log(error);
@@ -215,11 +255,13 @@ export default {
          * Hiển thị drop menu
          * Athor: Văn Anh(21/12/2022)
          */
-        showOnDropMenu(e, id, code, active) {
+        showOnDropMenu(e, id, code, active, parentId, accountId, isParent) {
         try {
             //Check trạng thái của active
             this.checkActive(active);
-            
+            this.parentIdChildren = parentId;
+            this.accountId  = accountId;
+            this.isParent = isParent;
             //Xét vị trí cho dropdown
             if (e.clientY > 560){
             this.isDropdown = false;
