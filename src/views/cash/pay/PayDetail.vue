@@ -166,7 +166,6 @@
                     @inputOutFocus="this.borderErrorNumber = false"
                     :isDisabled="this.isDisabled"
                     maxLength="20"
-
                     />
                 </div>
                 <div class="container-right">

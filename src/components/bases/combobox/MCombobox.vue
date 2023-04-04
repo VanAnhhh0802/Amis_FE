@@ -177,23 +177,16 @@ export default {
       this.entitySearch = [...this.options]
       this.entities = [...this.options]
     }
+    this.setItemSelected();
   },
   updated(){
-    if(this.textSelected){
-      this.setItemSelected();
-    }
+    
   },
   watch: {
-    modelValue: {
-      handler: function () {
-        // if (!newValue && !this.defaultName) {
-        //   this.textSelected = "";
-        // }
-        if (this.modelValue || this.modelValue === 0) {
-        this.setItemSelected();
-        }
-      },
-      // immediate: true,
+    modelValue: function (newValue) {
+      console.log("newValue: " + newValue);
+      // this.textSelected = newValue;
+      this.findIdexSelected = newValue;
     },
     
     /**
@@ -206,15 +199,16 @@ export default {
     /**
      * Hàm theo dõi text combobox sau khi đc chọn
      */
-    // textSelected: {
-    //   handler: function (newValue) {
-    //     if (!newValue) {
-    //       this.$emit("update:modelValue", "");
-    //     }
-    //   this.$emit("update:modelValue", newValue);
-    //   },
-    //   immediate: true,
-    // },
+    textSelected: {
+      handler: function (newValue) {
+        console.log("textSelected: " + newValue);
+        if (!newValue) {
+          this.$emit("update:modelValue", "");
+        }
+      this.$emit("update:modelValue", newValue);
+      },
+      immediate: true,
+    },
   },
   computed: {
     /**
@@ -345,7 +339,6 @@ export default {
         this.entitySearch = this.entities;
         //Gán item đang đc chọn cho entity
         this.itemSelected = entity;
-        this.$emit("changeGrande", this.itemSelected?.Grade);
         this.$emit("changeObject", this.itemSelected);
         //set index của item được chọn
         this.indexItemSelect = me.findIdexSelected;
@@ -373,11 +366,7 @@ export default {
 
         //Truyền bậc của tài khoản cha 
         if(this.isTable){
-          if(entitySelected.Grade){
-            this.$emit("changeGrade", entitySelected.Grade)
             this.$emit("parentAccountNumber", entitySelected.AccountNumber)
-
-          }
         }
 
         //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input

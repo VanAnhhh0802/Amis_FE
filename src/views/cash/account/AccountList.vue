@@ -75,7 +75,7 @@
           <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
           <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
           <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" style="display: none"/>
-          <DxColumn :width="100" data-field="IsParent" caption="cha" style="display: none"/>
+          <DxColumn :width="0" data-field="IsParent" caption="" style="display: none"/>
           <DxColumn :width="150"  caption="Chức năng" cell-template="functionTemplate" />
           <template #functionTemplate="{ data: options }">
             <MFeatureDetail :data="options.data"
@@ -360,7 +360,6 @@ export default {
        * Author: Văn Anh (19/3/2023)
        */
       btnDbClick(e){
-        console.log(e.data);
         this.handleClickEdit(e.data.AccountId)
       },
       /**
@@ -480,5 +479,7 @@ export default {
   .dx-treelist .dx-column-lines > td:nth-child(7),
   .dx-treelist .dx-row > td:nth-child(7){
     display: none;
+    padding: 0;
   }
+  
 </style>

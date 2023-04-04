@@ -101,51 +101,7 @@
                     </div>
                 </div>
             </div>
-        
         </vue-resizable>
-        <!-- <div class="detail-payment" :style="{ height: heightDetail + 'px' }">
-            <div class="content__list" style="height: 100%;box-sizing: border-box;" >
-                <div class="flex list__header" style="justify-content: space-between; margin-bottom: 0; background-color:#eceef1;">
-                    <div class="toolbar__detail">Chi tiết</div>
-                </div>
-                <MTableDetail
-                    :entities = "payments"
-                ></MTableDetail>
-                <div class="content__footer">
-                    <div class="content--left">
-                    <div class="total-record">
-                        Tổng số :
-                        <b>{{ this.totalRecord }}</b>
-                        bản ghi
-                    </div>
-                    </div>
-                    <div class="content--right">
-                        <div class="flex pagination">
-                            
-                            <MDropCombobox
-                            :pageNumberRecord="this.pagination"
-                            v-model="this.pageSize"
-                            @pageSize="setPageSize"
-                            :total="this.paging"
-                            :default="this.paging[1].value"
-                            style="min-width:200px"
-                            styleData="top: -143px!important"
-                            ></MDropCombobox>
-                            <paginate
-                            :page-count="this.totalPage"
-                            :page-range="2"
-                            :margin-pages="1"
-                            :click-handler="clickCallback"
-                            :prev-text="'Trước'"
-                            :next-text="'Sau'"
-                            :container-class="'pagination'"
-                            :page-class="'page-item'"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
     <MLoading
     v-if="isShowLoading"

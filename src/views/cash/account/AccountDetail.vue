@@ -72,7 +72,7 @@
                         :tabIndex="4"
                         :columns = "this.comboboxAccount"
                         isTable="true"
-                        @changeGrade="newAccount.Grade = $event ? $event + 1 : newAccount.Grade; "
+                        @changeObject="setGrade"
                         @parentAccountNumber="this.parentNumber = $event"
                         @removeParentId="removeParentId"
                         ></MComboboxV2>
@@ -95,6 +95,8 @@
                             :inputErrorCombobox = "this.borderNatureError"
                             :tooltipError = "this.borderNatureError"
                             :tooltipContent = "this.tooltipContentNature"
+                            @changeObject="setType"
+
                         ></MCombobox>
                     </div>
                 </div>
@@ -637,7 +639,17 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
         
     },
     methods: {
-
+        setType(event){
+            console.log("event: " + event);
+        },
+        /**
+         * Set lại grade nếu là con của tài khoản tổng hợp
+         * @param {*} event 
+         * Author: Văn ANh (4/4/2023)
+         */
+        setGrade(event){
+            this.newAccount.Grade = event.Grade + 1;
+        },
         /**
          * Hàm đóng dialog warning
          * Author: Văn ANh(28/3/2023)
@@ -740,14 +752,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
             this.parentNumber = "",
             this.newAccount.Grade = 1
         },
-        /**
-         * Nếu là tài khoản tổng hợp thì cộng bậc của tài khoản cha lên + 1
-         * Author: Văn Anh(25/3/2023)
-         */
-        SetGradeAccount(event){
-            this.newAccount.Grade = event ? event + 1 : this.newAccount.Grade;
-            console.log("grade: " + this.newAccount.Grade);
-        },
+        
         /**
          * Hàm xử lý nhấn save 
          * Author: Văn Anh (23/3/2023)
@@ -864,7 +869,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 this.isShowDialogError = true;
                 } else {
                 this.isShowLoading = true;
-                if(this.isAdd || this.DuplicateAccount){
+                if(!this.newAccount.AccountId || this.DuplicateAccount){
                     this.handleSubmit(isSaveAndAdd, true, resource.FORM_MODE.ADD)
                 }
                 else {

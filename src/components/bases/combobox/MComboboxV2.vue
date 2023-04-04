@@ -158,6 +158,7 @@
           .get(this.api)
           .then((data) => {
             this.entities = [...data.data]; 
+            console.log("data", this.entities);
             this.entitySearch = data.data;
             //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
             // this.entitySearch = data.data;
@@ -169,14 +170,7 @@
             console.log(response);
           });
       }
-      else {
-        this.entitySearch =[...this.list];
-        this.entities =[...this.list];
-      }
-      if (this.options){
-        this.entitySearch = [...this.options]
-        this.entities = [...this.options]
-      }
+      
     },
     updated(){
       if(this.textSelected){
@@ -249,7 +243,6 @@
        */
       inputOnKeyDown(event) {
         try {
-          console.log(event);
           const keyCode = event.keyCode;
           switch (keyCode) {
             case this.MISAEnum.KEY_CODE.ENTER:
@@ -340,14 +333,14 @@
        */
       itemOnSelect(entity) {
         try {
-            console.log("click");
           var me = this;
           //Sau khi chọn 1 trường thì thực hiện reset lại danh sách
           this.entitySearch = this.entities;
           //Gán item đang đc chọn cho entity
           this.itemSelected = entity;
-          this.$emit("changeGrande", this.itemSelected?.Grade);
+          // this.$emit("changeGrande", this.itemSelected?.Grade);
           this.$emit("changeObject", this.itemSelected);
+          console.log(this.$emit("changeObject", this.itemSelected));
           //set index của item được chọn
           this.indexItemSelect = me.findIdexSelected;
           this.textSelected = entity[this.propName];
@@ -375,7 +368,6 @@
           //Truyền bậc của tài khoản cha 
           if(this.isTable){
             if(entitySelected.Grade){
-              this.$emit("changeGrade", entitySelected.Grade)
               this.$emit("parentAccountNumber", entitySelected.AccountNumber)
   
             }

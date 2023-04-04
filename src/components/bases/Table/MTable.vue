@@ -105,7 +105,9 @@
       :style="[isDropdown ? dropdownPosition : dropdownPositionReverse]"
     >
       <ul class="dropdown-list">
-        <li class="dropdown_list-item">Sửa</li>
+        <li class="dropdown_list-item"
+            @click="handleEdit"
+        >Sửa</li>
         <li class="dropdown_list-item">Nhân bản</li>
         <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete">
           Xóa
@@ -214,7 +216,31 @@ export default {
     },
     methods: {
         //#region Hàm liên quan đến xử lý sự kiện
-        
+        handleDuplicate(){
+            try {
+                this.$router.push({
+                path: "/pay/pay-detail",
+                query: {id : this.deleteId}
+            })
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        /**
+         * Xử sủa chứng từ
+         * Author: Văn Anh (4/4/2023)
+         */
+        handleEdit(){
+            try {
+                this.$router.push({
+                path: "/pay/pay-detail",
+                query: {id : this.deleteId}
+            })
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
         /**
          * Hàm click btn xem chứng từ 
          * Authot: Văn Anh(29/3/2023)

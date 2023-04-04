@@ -1,4 +1,3 @@
-import MISAEnum  from "../lib/enum.js";
 
 const commonJs = {
     formatDate(date) {
@@ -75,18 +74,17 @@ const commonJs = {
       return active;
     },
     formatTypeAccount(type){
-      if (MISAEnum.TypeAccount.DEBT === 1){
+      if (type === 1){
         type = "Dư nợ"
-
       }
-      else if (MISAEnum.TypeAccount.HERMAPHRODITE === 2){
-        type = "Lưỡng tính"
-      }
-      else if (MISAEnum.TypeAccount.SURPLUS === 3){
+      else if (type === 2){
         type = "Dư có"
       }
-      else if(MISAEnum.TypeAccount.SURPLUS === 4) {
-        type = "Khống có số dư"
+      else if (type === 3){
+        type = "Lưỡng tính"
+      }
+      else if(type === 4) {
+        type = "Không có số dư"
       }
       else {
         type = ""
