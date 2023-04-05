@@ -108,7 +108,9 @@
         <li class="dropdown_list-item"
             @click="handleEdit"
         >Sửa</li>
-        <li class="dropdown_list-item">Nhân bản</li>
+        <li class="dropdown_list-item"
+        @click="handleDuplicate"
+        >Nhân bản</li>
         <li id="btn-delete" class="dropdown_list-item" @click="showOnDialogDelete">
           Xóa
         </li>
@@ -149,6 +151,7 @@ import commonJs from '@/script/common';
 import MDialog from '@/components/bases/Dialog/MDialog.vue';
 import MLoading from "../Loading/MLoading.vue";
 import { HTTPPayments } from '@/script/api';
+import MISAEnum from '@/lib/enum';
 export default {
     name: 'MTable',
     components: {
@@ -180,9 +183,9 @@ export default {
     emits: ["deleteResponse","showToolbar","listId"],
     created(){
         console.log("entities entit", this.entities);   
-    //      this.entities.forEach((item) => {
-    //         this.totalMoney += item.TotalAmount;
-    //     });
+         this.entities.forEach((item) => {
+            this.totalMoney += item.TotalAmount;
+        });
     },
      
     data(){
@@ -218,10 +221,11 @@ export default {
         //#region Hàm liên quan đến xử lý sự kiện
         handleDuplicate(){
             try {
+                console.log("click");
                 this.$router.push({
                 path: "/pay/pay-detail",
-                query: {id : this.deleteId}
-            })
+                query: {id : this.deleteId, formMode : MISAEnum.Mode.Duplicate}
+                })
             } catch (error) {
                 console.log(error);
             }
@@ -248,7 +252,7 @@ export default {
         btnWatchClick(id){
             this.$router.push({
                 path: "/pay/pay-detail",
-                query: {id : id}
+                query: {id : id, formMode: MISAEnum.Mode.Watch}
             })
         },
         /**
@@ -342,8 +346,6 @@ export default {
                 if (this.paymentSelected.length >= 2) {
                 this.isShowToolbar = true;
                 this.$emit("showToolbar", this.isShowToolbar);
-                console.log(this.$emit("showToolbar", this.isShowToolbar));
-
                 }
                 else {
                 this.isShowToolbar = false

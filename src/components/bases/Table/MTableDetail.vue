@@ -4,10 +4,13 @@
             <thead>
                 <tr>
                     <th
+                    :style="{
+                        text-align : column.align,
+                    }"
                     v-for="(column, index) in columnsTh"
                     :key="index"
                     >
-                    {{column.columnName}}
+                    {{column.columnName, column.align}}
                     </th>
                 </tr>
             </thead>

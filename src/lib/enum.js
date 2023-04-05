@@ -7,6 +7,7 @@ const MISAEnum = {
     Add: 0, // Trạng thái thêm
     Edit: 1, // Trạng thái sửa
     Duplicate:2, //Trạng thái nhân bản
+    Watch: 4, //Trạng thái xem 
   },
   StatusCode: {
     OK: 200, //Trả về thành công ở những phương thứ như GET, POST , PUT , DELETE

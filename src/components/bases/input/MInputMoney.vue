@@ -8,13 +8,18 @@
         style="text-align: right;"
         :disabled="isDisabled"
         @blur="inputBlur"
+        :maxlength="maxLength"
       />
     </div>
   </template>
   <script>
   export default {
     name: "MInputMoney",
-    props: ["modelValue", "isDisabled"],
+    props: {
+      isDisabled: Boolean,
+      maxLength: Number,
+      modelValue: String
+    },
     emits: ["update:modelValue", "blurInput"],
     data() {
       return {

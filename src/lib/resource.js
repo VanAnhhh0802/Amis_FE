@@ -405,13 +405,20 @@ export default {
         TILE_PAYMENT_NUMBER: "Số phiếu chi không được để trống",
         TITLE_PAYMENT_NUMBER_OUTLENGTH: "Số phiếu chi không được lớn hơn 20 ký tự",
         TITLE_ERROR_DATE: "Ngày hạch toán phải lớn hơn hoặc bằng Ngày chứng từ. Xin vui lòng kiểm tra lại.",
+        PAYMENT_DATE: "Ngày hạch toán không được để trống.",
+        POSTED_DATE:"Ngày chi phiếu không được để trống.",
         DETAIL: {
           DEBIT_ACCOUNT_ERROR: "Tài khoản nợ không được để trống",
-          CREBIT_ACCOUNT_ERROR: "Tài khoản có không được để trống"
+          CREBIT_ACCOUNT_ERROR: "Tài khoản có không được để trống",
+          ADD_DETAIL_SUCCESS: "Thêm chi phiếu",
+          EDIT_DETAIL_SUCCESS: "Sửa chi phiếu",
+          DUPLICATE_DETAIL_SUCCESS: "Nhân bản chi",
+          NO_DETAIL: "Bạn phải nhập chứng từ chi tiết.",
         }
       },
       DEFAULT:{
-        reason: "Chi tiền cho"
+        reason: "Chi tiền cho",
+
       }
     }
   },

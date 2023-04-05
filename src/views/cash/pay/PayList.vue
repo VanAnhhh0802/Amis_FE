@@ -412,6 +412,7 @@ export default {
             if(response){
                 this.isShowLoading = false;
                 await this.listPayments(this.keyword, this.pageSize, this.pageNumber);
+                this.isShowToolbar = false;
             }
 
         } catch (error) {

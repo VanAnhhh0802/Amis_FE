@@ -58,14 +58,18 @@
       </a>
     </div>
     <!-- TABLE -->
-    <div class="wrapper-table" v-if="isTable && isShowData && !isDisabledInput">     
+    <div class="wrapper-table" v-if="isTable && isShowData && !isDisabledInput"
+      :style="{'position': position,'top': top,'right': right}"
+    >     
       <table class="table table-cbo">
           <tbody class="tbd" ref="refList">
-              <tr class="table-row">
+              <tr class="table-row"
+              style="position: sticky; left: 0; top: 0; right: 0"
+              >
                   <th
                       v-for="(col, index) in columns"
                       :key="index"
-                      :style="{ width: col.width, textAlign: col.align }"
+                      :style="{ 'min-width': col.width, textAlign: col.align }"
                       style="text-transform: inherit;"
                   >
                       {{ col.columnName }}
@@ -141,6 +145,9 @@ export default {
     isTable: Boolean,
     maxLength: String,
     isDisabledInput:Boolean,
+    position: String,
+    top: String,
+    right: String,
   },
   emits: [
     "update:modelValue", 
@@ -186,7 +193,7 @@ export default {
     modelValue: function (newValue) {
       console.log("newValue: " + newValue);
       // this.textSelected = newValue;
-      this.findIdexSelected = newValue;
+      // this.findIdexSelected = newValue;
     },
     
     /**

@@ -458,7 +458,45 @@ export default {
      */
      searchAccount : _.debounce(function (number) {
       try {
-        this.listAccounts(this.keyword,this.pageSize, number);
+        let me = this;
+        HTTPAccounts.get(`/filterAccount?keyword=${this.keyword}&pageSize=${this.pageSize}&pageNumber=${number}`)
+        .then(function (response) {
+            me.accounts = response.data.Data;
+            //Xử lý dữ liệu trả về
+            me.accounts.forEach(account =>{
+              account.IsActive = commonJs.formatActiveAccount(account.IsActive);
+              account.Type = commonJs.formatTypeAccount(account.Type);
+            });
+            console.log(me.accounts);
+            me.totalPage = response.data.totalPage;
+            me.totalRecord = response.data.totalRecord;
+          })
+          .then(function(){
+            //Xử lý những tài khoản không có tài khoản cha
+            me.accounts.forEach((item) => (item.ParentId = "0"));
+
+            //Lấy ra những id là tài khoản cha
+            let accountIds = me.accounts.map((account) => account.AccountId);
+            //Lấy ra số tài khoản con tương ứng với tài khoản cha
+            let countChildren = 0;
+
+            me.childrenAccounts.map((children) => {
+              try {
+                if(accountIds.includes(children.ParentId)){
+                  me.accounts.push(children);
+                  accountIds = me.accounts.map((account) => account.AccountId);
+                  countChildren++;
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            })
+            me.totalRecord +=  countChildren;
+            me.isShowLoading = false
+          })
+          .catch(error => console.log(error))
+
+        // this.listAccounts(this.keyword,this.pageSize, number);
       } catch (error) {
         console.log(error);
       }
