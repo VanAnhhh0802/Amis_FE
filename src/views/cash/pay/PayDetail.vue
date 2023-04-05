@@ -1,5 +1,5 @@
 <template >
-    <div class="payment">
+    <div class="payment" >
         <div class="payment-header"> 
             <div class="payment-header__left">
                 <div class="m-icon">
@@ -40,12 +40,12 @@
                         <div style="min-width: 363px;">
                             <label for="">Mã đối tượng  </label>
                             <MCombobox
-                            v-model="newPayment.ObjectId"
                             style="width: 363px"
                             tabIndex="1"
                             isTable="true"
                             propName="ObjectCode"
                             propValue="ObjectId"
+                            v-model="newPayment.ObjectId"
                             api="https://localhost:7232/api/v1/Objects/GetAll"
                             @changeObject="getObject"
                             :columns = "this.comboboxObject"
@@ -218,6 +218,7 @@
                                 
                                 >
                                     <MCombobox
+                                    v-if="this.newPaymentDetails.length "
                                     :columns = "this.comboboxAccount"
                                     api="https://localhost:7232/api/v1/Accounts/All"
                                     isTable="true"
@@ -300,7 +301,7 @@
                         <tfoot style="position: sticky;bottom: 0;z-index: 1;">
                         <tr style="border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5;">
                             <th class="text-align-center no-border" ></th>            
-                            <th class="text-align-center w-200 no-border" style="text-transform: inherit">Tổng{{ this.isDisabled }}</th>
+                            <th class="text-align-center w-200 no-border" style="text-transform: inherit"></th>
                             <th class="text-align-left w-150 no-border" ></th>
                             <th class="text-align-left no-border" style="min-width: 200px;"></th>
                             <th class="text-align-right w-150 no-border">{{ this.formatMoney(this.newPayment.TotalAmount) }}</th>
@@ -345,7 +346,7 @@
             </MButton>
             <div class="flex col-gap-12 form__footer-right">
                 <div class="tooltip"
-                v-if="!this.isDisabled && !this.isWatch"
+                v-if="!isShowBtnEdit && !this.isWatch"
                 >
                     <MButton
                         id="btn--save"
@@ -359,7 +360,7 @@
                     <div class="tooltip-text tooltip-text-payment">Ctrl + S {{ !this.isWatch }}</div>
                 </div>
                 <div class="tooltip"
-                    v-if="this.isDisabled && this.isWatch"
+                    v-if="isShowBtnEdit && this.isWatch"
                 >
                     <MButton
                         id="btn--edit"
@@ -402,15 +403,7 @@
     @btnClickYes="SavPayment"
     ></MDialogWarning>
     <!-- Toast Message -->
-    <MToast
-        v-if="isShowToast"
-        @closeToast="closeToast"
-        @onHideToast="onHideToast"
-        :toastType="toastContent"
-        :toastTitle="toastTitle"
-        :isSuccessToast="isSuccessToast"
-        :isErrorToast="isErrorToast"
-    ></MToast>
+   
 </template>
 <script>
 import resource from "@/lib/resource";
@@ -424,8 +417,7 @@ import MComboButton from "@/components/bases/Button/MComboButton.vue";
 import MDatePicker from "@/components/bases/DatePicker/MDatePicker.vue";
 import MLoading from "@/components/bases/Loading/MLoading.vue";
 import MButton from "@/components/bases/Button/MButton.vue";
-import MToast from "@/components/bases/Toast/MToast.vue";
-import { HTTPPayments, HTTPPaymentsDetails } from '@/script/api';
+import {  HTTPPayments, HTTPPaymentsDetails } from '@/script/api';
 import CommonJs from "@/script/common";
 import MISAEnum from '@/lib/enum';
 
@@ -433,7 +425,6 @@ export default {
     name : "PayDetail",
     components: {
     MInput,
-    MToast,
     MDropCombobox,
     MInputMoney,
     MCombobox,
@@ -463,7 +454,9 @@ export default {
         borderErrorDebitAccount:false,
         borderErrorCreditAccount: false,
         //
+        isShowDetails: false,
         isEdit: false,
+        isShowBtnEdit:false,
         isDuplicate: null,
         isWatch: null,
         textBtnSave: null,
@@ -499,7 +492,10 @@ export default {
                 Description: resource.Vi.PEYMENT.DEFAULT.reason ,
             }
         ],
+        newEmployee: [],
+        newObject: [],
         errorMessage: [],
+        newAccount: [],
         //#region 
         //Text resources
         indexCoboButtonLocal: localStorage.actionSelect,
@@ -514,6 +510,23 @@ export default {
       }
     },
     async created(){
+        // await HTTPEmployees.get("/GetAll")
+        // .then((response) => {
+        //     this.newEmployee = response.data;
+        //     console.log("Employee", this.newEmployee);
+        // })
+        //  await HTTPObjects.get("/GetAll")
+        //  .then((response) => {
+        //     this.newObject = response.data;
+        //     console.log("Object: " + this.newObject);
+        //  });
+
+        //  await HTTPAccounts.get("/All")
+        //  .then((response) => {
+             
+        //      this.newAccount = response.data;
+        //      console.log("newAccount: " + this.newAccount);
+        //  })
         //Check nếu tồn tại id không và không tồn tại form mode thì là sửa 
         this.idPayment = this.$route.query.id;
         //Nếu tồn tại id và form mode = 3 thì là nhân bản
@@ -533,7 +546,7 @@ export default {
             }
         }
         else {
-        await    this.getNewNumber();
+        await this.getNewNumber();
         }
         
         this.$nextTick(function () {
@@ -553,7 +566,9 @@ export default {
             console.log("newValue dis", newValue);
         },
         newPaymentDetails: {
-            handler: function(){
+            handler: function(newValue){
+            console.log("paymentdetail", newValue);
+             
             this.newPayment.TotalAmount = this.newPaymentDetails.reduce((result, current) => {
                 console.log("result",result);
                 return result += current.Amount;
@@ -563,12 +578,17 @@ export default {
         },
         newPayment: {
             handler: function(newValue){
+                this.newPayment = newValue;
                 console.log("payment",newValue);
             },
             deep: true,
         }
     },
     methods: {
+        /**
+         * Hàm focus vào ô input đầu tiên
+         * Author: Văn ANh (4//4/2023)
+         */
         firstTab(){
             try {
                 this.$nextTick(function () {
@@ -701,14 +721,20 @@ export default {
          * Author: văn Anh (4/4/2023)
          */
         handlePaymentDate(){
+            try {
             this.newPayment.PostedDate = this.newPayment.PaymentDate
+                
+            } catch (error) {
+                console.log(error);
+            }
         },
         /**
          * Xử lý khi date thay đổi
          * Author: văn Anh (4/4/2023)
          */
         handleChangeDate(){
-            if (this.newPayment.PaymentDate && this.newPayment.PostedDate){
+            try {
+                if (this.newPayment.PaymentDate && this.newPayment.PostedDate){
                 let datePayment  = this.newPayment.PaymentDate.getTime();
                 let datePosted  = this.newPayment.PostedDate.getTime();
 
@@ -718,6 +744,10 @@ export default {
 
                 }
             }
+            } catch (error) {
+                console.log(error);
+            }
+            
         },
         /**
          * Xử lý click nút sửa bỏ disable các trường nhập liệu => Thực hiện gọi sửa nhân viên
@@ -748,16 +778,19 @@ export default {
          */
         async getPayment(id){
             try {
-                await HTTPPayments.get(`/${id}`)
-                .then(response => {
-                    this.newPayment = response.data;
-                })
-                .then(()=>{
-                    HTTPPaymentsDetails.get(`/getDetail/${id}`)
+                await HTTPPaymentsDetails.get(`/getDetail/${id}`)
                     .then((response) => {
                         this.newPaymentDetails = response.data;
                     })
-                })
+                    .then(()=> {
+                         HTTPPayments.get(`/${id}`)
+                        .then(response => {
+                            this.newPayment = response.data;
+                        })
+
+                    })
+
+                
             } catch (error) {
                 console.log(error);
             }
@@ -853,9 +886,11 @@ export default {
                     if(!isSaveAndAdd){
                             this.newPayment.PaymentId = response.data;
                             this.isDisabled = true;
+                            this.isShowBtnEdit = true;
                         }
                         else if (this.indexCoboButtonLocal == "0"){
                             this.resetForm();
+                             this.getNewNumber();
                         }
                         else {
                             this.closeForm();
@@ -883,7 +918,7 @@ export default {
          * Handle Sủa phiếu chi
          * Author: Văn Anh (4/3/2023)
          */
-        async handleSubmitEdit(isEdit, toastMessage){
+        async handleSubmitEdit(isEdit){
             try {
                 const response = await HTTPPayments.put(`/${this.newPayment.PaymentId}`,[
                     {
@@ -902,8 +937,7 @@ export default {
                     }
                 ]);
                 if(response){
-                console.log(toastMessage);
-                    
+                    console.log(isEdit);
                     this.newPaymentDetails.PaymentId = response.data;
                     this.newPayment.PaymentId = response.data;
                     this.isDisabled = true;
@@ -943,6 +977,10 @@ export default {
         //#endregion
 
         //#region Các sự kiện liên quan đến định dạng
+        /**
+         * Hàm kiếm tra các trường nhập liệu đúng format
+         * Author: văn ANh (1/4/2023)
+         */
         validateData(){
             try {
                 this.errorMessage = [];
@@ -1102,15 +1140,12 @@ export default {
          * Author: Văn Anh (4/3/2023)
          */
         closeForm(){
-            // if (this.isAdd){
-                console.log(this.$router.back);
-                this.$router.back();
-            // }
-            // else {
-            //     this.$router.push({
-            //     path: "/cash/pay"
-            //     })
-            // }
+            try {
+                this.$router.go(-1);
+                
+            } catch (error) {
+                console.log(error);
+            }
         },
         resetForm(){
             this.newPayment = {

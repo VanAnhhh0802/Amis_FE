@@ -44,6 +44,8 @@
                         :tabIndex ="2"
                         width="100%"
                         bottom="12px"
+                        ref="AccountName"
+                        nameRef="AccountName"
                         @inputOutFocus="this.borderAccountNameError = false"
                         :name="this.nameInput"
                         :error = "this.borderAccountNameError"
@@ -81,7 +83,7 @@
                         <label for="">Tính chất
                             <span class="input--required">*</span>
                         </label>
-                        <MCombobox
+                        <MComboboxV1
                             :list="this.comboboxNature"
                             v-model="this.newAccount.Type"
                             propValue="optionId"
@@ -97,7 +99,7 @@
                             :tooltipContent = "this.tooltipContentNature"
                             @changeObject="setType"
 
-                        ></MCombobox>
+                        ></MComboboxV1>
                     </div>
                 </div>
                 <div class="row" style="width: 100%">
@@ -480,6 +482,9 @@
     title="Cảnh báo"
     @btnCloseDialog="hideDialogError"
     ></MDialogError>
+
+
+
     <MDialog v-if="isShowDialogWarning" 
     @btnCloseDialog="closeDialogWarning"
     @btnYes="btnSaveOnClick(false)"
@@ -526,6 +531,7 @@ import MInput from '@/components/bases/input/MInput.vue';
 import MButton from '@/components/bases/Button/MButton.vue';
 import MCombobox from '@/components/bases/combobox/MCombobox.vue';
 import MComboboxV2 from '@/components/bases/combobox/MComboboxV2.vue';
+import MComboboxV1 from '@/components/bases/combobox/MComboboxV1.vue';
 import MDialog from '@/components/bases/Dialog/MDialog.vue';
 import MDialogError   from '@/components/bases/Dialog/MDialogError.vue';
 import resource from '@/lib/resource';
@@ -537,6 +543,7 @@ export default {
     components: {
         MInput,
         MCombobox,
+        MComboboxV1,
         MComboboxV2,
         MDialog,
         MButton,
@@ -722,14 +729,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
             this.isShowDialogError = false;
             this.$emit("closeDetail");
         },
-        /**
-         * Hàm ẩn dialog 
-         * Author: Văn Anh (23/3/2023)
-         */
-        hideDialogError(){
-            this.isShowDialogError = false;
-            this.inputErrorFocus();
-        },
+        
         
         //#region sự kiện sửa
         async getAccountId(id){
@@ -861,12 +861,13 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
             console.log(this.newAccount);
             try {
                 //Hiển thị loading
-                var valid = this.validate();
+                var valid = await this.validate();
                 //Validate dữ li
                 if (valid) {
                 this.isShowDialogWarning = false;
                 this.dialogMessage = this.errorMessage[0];
                 this.isShowDialogError = true;
+
                 } else {
                 this.isShowLoading = true;
                 if(!this.newAccount.AccountId || this.DuplicateAccount){
@@ -940,9 +941,6 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                     this.errorMessage.push(resource.Vi.ACCOUNT.TOOLTIP_ERROR.TITLE_ACCOUNT_NAMBER_MINLENGTH);
                 }
                 else if(this.parentNumber){
-                    console.log("this.parentNumber",this.parentNumber);
-                    console.log("this.parentNumber",this.newAccount.AccountNumber);
-                    
                     //Kiểm tra nếu có tài khoản cha thì số tài khoản bắt đầu từ tài khoản cha
                     let regex = new RegExp(`^${this.parentNumber}*`)
                     if(!regex.test(this.newAccount.AccountNumber)){
@@ -1005,26 +1003,44 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
         /**
          * Hàm focus khi có lỗi xảy ra
          */
-        inputErrorFocus() {
+        async inputErrorFocus() {
             try {
                 if (this.borderAccountNumberError){
-                    this.$nextTick(function () {
+                   
                         this.$refs.AccountNumber.inputFocus();
-                    });
+                
                 }
-                if (this.borderAccountNameError){
+
+                else if (this.borderAccountNameError){
                     this.$nextTick(function () {
                         this.$refs.AccountName.inputFocus();
                     });
+                    
                 }
-                if (this.borderNatureError){
-                    this.$nextTick(function () {
+                else if (this.borderNatureError){
+                         
                         this.$refs.AccountType.comboboxFocus();
-                    });
+                    
                 }
             } catch (error) {
                 console.log(error);
             }
+        },
+        /**
+         * Hàm ẩn dialog 
+         * Author: Văn Anh (23/3/2023)
+         */
+         async hideDialogError(){
+            try {
+                this.isShowDialogError = false;
+                this.validate();
+              await  this.inputErrorFocus();
+                
+            } catch (error) {
+                console.log(error);
+            }
+
+            
         },
         //Hàm dùng chung xử lý lỗi nhập vượt quá độ dài
         outLengthValid (value, number){

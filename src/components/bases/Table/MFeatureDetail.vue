@@ -67,7 +67,7 @@
         </template>
       </MDialog>
       <MDialogError
-      v-if="isShowDialogErr = true"
+      v-if="isShowDialogErr "
       :title="this.titleError"
       :message="this.messageError"
       @btnCloseDialog="closeDialog"
@@ -76,7 +76,7 @@
     <MDialogWarning 
     v-if="isShowDialogWarning"
     :message="this.dialogMessage"
-    @closeDialog="closeDialogWarning()"
+    @btnCloseDialog="this.isShowDialogWarning= false"
     @btnClickYes="btnDialogWarningClickYes"
   />
   <MLoading
@@ -138,7 +138,8 @@ export default {
         this.handleAccountActive(this.accountId, this.isParent, this.isShowActive);
       },
       closeDialogWarning(){
-        this.isShowDialogWarning= false
+        console.log("aaaaa");
+        this.isShowDialogWarning= false;
       },
       confirmActive(){
         this.dialogMessage = resource.Vi.ACCOUNT.DIALOG.TITLE_ACCOUNT_PARENT_ACTIVE;
@@ -174,8 +175,7 @@ export default {
                  await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId, ...accountIds])
                 .then(res => {
                   console.log(res);
-                  // this.$emits("activeResponse");
-              // this.$parent.reloadData();
+                this.isTrue = true;
                 })
             } 
             else {
@@ -183,8 +183,6 @@ export default {
               .then(res => {
                 console.log(res);
                 this.isTrue = true;
-                // this.$emits("activeResponse")
-              // this.$parent.reloadData();
               })
             }
             
@@ -197,7 +195,7 @@ export default {
                 var parentActive = response.data.IsActive;
                 //Nếu tài tài khoản cha Đang là Ngừng sử dụng thì show lỗi
                 if (!parentActive){
-                  this.isShowDialog = true;
+                  this.isShowDialog = false;
                   this.dialogMessage = resource.Vi.ACCOUNT.DIALOG.TITLE_ACCOUNT_CHILDREN_ACTIVE;
                   this.isShowDialogWarning = true;
                 }
@@ -205,7 +203,6 @@ export default {
                   await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
                   .then(res => {
                     console.log(res);
-                      // this.$emits("activeResponse");
                     this.isTrue = true;
 
                   })
@@ -217,7 +214,6 @@ export default {
               await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
               .then(res => {
                 console.log(res);
-                  // this.$emits("activeResponse");
                 this.isTrue = true;
                 
               })
@@ -225,7 +221,6 @@ export default {
           }
           
           if(this.isTrue){
-          console.log("this", this.$emit);
             this.$emit("activeResponse");
           }
         } catch (error) {
@@ -303,6 +298,7 @@ export default {
          * Author: Văn Anh (19/3/2023)
          */
         showOnDialogDelete(isParent){
+          console.log("isParent",isParent);
           if(isParent){
             console.log(isParent);
             this.isShowDialogErr = true;
@@ -314,6 +310,7 @@ export default {
          * Author: Văn Anh (19/3/2023)
          */
         closeDialog(){
+          this.isShowDialogWarning= false;
           this.isShowDialog = false;
           this.isShowDialogErr = false;
         },

@@ -179,11 +179,15 @@ export default {
     else {
       this.entitySearch =[...this.list];
       this.entities =[...this.list];
+      this.setItemSelected();
+
       console.log("list", this.list);
     }
     if (this.options){
       this.entitySearch = [...this.options]
       this.entities = [...this.options]
+      this.setItemSelected();
+
     }
     this.setItemSelected();
     if (!this.defaultName){
@@ -194,17 +198,13 @@ export default {
     }
   },
   updated(){
-    
+   
+
   },
   watch: {
-    // defaultName: function(){
-    //   console.log("default name", this.defaultName);
-    // },
-
-    modelValue: function (newValue) {
+    modelValue: async function (newValue) {
       if(newValue){
-        this.setItemSelected();
-
+        await this.setItemSelected();
       }
       console.log("newValue: " + newValue);
       // this.textSelected = newValue;
@@ -242,7 +242,9 @@ export default {
       var me = this;
       //Tìm index của item đã được chọn
       let findIdex = this.entitySearch.findIndex(
-        (item) => item[me.propValue] == me.itemSelected[me.propValue]
+        (item) => {
+          console.log("item", item);
+          item[me.propValue] == me.itemSelected[me.propValue]}
       );
       return findIdex;
     },
@@ -387,10 +389,6 @@ export default {
             item[me.propValue] == me.modelValue
           }
         );
-
-        //Truyền bậc của tài khoản cha 
-        
-
         //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input
         if (entitySelected) {
           this.textSelected = entitySelected[this.propName];

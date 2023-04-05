@@ -16,4 +16,6 @@ export const HTTPPayments = axios.create({
 export const HTTPPaymentsDetails = axios.create({
   baseURL: "https://localhost:7232/api/v1/PaymentDetails"
 })
-
+export const HTTPObjects = axios.create({
+  baseURL: "https://localhost:7232/api/v1/Objects"
+})

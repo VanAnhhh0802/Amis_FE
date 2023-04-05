@@ -24,6 +24,7 @@
             text="Không"
             @click="hideDialog"
             >
+            
         </MButton>
         <MButton
             class="btn btn--primary dialog__btn--acept"
@@ -54,6 +55,7 @@ export default {
          */
         hideDialog(){
             this.$emit("btnCloseDialog")
+            
             console.log("cickclose", this.$emit("btnCloseDialog"));
         },
         btnClick(){

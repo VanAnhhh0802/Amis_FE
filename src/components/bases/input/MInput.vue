@@ -127,9 +127,9 @@ export default {
      */
     inputFocus(){
       try {
-        this.$nextTick(function () {
+        // this.$nextTick(function () {
           this.$refs[this.nameRef].focus();
-        });
+        // });
       }
       catch (error) {
         console.log(error);

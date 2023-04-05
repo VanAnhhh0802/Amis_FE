@@ -63,7 +63,7 @@
             :sorting="false"
         >
           <DxScrolling mode="standard" />
-          <DxPaging :enabled="false" :page-size="10" />expandedRowKeys
+          <DxPaging :enabled="false" :page-size="10" />
           <DxPager
             :show-page-size-selector="true"
             :allowed-page-sizes="allowedPageSizes"
@@ -71,7 +71,7 @@
           />
           <DxColumn :width="130" data-field="AccountNumber" caption="Số tài khoản" />
           <DxColumn :width="250" data-field="AccountName" caption="Tên tài khoản" />
-          <DxColumn :width="100" data-field="Type" caption="Tính chất" />
+          <DxColumn :width="150" data-field="Type" caption="Tính chất" />
           <DxColumn :width="200" data-field="EnglishName" caption="Tên tiếng anh" />
           <DxColumn :width="316" data-field="Description" caption="Diễn giải" />
           <DxColumn :width="120" data-field="IsActive" caption="Trạng thái" style="display: none"/>
@@ -378,11 +378,13 @@ export default {
       btnToggleAccount(){
         try {
           this.isExpandList = !this.isExpandList;
+          //Kiểm tra trong mảng account mà tồn tại accountid return mảng các accountid
           const newParentIdList = this.accounts.map((item) => {
             if(item.AccountId){
               return item.AccountId
             }
           });
+          console.log("paren", newParentIdList);
           this.newExpandedRowKeys = [...newParentIdList];
         } catch (error) {
           console.log(error);

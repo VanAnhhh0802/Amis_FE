@@ -58,44 +58,14 @@
         </a>
       </div>
       <!-- TABLE -->
-      <div class="wrapper-table" v-if="isTable && isShowData && !isDisabledInput">     
-        <table class="table table-cbo">
-            <tbody class="tbd" ref="refList">
-                <tr class="table-row">
-                    <th
-                        v-for="(col, index) in columns"
-                        :key="index"
-                        :style="{ width: col.width, textAlign: col.align }"
-                        style="text-transform: inherit;"
-                    >
-                        {{ col.columnName }}
-                    </th>
-                </tr>
-                <tr
-                    ref="refItem"
-                    class="table-cbo-row"
-                    v-for="(option, index) in entities"
-                    :key="index"
-                    @click="itemOnSelect(option, index)"
-                    :class="{ 'combobox-item--active': index == indexItemSelect }"
-                >
-                    <td
-                        v-for="(col, index) in columns"
-                        :key="index"
-                    >
-                        {{ option[col.identityOption] }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
+      
   </div>
   </template>
   <script>
   import axios from "axios";
   // import MTableCombobox from "./MTableCombobox.vue";
   export default {
-    name: "MComboboxV2",
+    name: "MComboboxV1",
     components: {
       // MTableCombobox,
     },
@@ -141,6 +111,9 @@
       isTable: Boolean,
       maxLength: String,
       isDisabledInput:Boolean,
+      position: String,
+      top: String,
+      right: String,
     },
     emits: [
       "update:modelValue", 
@@ -152,15 +125,12 @@
        "removeParentId",
        "onChangeObject"
     ],
-    created() {
-
+    async created() {
       if (this.api) {
-        console.log("api", this.api);
-        axios
+       await axios
           .get(this.api)
           .then((data) => {
             this.entities = [...data.data]; 
-            console.log("data", this.entities);
             this.entitySearch = data.data;
             //Gán mảng search để khi thay đổi thì không ảnh hưởng  đến mảng entities
             // this.entitySearch = data.data;
@@ -172,26 +142,44 @@
             console.log(response);
           });
       }
-      
-    },
-    updated(){
-      if(this.textSelected){
-        this.setItemSelected();
+      else {
+        this.entitySearch =[...this.list];
+        this.entities =[...this.list];
+        console.log("list", this.list);
+      }
+      if (this.options){
+        this.entitySearch = [...this.options]
+        this.entities = [...this.options]
+      }
+      this.setItemSelected();
+      if (!this.defaultName){
+        this.textSelected = null;
+      }
+      else {
+        this.textSelected = this.defaultName;
       }
     },
+    updated(){
+      this.entitySearch =[...this.list];
+        this.entities =[...this.list];
+        console.log("list", this.list);
+  
+    },
     watch: {
-      modelValue: {
-        handler: function () {
-          // if (!newValue && !this.defaultName) {
-          //   this.textSelected = "";
-          // }
-          if (this.modelValue || this.modelValue === 0) {
-          this.setItemSelected();
-          }
-        },
-        // immediate: true,
+     
+  
+      modelValue: async function (newValue) {
+        if(newValue){
+          await this.setItemSelected();
+  
+        }
+        console.log("newValue: " + newValue);
+        // this.textSelected = newValue;
+        // this.findIdexSelected = newValue;
       },
-      
+      propName:function(newValue) {
+        console.log("newValue: " + newValue);
+      },
       /**
        * Hàm theo dõi border combobox khi bị lỗi
        * Author: Văn Anh(25/3/2023)
@@ -199,10 +187,19 @@
       inputErrorCombobox: function () {
         this.isError = this.inputErrorCombobox
       },
-      
-      propValue:  function (newValue) {
-        console.log("propValue", newValue);
-      }
+      /**
+       * Hàm theo dõi text combobox sau khi đc chọn
+       */
+      textSelected: {
+        handler: function (newValue) {
+          console.log("textSelected: " + newValue);
+          if (!newValue) {
+            this.$emit("update:modelValue", "");
+          }
+        // this.$emit("update:modelValue", newValue);
+        },
+        immediate: true,
+      },
     },
     computed: {
       /**
@@ -213,8 +210,8 @@
         //Tìm index của item đã được chọn
         let findIdex = this.entitySearch.findIndex(
           (item) => {
-            item[me.propValue] == me.itemSelected[me.propValue]
-          }
+            console.log("item", item);
+            item[me.propValue] == me.itemSelected[me.propValue]}
         );
         return findIdex;
       },
@@ -239,6 +236,7 @@
        */
       inputOnKeyDown(event) {
         try {
+          console.log(event);
           const keyCode = event.keyCode;
           switch (keyCode) {
             case this.MISAEnum.KEY_CODE.ENTER:
@@ -334,9 +332,7 @@
           this.entitySearch = this.entities;
           //Gán item đang đc chọn cho entity
           this.itemSelected = entity;
-          // this.$emit("changeGrande", this.itemSelected?.Grade);
           this.$emit("changeObject", this.itemSelected);
-          console.log(this.$emit("changeObject", this.itemSelected));
           //set index của item được chọn
           this.indexItemSelect = me.findIdexSelected;
           this.textSelected = entity[this.propName];
@@ -357,22 +353,12 @@
           //Tìm item tương ứng với modelValue truyền ở ngoài vào
           let entitySelected = this.entities.find(
             (item) =>  {
-              console.log("item", item[me.propValue]);
-              console.log("item model", me.modelValue);
-              console.log("item",typeof(item[me.propValue]) );
-              console.log("item model", typeof(item[me.propValue]));
-
-              item[me.propValue] == me["modelValue"]
+              item[me.propValue] == me.modelValue
             }
           );
-          
-          //Truyền bậc của tài khoản cha 
-          if(this.isTable){
-            if(entitySelected.Grade){
-              this.$emit("parentAccountNumber", entitySelected.AccountNumber)
   
-            }
-          }
+          //Truyền bậc của tài khoản cha 
+          
   
           //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input
           if (entitySelected) {
@@ -527,4 +513,4 @@
     background: var(--main-color);
   }
   </style>
-  
+v  
