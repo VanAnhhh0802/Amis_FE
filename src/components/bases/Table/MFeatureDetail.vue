@@ -110,6 +110,7 @@ export default {
           dialogMessage:null,
           isShowActive:false,
           isShowDialogWarning: false,
+          isTrue: false,
             //Khai báo biến liên quan đến loading
             isShowLoading: false,
             //Khai biến liên quan đến drop menu
@@ -174,17 +175,19 @@ export default {
                 .then(res => {
                   console.log(res);
                   // this.$emits("activeResponse");
-              this.$parent.reloadData();
+              // this.$parent.reloadData();
                 })
             } 
             else {
               await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
               .then(res => {
                 console.log(res);
-                // this.$emits("activeResponse");
-              this.$parent.reloadData();
+                this.isTrue = true;
+                // this.$emits("activeResponse")
+              // this.$parent.reloadData();
               })
             }
+            
           } 
           else {
             if(this.parentIdChildren && this.parentIdChildren != 0){
@@ -202,7 +205,9 @@ export default {
                   await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
                   .then(res => {
                     console.log(res);
-                      this.$emits("activeResponse");
+                      // this.$emits("activeResponse");
+                    this.isTrue = true;
+
                   })
                 }
               }
@@ -212,9 +217,16 @@ export default {
               await HTTPAccounts.put(`UpdateActive?isActive=${!isActive}`,[accountId])
               .then(res => {
                 console.log(res);
-                  this.$emits("activeResponse");
+                  // this.$emits("activeResponse");
+                this.isTrue = true;
+                
               })
             }
+          }
+          
+          if(this.isTrue){
+          console.log("this", this.$emit);
+            this.$emit("activeResponse");
           }
         } catch (error) {
           console.log(error);

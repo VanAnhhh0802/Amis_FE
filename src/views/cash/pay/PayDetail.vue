@@ -40,7 +40,7 @@
                         <div style="min-width: 363px;">
                             <label for="">Mã đối tượng  </label>
                             <MCombobox
-                            v-model="newPayment.ObjectICode"
+                            v-model="newPayment.ObjectId"
                             style="width: 363px"
                             tabIndex="1"
                             isTable="true"
@@ -49,8 +49,8 @@
                             api="https://localhost:7232/api/v1/Objects/GetAll"
                             @changeObject="getObject"
                             :columns = "this.comboboxObject"
-                            ref="PaymentObjectDetail"
-                            nameRef="PaymentObjectDetail"
+                            ref="PaymentObject"
+                            nameRef="PaymentObject"
                             :isDisabledInput="this.isDisabled"
                             maxLength="20"
                             ></MCombobox>
@@ -72,7 +72,6 @@
                         v-model="newPayment.Receiver"
                         style="width: 363px;"
                         :isDisabled="this.isDisabled"
-                        
                         maxLength="100"
                         />
                         <MInput 
@@ -91,7 +90,6 @@
                         tabIndex="5"
                         :isDisabled="this.isDisabled"
                         maxLength="255"
-
                         style="width: 100%" 
                         v-model="newPayment.Reason" 
                         />
@@ -102,6 +100,7 @@
                             tabIndex="6"
                             style="width: 363px"
                             isTable="true"
+                            v-model="newPayment.EmployeeId"
                             propName="FullName"
                             propValue="EmployeeId"
                             api="https://localhost:7232/api/v1/Employees/GetAll"
@@ -140,7 +139,7 @@
                         :tooltipError = "this.borderErrorPaymentDate"
                         @blurInput = "this.borderErrorPaymentDate = false"
                         :tooltipContent = "this.tooltipContentDate"
-                        @changeDate="handleChangeDate"
+                        @changeDate="handlePaymentDate"
                         />
                     </div>
                     <div style="margin: 16px 0; width: 166px">
@@ -150,21 +149,23 @@
                             :tabIndex="9"
                             style="width: 166px;" 
                             name="PostedDate"
-                            dateName="VoucherDay"
+                            dateName="'PostedDatePicker'"
                             :isDisabled="this.isDisabled"
-                            @changeDate="handlePaymentDate"
+                            @changeDate="handleChangeDate"
                             maxLength="255"
                             :isErrorInput = "this.borderErrorPostedtDate"
                             :tooltipError = "this.borderErrorPostedtDate"
                             @blurInput = "this.borderErrorPostedtDate = false"
                             :tooltipContent = "this.tooltipContentPostedDate"
+                            topTooltip="30px"
+                            left-tooltip="-200px"
                         />
                     </div>
                     <MInput 
                     label="Số phiếu chi" 
                     tabIndex="10"
                     width="166px" 
-                    v-model="newPayment.PaymentNumber"
+                    v-model="this.newPayment.PaymentNumber"
                     ref="PaymentNumber"
                     nameRef="PaymentNumber"
                     :error = "this.borderErrorNumber"
@@ -199,16 +200,16 @@
                         <tbody>
                             <tr
                                 class="employee-infor"
-                                v-for="(detail, index) in newPaymentDetails"
+                                v-for="(detail, index) in this.newPaymentDetails"
                                 :key="index"
-                                :class="{'disable': isDisabled}"
+                                :class="{'disable': this.isDisabled}"
                             >
                                 <td class="text-align-center" style="text-align: center; width: 35px;" >{{ index + 1}}</td>
                                 <td class=" text-align-left">
                                     <MInput 
-                                    v-model="newPaymentDetails[index].Description"
-                                    tabIndex="13"
-                                    :isDisabled="isDisabled"
+                                    v-model="this.newPaymentDetails[index].Description"
+                                    tabIndex="11"
+                                    :isDisabled="this.isDisabled"
                                     style="min-width: 250px; width: 250px;"
                                     />
                                 </td>
@@ -220,8 +221,8 @@
                                     :columns = "this.comboboxAccount"
                                     api="https://localhost:7232/api/v1/Accounts/All"
                                     isTable="true"
-                                    tabIndex="11"
-                                    :isDisabledInput="isDisabled"
+                                    tabIndex="12"
+                                    :isDisabledInput="this.isDisabled"
                                     propValue="AccountId"
                                     propName="AccountNumber"
                                     v-model="this.newPaymentDetails[index].DebitAccount"
@@ -244,8 +245,8 @@
                                     :columns = "this.comboboxAccount"
                                     api="https://localhost:7232/api/v1/Accounts/All"
                                     isTable="true"
-                                    tabIndex="12"
-                                    :isDisabledInput="isDisabled"
+                                    tabIndex="13"
+                                    :isDisabledInput="this.isDisabled"
                                     propValue="AccountId"
                                     propName="AccountNumber"
                                     v-model="this.newPaymentDetails[index].CreditAccount"
@@ -261,8 +262,8 @@
                                 <td class="text-align-right ">
                                     <MInputMoney
                                     style="min-width: 176px;width: 176px;"
-                                    tabIndex="13"
-                                    :isDisabled="isDisabled"
+                                    tabIndex="14"
+                                    :isDisabled="this.isDisabled"
                                     v-model="this.newPaymentDetails[index].Amount"
                                     :maxLength="14"
                                     ></MInputMoney>
@@ -270,8 +271,8 @@
                                 <td class="text-align-left ">
                                     <MCombobox
                                     style="width: 363px; min-width: 175px;width: 175px;"
-                                        v-model="this.newPaymentDetails[index].ObjectId"
-                                        tabIndex="14"
+                                        v-model="detail.ObjectId"
+                                        tabIndex="15"
                                         isTable="true"
                                         propName="ObjectCode"
                                         propValue="ObjectId"
@@ -279,7 +280,7 @@
                                         :columns = "this.comboboxObject"
                                         ref="PaymentDetailObject"
                                         nameRef="PaymentDetailObject"
-                                        :isDisabledInput="isDisabled"
+                                        :isDisabledInput="this.isDisabled"
                                         @changeObject="getObjectDetail(index, $event)"
                                         position="fixed"
                                         top="414px"
@@ -290,6 +291,7 @@
                                 <td
                                     class="tbl-col tbl-col-delete"
                                     style="width: 34px; min-width: 34px"
+                                    :class="{'disable': this.isDisabled}"
                                 >
                                     <div class="delete-icon"></div>
                                 </td>
@@ -298,9 +300,9 @@
                         <tfoot style="position: sticky;bottom: 0;z-index: 1;">
                         <tr style="border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5;">
                             <th class="text-align-center no-border" ></th>            
-                            <th class="text-align-center w-200 no-border" style="text-transform: inherit">Tổng</th>
+                            <th class="text-align-center w-200 no-border" style="text-transform: inherit">Tổng{{ this.isDisabled }}</th>
                             <th class="text-align-left w-150 no-border" ></th>
-                            <th class="text-align-left no-border" style="min-width: 200px;">{{this.newPaymentDetails.Amount}}</th>
+                            <th class="text-align-left no-border" style="min-width: 200px;"></th>
                             <th class="text-align-right w-150 no-border">{{ this.formatMoney(this.newPayment.TotalAmount) }}</th>
                             <th class="text-align-left w-150 no-border"></th>
                             <th class="text-align-left no-border" style="min-width: 200px; background-color:#f5f5f5"></th>
@@ -315,7 +317,7 @@
                     text="Thêm dòng" 
                     class="btn btn--secondary" 
                     style="font-weight: 600; height: 24px; margin-right: 8px;border-color:#8d9096 ; "
-                    tabIndex="15"
+                    tabIndex="16"
                     @click="addRowDetail"
                     :disable="this.isDisabled"
                     ></MButton>
@@ -323,7 +325,7 @@
                     text="Xóa hết dòng" 
                     class="btn btn--secondary"
                      style="font-weight: 600; height: 24px;border-color:#8d9096 ;"
-                    tabIndex="16"
+                    tabIndex="17"
                      @click="deleteRowDetail"
                      :disable="this.isDisabled"
                      ></MButton>
@@ -333,19 +335,21 @@
         <div class="import-footer">
             <MButton 
               class="btn btn--secondary"
-              tabIndex="19"
+              tabIndex="20"
               @click="closeForm"
               text="Hủy"
               style="height: 28px;background-color: #38393d; color: #fff; text-decoration: none;box-sizing: border-box; "
+              @keydown.tab.prevent="firstTab()"
+
             >
             </MButton>
             <div class="flex col-gap-12 form__footer-right">
                 <div class="tooltip"
-                v-if="!this.isDisabled || !this.isWatch"
+                v-if="!this.isDisabled && !this.isWatch"
                 >
                     <MButton
                         id="btn--save"
-                        tabIndex="17"
+                        tabIndex="18"
 
                         class="btn btn--secondary"
                         text="Cất"
@@ -355,11 +359,11 @@
                     <div class="tooltip-text tooltip-text-payment">Ctrl + S {{ !this.isWatch }}</div>
                 </div>
                 <div class="tooltip"
-                    v-if="this.isDisabled || this.isWatch"
+                    v-if="this.isDisabled && this.isWatch"
                 >
                     <MButton
                         id="btn--edit"
-                        tabIndex="17"
+                        tabIndex="18"
                         class="btn btn--secondary"
                         text="Sửa"
                         style="height: 28px; background-color: #38393d; color: #fff"
@@ -369,6 +373,7 @@
                 </div>
 
                 <MComboButton 
+                tabIndex="19"
                 :entities="this.comboButton"
                 :textDefault="this.comboButton[this.indexCoboButtonLocal]?.name"
                 :defaultTooltip="this.comboButton[this.indexCoboButtonLocal]?.tooltipText"
@@ -508,7 +513,7 @@ export default {
         //#endregion
       }
     },
-    created(){
+    async created(){
         //Check nếu tồn tại id không và không tồn tại form mode thì là sửa 
         this.idPayment = this.$route.query.id;
         //Nếu tồn tại id và form mode = 3 thì là nhân bản
@@ -517,19 +522,22 @@ export default {
         this.isWatch = this.$route.query.formMode;
 
         if (this.idPayment || this.isDuplicate || this.isWatch) {
-            this.getPayment(this.idPayment)
-            this.GetPaymentDetailById(this.idPayment);
+           await this.getPayment(this.idPayment)
+            // this.GetPaymentDetailById(this.idPayment);
             //Mếu trạng thái là xem thì disable các trường nhập liệu 
             if(this.isWatch){
                 this.isDisabled = true;
             }
+            else {
+                this.isDisabled = false;
+            }
         }
         else {
-            this.getNewNumber();
+        await    this.getNewNumber();
         }
         
         this.$nextTick(function () {
-            this.$refs.PaymentObject.inputFocus();
+            this.$refs.PaymentObject.comboboxFocus();
         });
     },
     computed: {
@@ -541,16 +549,35 @@ export default {
         }
     },
     watch:{
-        newPaymentDetails: function(newValue, oldValue){
-            console.log("total", newValue, oldValue);
+        isDisabled: function(newValue){
+            console.log("newValue dis", newValue);
+        },
+        newPaymentDetails: {
+            handler: function(){
             this.newPayment.TotalAmount = this.newPaymentDetails.reduce((result, current) => {
+                console.log("result",result);
                 return result += current.Amount;
-
             }, 0);
         },
         deep: true,
+        },
+        newPayment: {
+            handler: function(newValue){
+                console.log("payment",newValue);
+            },
+            deep: true,
+        }
     },
     methods: {
+        firstTab(){
+            try {
+                this.$nextTick(function () {
+                this.$refs.PaymentObject.comboboxFocus();
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        },
         /**
          * Hàm show toast
          */
@@ -629,11 +656,9 @@ export default {
          * Author: Văn Anh (4/3/2023)
          */
         getObjectDetail(index, event){
-            console.log("event",event);
             this.newPaymentDetails[index].ObjectId = event.ObjectId;
             this.newPaymentDetails[index].ObjectCode = event.ObjectCode;
             this.newPaymentDetails[index].ObjectName = event.ObjectName;
-            console.log("event2",this.newPaymentDetails[index]);
         },
         /**
          * Người dùng chọn đối tượng nhận viên ở combobox và gán lại dữ liệu cho đối tượng payment
@@ -661,10 +686,12 @@ export default {
                 this.newPayment.Receiver = event.ObjectName;
                 this.newPayment.Address = event.Address;
                 this.newPayment.Reason = "Lý do chi " + event.ObjectName;
-
-                this.newPaymentDetails.forEach((item) => {
+                
+                this.newPaymentDetails.map((item) => {
                     item.Description =  "Chi tiền cho " +  event.ObjectName;
+                    item.ObjectId = event.ObjectId;
                 });
+                console.log("event",event, this.newPaymentDetails);
             } catch (error) {
                 console.log(error);
             }
@@ -674,26 +701,23 @@ export default {
          * Author: văn Anh (4/4/2023)
          */
         handlePaymentDate(){
-            console.log("date: " ,this.newPayment.PostedDate, this.newPayment.PaymentDate);
-            var date1 = CommonJs.formatDate(this.newPayment.PostedDate);
-            var date2 = CommonJs.formatDate(this.newPayment.PaymentDate);
-            if (date1 === date2) {
-                this.isDateChange = true;
-            } else {
-                this.isDateChange = false;
-            }
+            this.newPayment.PostedDate = this.newPayment.PaymentDate
         },
         /**
          * Xử lý khi date thay đổi
          * Author: văn Anh (4/4/2023)
          */
         handleChangeDate(){
-            if (this.isDateChange){
-                var date = JSON.stringify(this.newPaymentDetails.PostedDate);
-                console.log("date: " + date);
-                this.newPaymentDetails.PaymentDate = JSON.parse(date);
+            if (this.newPayment.PaymentDate && this.newPayment.PostedDate){
+                let datePayment  = this.newPayment.PaymentDate.getTime();
+                let datePosted  = this.newPayment.PostedDate.getTime();
+
+                if(datePayment < datePosted){
+                    this.borderErrorPostedtDate = true;
+                    this.tooltipContentPostedDate = resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.TITLE_ERROR_DATE;
+
+                }
             }
-            this.handlePaymentDate();
         },
         /**
          * Xử lý click nút sửa bỏ disable các trường nhập liệu => Thực hiện gọi sửa nhân viên
@@ -702,6 +726,7 @@ export default {
         btnEditOnClick(){
             this.isDisabled = false;
             this.isWatch = null;
+
         },  
         //#region Sự kiện liên quan đến API
         /**
@@ -723,9 +748,16 @@ export default {
          */
         async getPayment(id){
             try {
-                const response = await HTTPPayments.get(`/${id}`);
-                console.log(response);
-                this.newPayment = response.data;
+                await HTTPPayments.get(`/${id}`)
+                .then(response => {
+                    this.newPayment = response.data;
+                })
+                .then(()=>{
+                    HTTPPaymentsDetails.get(`/getDetail/${id}`)
+                    .then((response) => {
+                        this.newPaymentDetails = response.data;
+                    })
+                })
             } catch (error) {
                 console.log(error);
             }
@@ -814,6 +846,9 @@ export default {
                     });
                     //Gọi api thêm payment details
                      this.handleAddPaymentDetail();
+
+                     //Show toast thông báo
+
                     //Check trạng thái của button
                     if(!isSaveAndAdd){
                             this.newPayment.PaymentId = response.data;
@@ -833,6 +868,9 @@ export default {
                     this.handleException(error)
                 })
                 
+                this.isShowToast = true;
+                    this.changeToastMsg(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.DETAIL.DEBIT_ACCOUNT_ERROR ,false,true, resource.NOTIFICATION_TITLE.SUCCESS)
+                    this.onHideToast();
             } catch (error) {
                 this.isDisabled = false;
 
@@ -883,13 +921,6 @@ export default {
             try {
                 const response = await HTTPPaymentsDetails.post("/InsertMany", this.newPaymentDetails)
                 this.newPaymentDetails = response.data;
-                if(response){
-                    //Show toast thông báo
-                    this.onshowToast();
-                    this.changeToastMsg(resource.PEYMENT.DETAIL.DEBIT_ACCOUNT_ERROR ,false,true, resource.NOTIFICATION_TITLE.SUCCESS)
-                    
-                }
-                return response;
             } catch (error) {
                 this.isDisabled = false
                 console.log(error);
@@ -900,15 +931,15 @@ export default {
          * Lấy detail theo id 
          * Author: văn Anh (4/4/2023)
          */
-        async GetPaymentDetailById(id){
-            try {
-                const response = await HTTPPaymentsDetails.get(`/getDetail/${id}`);
-                this.newPaymentDetails = response.data;
-            } catch (error) {
-                this.handleException(error)
-                console.log(error);
-            }
-        },
+        // async GetPaymentDetailById(id){
+        //     try {
+        //         const response = await HTTPPaymentsDetails.get(`/getDetail/${id}`);
+        //         this.newPaymentDetails = response.data;
+        //     } catch (error) {
+        //         this.handleException(error)
+        //         console.log(error);
+        //     }
+        // },
         //#endregion
 
         //#region Các sự kiện liên quan đến định dạng
@@ -949,22 +980,8 @@ export default {
                 else {
                     this.borderErrorPostedtDate = false;
                 }
-
-                //NGược lại nếu cả ngày hạch toán và ngày chi phiếu k trống thì check xem ngày hạch toán không đc bé hơn ngày chi phiếu
-                if (this.newPayment.PaymentDate && this.newPayment.PostedDate){
-                    let paymentDate = new Date(this.newPayment.PaymentDate);
-                    let postedDate = new Date(this.newPayment.PaymentDate);
-                    console.log("date", paymentDate.getTime(), postedDate.getTime());
-                    if (paymentDate.getTime() < postedDate.getTime()){
-                        this.errorMessage.push(resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.ITTLE_ERROR_DATE);
-                        this.borderErrorPaymentDate = true;
-                        this.tooltipContentDate= resource.Vi.PEYMENT.TOOLTIP_ERROR_PAYMENT.ITTLE_ERROR_DATE
-                    }
-                }
-
                 //Detail
                 this.validateDetail();
-
 
                 if (this.errorMessage.length > 0) {
 
@@ -1085,7 +1102,15 @@ export default {
          * Author: Văn Anh (4/3/2023)
          */
         closeForm(){
-            this.$router.go(-1);
+            // if (this.isAdd){
+                console.log(this.$router.back);
+                this.$router.back();
+            // }
+            // else {
+            //     this.$router.push({
+            //     path: "/cash/pay"
+            //     })
+            // }
         },
         resetForm(){
             this.newPayment = {
@@ -1162,12 +1187,8 @@ export default {
 .tooltip-text-payment{
     top: -29px;
 }
-.disable::after{
-    position: absolute;
-    content:"";
-    width: 100%;
-    height: 100%;
-    background-color: #e5f3ff;
+.disable{
+    background-color: #edeef0;
 }
 tr:hover, tr:hover > td:last-child{
     background-color: #e5f3ff!important;

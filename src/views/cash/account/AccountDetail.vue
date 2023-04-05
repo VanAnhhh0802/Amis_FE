@@ -784,16 +784,16 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
                 IsTrackItem: this.newAccount.IsTrackItem,
                 IsActive: isAdd ? this.newAccount.IsActive :  this.newAccount.IsActive = true,
                 Type: this.newAccount.Type,
-                Object: this.newAccount.Object,
-                Job: this.newAccount.Job,
-                Order: this.newAccount.Order,
-                PurchaseContract: this.newAccount.PurchaseContract,
-                OrganizationUnit: this.newAccount.OrganizationUnit,
-                BankAccount: this.newAccount.BankAccount,
-                ProjectWork: this.newAccount.ProjectWork,
-                SaleContract: this.newAccount.SaleContract,
-                ExpenseItem: this.newAccount.ExpenseItem,
-                Item: this.newAccount.Item,
+                Object: this.newAccount.Object|| 1 ,
+                Job: this.newAccount.Job|| 1,
+                Order: this.newAccount.Order|| 1,
+                PurchaseContract: this.newAccount.PurchaseContract|| 1,
+                OrganizationUnit: this.newAccount.OrganizationUnit|| 1,
+                BankAccount: this.newAccount.BankAccount|| 1,
+                ProjectWork: this.newAccount.ProjectWork|| 1,
+                SaleContract: this.newAccount.SaleContract|| 1,
+                ExpenseItem: this.newAccount.ExpenseItem|| 1,
+                Item: this.newAccount.Item|| 1,
                 CreatedBy: "Hồ Văn Anh",
                 CreatedDate: new Date(),
                 ModifiedBy: "",
@@ -1082,7 +1082,7 @@ emits: ["CloseDetail", "reloadData", "onshowToast", "changeToastMsg"],
     watch: {
         newAccount:  {
             handler(newValue, oldValue) {
-
+                console.log("value 2", newValue);
                 if (oldValue){
                     this.accountChanged = false;
                 }

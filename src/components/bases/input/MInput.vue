@@ -69,22 +69,26 @@ export default {
       isBorder: false,
     };
   },
-  emits: ["update:model-Value", "inputFocus", "inputOutFocus"],
+  emits: ["update:modelValue", "inputFocus", "inputOutFocus"],
  
   watch: {
+    isDisabled: function(newValue){
+      console.log("newValueIn: " + newValue);
+    },
     /**
      * Theo dõi sự thay đổi của biến modelValue
      * @param {} newValue 
      */
     modelValue: function (newValue) {
       this.value = newValue;
+      console.log("value inp", newValue) ;
     },
     /**
      * Theo dõi sự thay đổi của biến value
      * @param {*} newValue 
      */
     value: function (newValue) {
-      this.$emit("update:model-Value", newValue);
+      this.$emit("update:modelValue", newValue);
     },
     error: function () {
         this.isError = this.error;

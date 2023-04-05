@@ -25,7 +25,8 @@
               :class="{
                 'textfield__input':true, 
                 'modal-textfield__input': true,
-                'textfield--error-input': isError }"
+                'textfield--error-input': isError 
+              }"
               type="text"
               placeholder="DD/MM/YYYY"
               :ref="name"
@@ -46,7 +47,9 @@
           </div>
         </template>
       </DatePicker>
-      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;left: -80px">
+      <div class="error-info error-bg" v-if="tooltipError" style="top: 42px;left: -80px"
+      :style="{'top' : topTooltip, 'left': leftTooltip}"
+      >
         <div class="error-arrow error-bg" style="left: 50%;top: -15%;"></div>
         <div class="error-text">{{ tooltipContent }}</div>
       </div>
@@ -65,6 +68,7 @@ export default {
   data() {
     return {
       isError:false,
+      disabled:false,
       date: this.modelValue,
       options: {
         format: "DD/MM/YYYY",
@@ -91,8 +95,12 @@ export default {
     tooltipContent: String,
     style:String,
     isDisabled: Boolean,
+    topTooltip: String,
+    leftTooltip: String,
   },
-  
+  created(){
+    this.disabled = this.isDisabled;
+  },
   methods: {
     /**
      * Truyền sự kiện date thay đổi
@@ -168,6 +176,12 @@ export default {
     }
   },
   watch: {
+    isDisabled: function(newValue){
+      console.log("disabled", newValue);
+     this.disabled = newValue;
+
+    },
+
     date: function(){
       this.$emit("changeDate");
       console.log("change");
@@ -186,14 +200,11 @@ export default {
      * Hàm theo dõi sự thay đổi của isErrorInput mỗi khi validate
      * Author: Văn ANh(2/3/2023)
      */
-    isErrorInput: function () {
-      this.isError = this.isErrorInput ;
-      // if (!this.isErrorInput){
-      //   this.isError = false;
-      // }
-      // else {
-      //   this.isError = true;
-      // }
+    isErrorInput: function (newValue) {
+      console.log("date 1", this.isErrorInput);
+      // this.isError = this.isErrorInput ;
+      this.isError = newValue ;
+      
     }
    
   },

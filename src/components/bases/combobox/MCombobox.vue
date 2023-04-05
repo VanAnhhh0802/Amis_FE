@@ -110,7 +110,7 @@ export default {
       isError: false,
       isShowData: false,
       indexItemSelect: 0,
-      textSelected: this.defaultName,
+      textSelected: null,
       itemSelected: null,
       inputOnFocus: false,
       entities: [],
@@ -159,9 +159,9 @@ export default {
      "removeParentId",
      "onChangeObject"
   ],
-  created() {
+  async created() {
     if (this.api) {
-      axios
+     await axios
         .get(this.api)
         .then((data) => {
           this.entities = [...data.data]; 
@@ -179,23 +179,40 @@ export default {
     else {
       this.entitySearch =[...this.list];
       this.entities =[...this.list];
+      console.log("list", this.list);
     }
     if (this.options){
       this.entitySearch = [...this.options]
       this.entities = [...this.options]
     }
     this.setItemSelected();
+    if (!this.defaultName){
+      this.textSelected = null;
+    }
+    else {
+      this.textSelected = this.defaultName;
+    }
   },
   updated(){
     
   },
   watch: {
+    // defaultName: function(){
+    //   console.log("default name", this.defaultName);
+    // },
+
     modelValue: function (newValue) {
+      if(newValue){
+        this.setItemSelected();
+
+      }
       console.log("newValue: " + newValue);
       // this.textSelected = newValue;
       // this.findIdexSelected = newValue;
     },
-    
+    propName:function(newValue) {
+      console.log("newValue: " + newValue);
+    },
     /**
      * Hàm theo dõi border combobox khi bị lỗi
      * Author: Văn Anh(25/3/2023)
@@ -212,7 +229,7 @@ export default {
         if (!newValue) {
           this.$emit("update:modelValue", "");
         }
-      this.$emit("update:modelValue", newValue);
+      // this.$emit("update:modelValue", newValue);
       },
       immediate: true,
     },
@@ -372,9 +389,7 @@ export default {
         );
 
         //Truyền bậc của tài khoản cha 
-        if(this.isTable){
-            this.$emit("parentAccountNumber", entitySelected.AccountNumber)
-        }
+        
 
         //Nếu tìm thấy prop name truyền vào trùng với propName thì hiển thị lên ô input
         if (entitySelected) {

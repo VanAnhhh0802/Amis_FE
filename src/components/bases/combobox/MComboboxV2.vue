@@ -171,6 +171,7 @@
           });
       }
       
+      
     },
     updated(){
       if(this.textSelected){
